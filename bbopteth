@@ -1,0 +1,64 @@
+import requests
+import time
+import hmac
+import hashlib
+import pybit
+from pybit.unified_trading import HTTP
+
+# Bybit API Credentials (Replace with your actual keys)
+api_key = "1ut2q2Ghfkk3OvSJjQ"
+api_secret = "hiEmO34AXqNs48vT0k06aRlzV1ecpVJXxZfd"
+
+BASE_URL = "https://api.bybit.com"
+# Instantiate the Bybit client
+client = bybit.bybit(test=False, api_key=api_key, api_secret=api_secret)
+
+def get_closest_expiration_date(symbols):
+    # Extract all unique expiration dates
+    expiration_dates = set([symbol.split('-')[1] for symbol in symbols])
+    
+    # Convert expiration dates to datetime objects for sorting
+    expiration_dates = [datetime.datetime.strptime(date, "%d%b%y") for date in expiration_dates]
+    
+    # Find the closest expiration date (the one that is nearest in the future)
+    closest_expiration = min(expiration_dates)
+    
+    # Return all symbols for the closest expiration date
+    closest_symbols = [symbol for symbol in symbols if symbol.split('-')[1] == closest_expiration.strftime("%d%b%y")]
+    
+    return closest_symbols
+
+def place_order(symbol, side, qty, price):
+    try:
+        order = client.place_active_order(
+            symbol=symbol,
+            side=side,
+            order_type="Limit",
+            qty=qty,
+            price=price,
+            time_in_force="GoodTillCancel",
+        )
+        print(f"Order placed: {order}")
+    except Exception as e:
+        print(f"Error placing order: {e}")
+
+# Available BTC Option Symbols (this is a mock list for this example)
+symbols = [
+    'BTC-14FEB25-91000-P', 'BTC-14FEB25-91000-C', 'BTC-14FEB25-94500-P', 'BTC-14FEB25-94500-C', 
+    'BTC-14FEB25-93000-P', 'BTC-14FEB25-93000-C', 'BTC-14FEB25-96500-P', 'BTC-14FEB25-96500-C', 
+    'BTC-14FEB25-98500-P', 'BTC-14FEB25-98500-C', # Add more symbols as needed
+]
+
+# Get the closest expiration symbols
+closest_expiration_symbols = get_closest_expiration_date(symbols)
+
+# Choose a symbol from the filtered list, for example: 'BTC-14FEB25-93000-P'
+selected_symbol = closest_expiration_symbols[0]
+
+# Define order details
+side = "Buy"  # or "Sell" depending on the desired position
+qty = 0.5  # Half a contract
+price = 0.50  # Limit price of 0.50 USD
+
+# Place the order for the selected symbol
+place_order(selected_symbol, side, qty, price)

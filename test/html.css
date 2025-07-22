@@ -1,0 +1,2157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Support Ticketing & Asset Management</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: #3a4da5;
+            color: white;
+            padding: 1rem;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        h1, h2, h3 {
+            color: #3a4da5;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 20px;
+        }
+        
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background-color: #f0f4ff;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e1e5f2;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .btn {
+            background-color: #3a4da5;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #2c3a8a;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e1e5f2;
+        }
+        
+        th {
+            background-color: #f0f4ff;
+            font-weight: 600;
+            color: #3a4da5;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        
+        th:hover {
+            background-color: #e6ebf5;
+        }
+        
+        th::after {
+            content: '';
+            display: inline-block;
+            width: 0;
+            height: 0;
+            margin-left: 5px;
+            vertical-align: middle;
+            border-top: 5px solid #ccc;
+            border-right: 5px solid transparent;
+            border-left: 5px solid transparent;
+            opacity: 0.6;
+        }
+        
+        th.sort-asc::after {
+            border-top: 5px solid #3a4da5;
+            border-bottom: 5px solid transparent;
+        }
+        
+        th.sort-desc::after {
+            border-bottom: 5px solid #3a4da5;
+            border-top: 5px solid transparent;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status-open {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-in-progress {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-closed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .priority-high {
+            color: #dc3545;
+            font-weight: 600;
+        }
+        
+        .priority-medium {
+            color: #ffc107;
+            font-weight: 600;
+        }
+        
+        .priority-low {
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        form {
+            display: grid;
+            grid-gap: 15px;
+        }
+        
+        label {
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .tab-container {
+            margin-top: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e1e5f2;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid #3a4da5;
+            color: #3a4da5;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px 0;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            color: #6c757d;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #3a4da5;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 600px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e1e5f2;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+        }
+        
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .close-modal:hover {
+            color: #333;
+        }
+        
+        .ticket-details {
+            margin-bottom: 20px;
+        }
+        
+        .detail-row {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            margin-bottom: 15px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .timeline {
+            margin-top: 20px;
+            border-left: 2px solid #e1e5f2;
+            padding-left: 20px;
+        }
+        
+        .timeline-item {
+            margin-bottom: 15px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .timeline-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #3a4da5;
+            left: -27px;
+            top: 4px;
+        }
+        
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-author {
+            font-weight: 600;
+        }
+        
+        .timeline-date {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .timeline-content {
+            line-height: 1.5;
+        }
+        
+        .ticket-actions {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e5f2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        canvas {
+            width: 100%;
+            height: 150px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            nav ul {
+                flex-direction: column;
+            }
+            
+            nav ul li {
+                margin: 5px 0;
+            }
+            
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .detail-row {
+                grid-template-columns: 120px 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">IT Support System</div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active" id="dashboard-tab">Dashboard</a></li>
+                    <li><a href="#" id="tickets-tab">Tickets</a></li>
+                    <li><a href="#" id="assets-tab">Assets</a></li>
+                    <li><a href="#" id="reports-tab">Reports</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="tab-container">
+            <!-- Dashboard Tab -->
+            <div class="tab-content active" id="dashboard-content">
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3>Open Tickets</h3>
+                        <div class="number">12</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>In Progress</h3>
+                        <div class="number">8</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Closed Today</h3>
+                        <div class="number">5</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Assets</h3>
+                        <div class="number">47</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Recent Tickets</h2>
+                    </div>
+                    <div class="card-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ticket #</th>
+                                    <th>Subject</th>
+                                    <th>Requester</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-tickets-body">
+                                <tr>
+                                    <td>#TKT-001</td>
+                                    <td>Laptop not connecting to Wi-Fi</td>
+                                    <td>Sarah Johnson</td>
+                                    <td><span class="priority-high">High</span></td>
+                                    <td><span class="status status-in-progress">In Progress</span></td>
+                                    <td>Oct 10, 2023</td>
+                                </tr>
+                                <tr>
+                                    <td>#TKT-002</td>
+                                    <td>Need access to shared drive</td>
+                                    <td>Michael Chen</td>
+                                    <td><span class="priority-medium">Medium</span></td>
+                                    <td><span class="status status-open">Open</span></td>
+                                    <td>Oct 10, 2023</td>
+                                </tr>
+                                <tr>
+                                    <td>#TKT-003</td>
+                                    <td>Printer is out of toner</td>
+                                    <td>Emily Davis</td>
+                                    <td><span class="priority-low">Low</span></td>
+                                    <td><span class="status status-closed">Closed</span></td>
+                                    <td>Oct 9, 2023</td>
+                                </tr>
+                                <tr>
+                                    <td>#TKT-004</td>
+                                    <td>Email configuration issue</td>
+                                    <td>Robert Kim</td>
+                                    <td><span class="priority-high">High</span></td>
+                                    <td><span class="status status-open">Open</span></td>
+                                    <td>Oct 9, 2023</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Asset Overview</h2>
+                    </div>
+                    <div class="card-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Asset ID</th>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Assigned To</th>
+                                    <th>Status</th>
+                                    <th>Last Maintenance</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>AS-1001</td>
+                                    <td>Dell Latitude 5420</td>
+                                    <td>Laptop</td>
+                                    <td>Sarah Johnson</td>
+                                    <td><span class="status status-open">Active</span></td>
+                                    <td>Sept 15, 2023</td>
+                                </tr>
+                                <tr>
+                                    <td>AS-1002</td>
+                                    <td>HP EliteDesk 800</td>
+                                    <td>Desktop</td>
+                                    <td>Michael Chen</td>
+                                    <td><span class="status status-open">Active</span></td>
+                                    <td>Aug 22, 2023</td>
+                                </tr>
+                                <tr>
+                                    <td>AS-2001</td>
+                                    <td>Brother MFC-L8900CDW</td>
+                                    <td>Printer</td>
+                                    <td>N/A</td>
+                                    <td><span class="status status-in-progress">Maintenance</span></td>
+                                    <td>Oct 5, 2023</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tickets Tab -->
+            <div class="tab-content" id="tickets-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Support Tickets</h2>
+                    </div>
+                    <div class="card-body">
+                        <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <button class="btn" id="new-ticket-btn">Create New Ticket</button>
+                            </div>
+                            <div>
+                                <select id="filter-status">
+                                    <option value="">All Status</option>
+                                    <option value="open">Open</option>
+                                    <option value="in-progress">In Progress</option>
+                                    <option value="closed">Closed</option>
+                                </select>
+                                <select id="filter-priority">
+                                    <option value="">All Priorities</option>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <table id="tickets-table">
+                            <thead>
+                                <tr>
+                                    <th data-sort="id">Ticket #</th>
+                                    <th data-sort="subject">Subject</th>
+                                    <th data-sort="requester">Requester</th>
+                                    <th data-sort="assignee">Assignee</th>
+                                    <th data-sort="priority">Priority</th>
+                                    <th data-sort="status">Status</th>
+                                    <th data-sort="date">Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tickets-table-body">
+                                <tr data-ticket-id="TKT-001" data-priority="high" data-status="in-progress" data-date="2023-10-10">
+                                    <td>#TKT-001</td>
+                                    <td>Laptop not connecting to Wi-Fi</td>
+                                    <td>Sarah Johnson</td>
+                                    <td>John Smith</td>
+                                    <td><span class="priority-high">High</span></td>
+                                    <td><span class="status status-in-progress">In Progress</span></td>
+                                    <td>Oct 10, 2023</td>
+                                    <td>
+                                        <button class="btn btn-secondary view-ticket">View</button>
+                                    </td>
+                                </tr>
+                                <tr data-ticket-id="TKT-002" data-priority="medium" data-status="open" data-date="2023-10-10">
+                                    <td>#TKT-002</td>
+                                    <td>Need access to shared drive</td>
+                                    <td>Michael Chen</td>
+                                    <td>Unassigned</td>
+                                    <td><span class="priority-medium">Medium</span></td>
+                                    <td><span class="status status-open">Open</span></td>
+                                    <td>Oct 10, 2023</td>
+                                    <td>
+                                        <button class="btn btn-secondary view-ticket">View</button>
+                                    </td>
+                                </tr>
+                                <tr data-ticket-id="TKT-003" data-priority="low" data-status="closed" data-date="2023-10-09">
+                                    <td>#TKT-003</td>
+                                    <td>Printer is out of toner</td>
+                                    <td>Emily Davis</td>
+                                    <td>Jane Wilson</td>
+                                    <td><span class="priority-low">Low</span></td>
+                                    <td><span class="status status-closed">Closed</span></td>
+                                    <td>Oct 9, 2023</td>
+                                    <td>
+                                        <button class="btn btn-secondary view-ticket">View</button>
+                                    </td>
+                                </tr>
+                                <tr data-ticket-id="TKT-004" data-priority="high" data-status="open" data-date="2023-10-09">
+                                    <td>#TKT-004</td>
+                                    <td>Email configuration issue</td>
+                                    <td>Robert Kim</td>
+                                    <td>Unassigned</td>
+                                    <td><span class="priority-high">High</span></td>
+                                    <td><span class="status status-open">Open</span></td>
+                                    <td>Oct 9, 2023</td>
+                                    <td>
+                                        <button class="btn btn-secondary view-ticket">View</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- New Ticket Modal -->
+                <div id="ticket-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>Create New Ticket</h2>
+                            <span class="close-modal" id="close-ticket-modal">&times;</span>
+                        </div>
+                        <form id="ticket-form">
+                            <div class="form-row">
+                                <div>
+                                    <label for="requester">Requester Name *</label>
+                                    <input type="text" id="requester" required>
+                                </div>
+                                <div>
+                                    <label for="email">Email *</label>
+                                    <input type="email" id="email" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div>
+                                    <label for="subject">Subject *</label>
+                                    <input type="text" id="subject" required>
+                                </div>
+                                <div>
+                                    <label for="priority">Priority *</label>
+                                    <select id="priority" required>
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <label for="description">Description *</label>
+                            <textarea id="description" rows="5" required></textarea>
+                            
+                            <label for="category">Category</label>
+                            <select id="category">
+                                <option value="hardware">Hardware</option>
+                                <option value="software">Software</option>
+                                <option value="network">Network</option>
+                                <option value="access">Access/Permissions</option>
+                                <option value="other">Other</option>
+                            </select>
+                            
+                            <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                                <button type="button" class="btn btn-secondary" id="cancel-ticket">Cancel</button>
+                                <button type="submit" class="btn">Submit Ticket</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- View Ticket Modal -->
+                <div id="view-ticket-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>Ticket Details</h2>
+                            <span class="close-modal" id="close-view-modal">&times;</span>
+                        </div>
+                        
+                        <div id="ticket-details-content">
+                            <div class="ticket-details">
+                                <div class="detail-row">
+                                    <div class="detail-label">Ticket ID:</div>
+                                    <div id="ticket-id">#TKT-001</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Status:</div>
+                                    <div id="ticket-status"><span class="status status-in-progress">In Progress</span></div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Priority:</div>
+                                    <div id="ticket-priority"><span class="priority-high">High</span></div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Requester:</div>
+                                    <div id="ticket-requester">Sarah Johnson</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Requester Email:</div>
+                                    <div id="ticket-email">sarah.johnson@company.com</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Assignee:</div>
+                                    <div id="ticket-assignee">John Smith</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Category:</div>
+                                    <div id="ticket-category">Hardware</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Created Date:</div>
+                                    <div id="ticket-created">Oct 10, 2023</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Last Updated:</div>
+                                    <div id="ticket-updated">Oct 10, 2023</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Subject:</div>
+                                    <div id="ticket-subject">Laptop not connecting to Wi-Fi</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Description:</div>
+                                    <div id="ticket-description">My laptop cannot connect to the company Wi-Fi network. I've tried restarting the computer and the router, but the issue persists. The Wi-Fi icon shows no available networks.</div>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline">
+                                <h3>Activity Timeline</h3>
+                                <div id="ticket-timeline">
+                                    <div class="timeline-item">
+                                        <div class="timeline-header">
+                                            <span class="timeline-author">John Smith (Agent)</span>
+                                            <span class="timeline-date">Oct 10, 2023, 10:30 AM</span>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <p>Assigned to John Smith for resolution. Checking network settings on the user's laptop.</p>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-item">
+                                        <div class="timeline-header">
+                                            <span class="timeline-author">John Smith (Agent)</span>
+                                            <span class="timeline-date">Oct 10, 2023, 10:15 AM</span>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <p>Status changed from Open to In Progress.</p>
+                                        </div>
+                                    </div>
+                                    <div class="timeline-item">
+                                        <div class="timeline-header">
+                                            <span class="timeline-author">Sarah Johnson (Requester)</span>
+                                            <span class="timeline-date">Oct 10, 2023, 9:45 AM</span>
+                                        </div>
+                                        <div class="timeline-content">
+                                            <p>Ticket created with description: "My laptop cannot connect to the company Wi-Fi network. I've tried restarting the computer and the router, but the issue persists. The Wi-Fi icon shows no available networks."</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="add-note-section">
+                                    <h3>Add Note</h3>
+                                    <form id="note-form">
+                                        <textarea id="note-content" rows="4" placeholder="Add your note or update here..."></textarea>
+                                        <div class="ticket-actions">
+                                            <div>
+                                                <label for="update-status">Update Status:</label>
+                                                <select id="update-status">
+                                                    <option value="open">Open</option>
+                                                    <option value="in-progress" selected>In Progress</option>
+                                                    <option value="closed">Closed</option>
+                                                </select>
+                                            </div>
+                                            <div class="action-buttons">
+                                                <button type="button" class="btn btn-secondary" id="cancel-note">Cancel</button>
+                                                <button type="submit" class="btn">Update</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <div class="ticket-actions">
+                                <div class="action-buttons">
+                                    <button class="btn" id="update-ticket">Update Ticket</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assets Tab -->
+            <div class="tab-content" id="assets-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Asset Management</h2>
+                    </div>
+                    <div class="card-body">
+                        <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <button class="btn" id="new-asset-btn">Add New Asset</button>
+                            </div>
+                            <div>
+                                <select id="filter-type">
+                                    <option value="">All Types</option>
+                                    <option value="laptop">Laptop</option>
+                                    <option value="desktop">Desktop</option>
+                                    <option value="printer">Printer</option>
+                                    <option value="phone">Phone</option>
+                                    <option value="monitor">Monitor</option>
+                                </select>
+                                <select id="filter-status-asset">
+                                    <option value="">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="maintenance">Maintenance</option>
+                                    <option value="retired">Retired</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <table id="assets-table">
+                            <thead>
+                                <tr>
+                                    <th data-sort="id">Asset ID</th>
+                                    <th data-sort="name">Name</th>
+                                    <th data-sort="type">Type</th>
+                                    <th data-sort="model">Model</th>
+                                    <th data-sort="assigned">Assigned To</th>
+                                    <th data-sort="status">Status</th>
+                                    <th data-sort="purchase">Purchase Date</th>
+                                    <th data-sort="warranty">Warranty Expires</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assets-table-body">
+                                <tr data-asset-id="AS-1001" data-type="laptop" data-status="active" data-purchase="2022-03-15" data-warranty="2025-03-15">
+                                    <td>AS-1001</td>
+                                    <td>Dell Latitude 5420</td>
+                                    <td>Laptop</td>
+                                    <td>Latitude 5420</td>
+                                    <td>Sarah Johnson</td>
+                                    <td><span class="status status-open">Active</span></td>
+                                    <td>Mar 15, 2022</td>
+                                    <td>Mar 15, 2025</td>
+                                    <td>
+                                        <button class="btn btn-secondary edit-asset">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr data-asset-id="AS-1002" data-type="desktop" data-status="active" data-purchase="2022-01-10" data-warranty="2024-01-10">
+                                    <td>AS-1002</td>
+                                    <td>HP EliteDesk 800</td>
+                                    <td>Desktop</td>
+                                    <td>EliteDesk 800 G6</td>
+                                    <td>Michael Chen</td>
+                                    <td><span class="status status-open">Active</span></td>
+                                    <td>Jan 10, 2022</td>
+                                    <td>Jan 10, 2024</td>
+                                    <td>
+                                        <button class="btn btn-secondary edit-asset">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr data-asset-id="AS-1003" data-type="laptop" data-status="active" data-purchase="2022-11-03" data-warranty="2025-11-03">
+                                    <td>AS-1003</td>
+                                    <td>MacBook Pro 14"</td>
+                                    <td>Laptop</td>
+                                    <td>MacBook Pro M1</td>
+                                    <td>Emily Davis</td>
+                                    <td><span class="status status-open">Active</span></td>
+                                    <td>Nov 3, 2022</td>
+                                    <td>Nov 3, 2025</td>
+                                    <td>
+                                        <button class="btn btn-secondary edit-asset">Edit</button>
+                                    </td>
+                                </tr>
+                                <tr data-asset-id="AS-2001" data-type="printer" data-status="maintenance" data-purchase="2021-02-28" data-warranty="expired">
+                                    <td>AS-2001</td>
+                                    <td>Brother MFC-L8900CDW</td>
+                                    <td>Printer</td>
+                                    <td>MFC-L8900CDW</td>
+                                    <td>N/A</td>
+                                    <td><span class="status status-in-progress">Maintenance</span></td>
+                                    <td>Feb 28, 2021</td>
+                                    <td>Expired</td>
+                                    <td>
+                                        <button class="btn btn-secondary edit-asset">Edit</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- New/Edit Asset Modal -->
+                <div id="asset-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 id="modal-title">Add New Asset</h2>
+                            <span class="close-modal" id="close-asset-modal">&times;</span>
+                        </div>
+                        <form id="asset-form">
+                            <input type="hidden" id="edit-mode" value="false">
+                            <input type="hidden" id="edit-asset-id">
+                            
+                            <div class="form-row">
+                                <div>
+                                    <label for="asset-name">Asset Name *</label>
+                                    <input type="text" id="asset-name" required>
+                                </div>
+                                <div>
+                                    <label for="asset-id">Asset ID *</label>
+                                    <input type="text" id="asset-id" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div>
+                                    <label for="asset-type">Type *</label>
+                                    <select id="asset-type" required>
+                                        <option value="laptop">Laptop</option>
+                                        <option value="desktop">Desktop</option>
+                                        <option value="printer">Printer</option>
+                                        <option value="phone">Phone</option>
+                                        <option value="monitor">Monitor</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="model">Model *</label>
+                                    <input type="text" id="model" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div>
+                                    <label for="serial-number">Serial Number</label>
+                                    <input type="text" id="serial-number">
+                                </div>
+                                <div>
+                                    <label for="purchase-date">Purchase Date</label>
+                                    <input type="date" id="purchase-date">
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div>
+                                    <label for="warranty-expires">Warranty Expires</label>
+                                    <input type="date" id="warranty-expires">
+                                </div>
+                                <div>
+                                    <label for="status-asset">Status</label>
+                                    <select id="status-asset">
+                                        <option value="active">Active</option>
+                                        <option value="maintenance">Maintenance</option>
+                                        <option value="retired">Retired</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <label for="assigned-to">Assigned To</label>
+                            <input type="text" id="assigned-to">
+                            
+                            <label for="notes">Notes</label>
+                            <textarea id="notes" rows="3"></textarea>
+                            
+                            <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                                <button type="button" class="btn btn-secondary" id="cancel-asset">Cancel</button>
+                                <button type="submit" class="btn" id="save-asset">Save Asset</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Tab -->
+            <div class="tab-content" id="reports-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Reports & Analytics</h2>
+                    </div>
+                    <div class="card-body">
+                        <div style="margin-bottom: 20px;">
+                            <button class="btn" id="generate-report">Generate Report</button>
+                        </div>
+                        
+                        <div class="form-row" style="margin-bottom: 20px;">
+                            <div>
+                                <label for="report-type">Report Type</label>
+                                <select id="report-type">
+                                    <option value="ticket-volume">Ticket Volume</option>
+                                    <option value="response-time">Average Response Time</option>
+                                    <option value="resolution-time">Average Resolution Time</option>
+                                    <option value="asset-inventory">Asset Inventory</option>
+                                    <option value="warranty-status">Warranty Status</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="report-period">Time Period</label>
+                                <select id="report-period">
+                                    <option value="7">Last 7 days</option>
+                                    <option value="30">Last 30 days</option>
+                                    <option value="90">Last 90 days</option>
+                                    <option value="180">Last 6 months</option>
+                                    <option value="365">Last year</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="card" style="margin-top: 20px;">
+                            <div class="card-header">
+                                <h3 id="report-title">Ticket Volume Report</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="ticket-chart" width="400" height="150"></canvas>
+                                
+                                <div style="margin-top: 20px;">
+                                    <table id="report-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Period</th>
+                                                <th>New Tickets</th>
+                                                <th>Closed Tickets</th>
+                                                <th>Avg. Resolution Time</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Oct 1-7, 2023</td>
+                                                <td>15</td>
+                                                <td>12</td>
+                                                <td>2.4 days</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Sept 24-30, 2023</td>
+                                                <td>18</td>
+                                                <td>16</td>
+                                                <td>1.8 days</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Sept 17-23, 2023</td>
+                                                <td>12</td>
+                                                <td>14</td>
+                                                <td>2.1 days</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Sept 10-16, 2023</td>
+                                                <td>20</td>
+                                                <td>18</td>
+                                                <td>1.5 days</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card" style="margin-top: 20px;">
+                            <div class="card-header">
+                                <h3>Asset Summary</h3>
+                            </div>
+                            <div class="card-body">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Asset Type</th>
+                                            <th>Total</th>
+                                            <th>Active</th>
+                                            <th>Under Maintenance</th>
+                                            <th>Retired</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Laptops</td>
+                                            <td>15</td>
+                                            <td>14</td>
+                                            <td>1</td>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Desktops</td>
+                                            <td>12</td>
+                                            <td>12</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Printers</td>
+                                            <td>3</td>
+                                            <td>2</td>
+                                            <td>1</td>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Phones</td>
+                                            <td>8</td>
+                                            <td>8</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Monitors</td>
+                                            <td>9</td>
+                                            <td>9</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Total</strong></td>
+                                            <td><strong>47</strong></td>
+                                            <td><strong>45</strong></td>
+                                            <td><strong>2</strong></td>
+                                            <td><strong>0</strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const tabLinks = document.querySelectorAll('nav ul li a');
+            
+            // Setup event listeners for navigation tabs
+            tabLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all tabs
+                    tabLinks.forEach(tab => tab.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Show corresponding content
+                    const tabId = this.id;
+                    showTabContent(tabId);
+                });
+            });
+            
+            function showTabContent(tabId) {
+                // Hide all tab contents
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Show selected tab content
+                if (tabId === 'dashboard-tab') {
+                    document.getElementById('dashboard-content').classList.add('active');
+                } else if (tabId === 'tickets-tab') {
+                    document.getElementById('tickets-content').classList.add('active');
+                } else if (tabId === 'assets-tab') {
+                    document.getElementById('assets-content').classList.add('active');
+                } else if (tabId === 'reports-tab') {
+                    document.getElementById('reports-content').classList.add('active');
+                }
+            }
+            
+            // Modal functionality
+            const newTicketBtn = document.getElementById('new-ticket-btn');
+            const ticketModal = document.getElementById('ticket-modal');
+            const closeTicketModal = document.getElementById('close-ticket-modal');
+            const cancelTicketBtn = document.getElementById('cancel-ticket');
+            const ticketForm = document.getElementById('ticket-form');
+            
+            const viewTicketModal = document.getElementById('view-ticket-modal');
+            const closeViewModal = document.getElementById('close-view-modal');
+            const cancelNoteBtn = document.getElementById('cancel-note');
+            
+            const newAssetBtn = document.getElementById('new-asset-btn');
+            const assetModal = document.getElementById('asset-modal');
+            const closeAssetModal = document.getElementById('close-asset-modal');
+            const cancelAssetBtn = document.getElementById('cancel-asset');
+            const assetForm = document.getElementById('asset-form');
+            const modalTitle = document.getElementById('modal-title');
+            const editMode = document.getElementById('edit-mode');
+            const editAssetId = document.getElementById('edit-asset-id');
+            
+            // Edit asset buttons
+            const editAssetButtons = document.querySelectorAll('.edit-asset');
+            
+            // View ticket buttons
+            const viewTicketButtons = document.querySelectorAll('.view-ticket');
+            
+            // Track tickets for generating unique IDs
+            let ticketCounter = 4; // Starting after existing tickets
+            
+            // Sorting variables
+            let currentSortColumn = null;
+            let currentSortDirection = 'asc';
+            let currentAssetSortColumn = null;
+            let currentAssetSortDirection = 'asc';
+            
+            // Ticket modal - New ticket button
+            newTicketBtn.addEventListener('click', function() {
+                // Reset form
+                ticketForm.reset();
+                
+                // Show modal
+                ticketModal.style.display = 'flex';
+            });
+            
+            // Close ticket modal
+            closeTicketModal.addEventListener('click', function() {
+                ticketModal.style.display = 'none';
+            });
+            
+            cancelTicketBtn.addEventListener('click', function() {
+                ticketModal.style.display = 'none';
+            });
+            
+            // Close modal if clicking outside or on close button
+            ticketModal.addEventListener('click', function(e) {
+                if (e.target === ticketModal || e.target.classList.contains('close-modal')) {
+                    ticketModal.style.display = 'none';
+                }
+            });
+            
+            // Handle ticket form submission
+            ticketForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Get form values
+                const requester = document.getElementById('requester').value;
+                const email = document.getElementById('email').value;
+                const subject = document.getElementById('subject').value;
+                const priority = document.getElementById('priority').value;
+                const description = document.getElementById('description').value;
+                const category = document.getElementById('category').value;
+                
+                // Create formatted date
+                const now = new Date();
+                const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+                const formattedDate = now.toLocaleDateString('en-US', dateOptions);
+                const isoDate = now.toISOString().split('T')[0];
+                
+                // Generate ticket ID
+                ticketCounter++;
+                const ticketId = `#TKT-${String(ticketCounter).padStart(3, '0')}`;
+                const dataTicketId = `TKT-${String(ticketCounter).padStart(3, '0')}`;
+                
+                // Create new ticket row
+                const newRow = document.createElement('tr');
+                newRow.setAttribute('data-ticket-id', dataTicketId);
+                newRow.setAttribute('data-priority', priority);
+                newRow.setAttribute('data-status', 'open');
+                newRow.setAttribute('data-date', isoDate);
+                newRow.innerHTML = `
+                    <td>${ticketId}</td>
+                    <td>${subject}</td>
+                    <td>${requester}</td>
+                    <td>Unassigned</td>
+                    <td><span class="priority-${priority}">${priority.charAt(0).toUpperCase() + priority.slice(1)}</span></td>
+                    <td><span class="status status-open">Open</span></td>
+                    <td>${formattedDate}</td>
+                    <td>
+                        <button class="btn btn-secondary view-ticket">View</button>
+                    </td>
+                `;
+                
+                // Add to tickets table
+                document.getElementById('tickets-table-body').prepend(newRow);
+                
+                // Also add to recent tickets on dashboard if there's space
+                const recentTicketsBody = document.getElementById('recent-tickets-body');
+                if (recentTicketsBody.children.length >= 4) {
+                    recentTicketsBody.deleteRow(recentTicketsBody.rows.length - 1);
+                }
+                const recentRow = document.createElement('tr');
+                recentRow.innerHTML = `
+                    <td>${ticketId}</td>
+                    <td>${subject}</td>
+                    <td>${requester}</td>
+                    <td><span class="priority-${priority}">${priority.charAt(0).toUpperCase() + priority.slice(1)}</span></td>
+                    <td><span class="status status-open">Open</span></td>
+                    <td>${formattedDate}</td>
+                `;
+                recentTicketsBody.insertBefore(recentRow, recentTicketsBody.firstChild);
+                
+                // Update dashboard stats
+                const openTicketsElement = document.querySelector('.stat-card:nth-child(1) .number');
+                openTicketsElement.textContent = parseInt(openTicketsElement.textContent) + 1;
+                
+                // Close modal and reset form
+                ticketModal.style.display = 'none';
+                ticketForm.reset();
+                
+                // Reattach event listener to the new view button
+                attachViewTicketListener(newRow.querySelector('.view-ticket'));
+                
+                // Apply current sorting if needed
+                if (currentSortColumn) {
+                    sortTickets(currentSortColumn, currentSortDirection);
+                }
+                
+                // Show success message
+                alert(`Ticket ${ticketId} has been created successfully!`);
+            });
+            
+            // Function to attach view ticket listener
+            function attachViewTicketListener(button) {
+                button.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const ticketId = row.getAttribute('data-ticket-id');
+                    
+                    // Set ticket details in the modal
+                    document.getElementById('ticket-id').textContent = '#' + ticketId;
+                    
+                    // Get other data from the table cells
+                    const statusCell = row.cells[5].querySelector('.status');
+                    document.getElementById('ticket-status').innerHTML = statusCell.outerHTML;
+                    
+                    const priorityCell = row.cells[4].querySelector('.priority-high, .priority-medium, .priority-low');
+                    document.getElementById('ticket-priority').innerHTML = priorityCell.outerHTML;
+                    
+                    document.getElementById('ticket-requester').textContent = row.cells[2].textContent;
+                    document.getElementById('ticket-assignee').textContent = row.cells[3].textContent;
+                    document.getElementById('ticket-created').textContent = row.cells[6].textContent;
+                    document.getElementById('ticket-updated').textContent = row.cells[6].textContent;
+                    
+                    // For demo purposes, set default values for email and category
+                    document.getElementById('ticket-email').textContent = row.cells[2].textContent.toLowerCase().replace(' ', '.') + '@company.com';
+                    document.getElementById('ticket-category').textContent = 'Hardware';
+                    document.getElementById('ticket-subject').textContent = row.cells[1].textContent;
+                    document.getElementById('ticket-description').textContent = 'This is the detailed description of the issue reported by the user. It provides context and specific information about the problem they are experiencing.';
+                    
+                    // Show the modal
+                    viewTicketModal.style.display = 'flex';
+                });
+            }
+            
+            // Attach listeners to all existing view ticket buttons
+            viewTicketButtons.forEach(button => {
+                attachViewTicketListener(button);
+            });
+            
+            // Close view ticket modal
+            closeViewModal.addEventListener('click', function() {
+                viewTicketModal.style.display = 'none';
+            });
+            
+            cancelNoteBtn.addEventListener('click', function() {
+                document.getElementById('note-content').value = '';
+            });
+            
+            // Close modal if clicking outside
+            viewTicketModal.addEventListener('click', function(e) {
+                if (e.target === viewTicketModal || e.target.classList.contains('close-modal')) {
+                    viewTicketModal.style.display = 'none';
+                }
+            });
+            
+            // Handle note form submission
+            document.getElementById('note-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const noteContent = document.getElementById('note-content').value;
+                const status = document.getElementById('update-status').value;
+                
+                if (!noteContent.trim()) {
+                    alert('Please enter a note before submitting.');
+                    return;
+                }
+                
+                // Create new timeline item
+                const now = new Date();
+                const timeOptions = { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                };
+                const formattedDateTime = now.toLocaleDateString('en-US', timeOptions);
+                
+                const timelineItem = document.createElement('div');
+                timelineItem.className = 'timeline-item';
+                timelineItem.innerHTML = `
+                    <div class="timeline-header">
+                        <span class="timeline-author">John Smith (Agent)</span>
+                        <span class="timeline-date">${formattedDateTime}</span>
+                    </div>
+                    <div class="timeline-content">
+                        <p>${noteContent}</p>
+                    </div>
+                `;
+                
+                // Add to timeline (at the top)
+                const timeline = document.getElementById('ticket-timeline');
+                timeline.insertBefore(timelineItem, timeline.firstChild);
+                
+                // Update status if changed
+                if (status !== getCurrentStatus()) {
+                    updateTicketStatus(status);
+                }
+                
+                // Clear the form
+                document.getElementById('note-content').value = '';
+                
+                alert('Update added successfully!');
+            });
+            
+            // Helper function to get current status
+            function getCurrentStatus() {
+                const statusElement = document.getElementById('ticket-status').querySelector('.status');
+                if (statusElement.classList.contains('status-open')) return 'open';
+                if (statusElement.classList.contains('status-in-progress')) return 'in-progress';
+                return 'closed';
+            }
+            
+            // Helper function to update ticket status
+            function updateTicketStatus(newStatus) {
+                // Update the status display in the modal
+                const statusDisplay = newStatus === 'open' ? 'Open' : 
+                                   newStatus === 'in-progress' ? 'In Progress' : 'Closed';
+                const statusClass = newStatus === 'open' ? 'status-open' : 
+                                  newStatus === 'in-progress' ? 'status-in-progress' : 'status-closed';
+                
+                document.getElementById('ticket-status').innerHTML = `<span class="status ${statusClass}">${statusDisplay}</span>`;
+                
+                // Update the status in the table
+                const ticketId = document.getElementById('ticket-id').textContent.replace('#', '');
+                const row = document.querySelector(`tr[data-ticket-id="${ticketId}"]`);
+                if (row) {
+                    const statusCell = row.cells[5];
+                    statusCell.innerHTML = `<span class="status ${statusClass}">${statusDisplay}</span>`;
+                    row.setAttribute('data-status', newStatus);
+                }
+                
+                // Update the status in the dashboard recent tickets
+                const recentRow = Array.from(document.querySelectorAll('#recent-tickets-body tr')).find(row => 
+                    row.cells[0].textContent === ticketId
+                );
+                if (recentRow) {
+                    const statusCell = recentRow.cells[4];
+                    statusCell.innerHTML = `<span class="status ${statusClass}">${statusDisplay}</span>`;
+                }
+            }
+            
+            // Update ticket button
+            document.getElementById('update-ticket').addEventListener('click', function() {
+                try {
+                    const ticketId = document.getElementById('ticket-id').textContent;
+                    const currentStatus = getCurrentStatus();
+                    
+                    // Get the selected status from the dropdown
+                    const newStatus = document.getElementById('update-status').value;
+                    const statusDisplay = newStatus === 'open' ? 'Open' : 
+                                       newStatus === 'in-progress' ? 'In Progress' : 'Closed';
+                    
+                    // Check if status is actually changing
+                    if (newStatus === currentStatus) {
+                        alert(`Ticket ${ticketId} is already ${statusDisplay.toLowerCase()}. Please select a different status.`);
+                        return;
+                    }
+                    
+                    if (confirm(`Are you sure you want to update ticket ${ticketId}?\n\nStatus will be changed from ${getCurrentStatusDisplay()} to ${statusDisplay}`)) {
+                        updateTicketStatus(newStatus);
+                        
+                        // Add timeline entry
+                        const now = new Date();
+                        const timeOptions = { 
+                            year: 'numeric', 
+                            month: 'short', 
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        };
+                        const formattedDateTime = now.toLocaleDateString('en-US', timeOptions);
+                        
+                        const timelineItem = document.createElement('div');
+                        timelineItem.className = 'timeline-item';
+                        timelineItem.innerHTML = `
+                            <div class="timeline-header">
+                                <span class="timeline-author">System</span>
+                                <span class="timeline-date">${formattedDateTime}</span>
+                            </div>
+                            <div class="timeline-content">
+                                <p>Status changed from ${getCurrentStatusDisplay()} to ${statusDisplay}.</p>
+                            </div>
+                        `;
+                        
+                        // Add to timeline (at the top)
+                        const timeline = document.getElementById('ticket-timeline');
+                        timeline.insertBefore(timelineItem, timeline.firstChild);
+                        
+                        // Update last updated time
+                        document.getElementById('ticket-updated').textContent = now.toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'});
+                        
+                        // Close the modal
+                        viewTicketModal.style.display = 'none';
+                        
+                        alert(`Ticket ${ticketId} has been updated successfully!`);
+                    }
+                } catch (error) {
+                    console.error('Error updating ticket:', error);
+                    alert('An error occurred while updating the ticket. Please try again.');
+                }
+            });
+            
+            // Helper function to get current status display text
+            function getCurrentStatusDisplay() {
+                const statusElement = document.getElementById('ticket-status').querySelector('.status');
+                if (statusElement.classList.contains('status-open')) return 'Open';
+                if (statusElement.classList.contains('status-in-progress')) return 'In Progress';
+                return 'Closed';
+            }
+            
+            // Asset modal - New asset button
+            newAssetBtn.addEventListener('click', function() {
+                // Reset form for new asset
+                editMode.value = 'false';
+                editAssetId.value = '';
+                modalTitle.textContent = 'Add New Asset';
+                document.getElementById('save-asset').textContent = 'Add Asset';
+                
+                // Clear form fields
+                assetForm.reset();
+                
+                // Show modal
+                assetModal.style.display = 'flex';
+            });
+            
+            // Close asset modal
+            closeAssetModal.addEventListener('click', function() {
+                assetModal.style.display = 'none';
+            });
+            
+            cancelAssetBtn.addEventListener('click', function() {
+                assetModal.style.display = 'none';
+            });
+            
+            // Close modal if clicking outside
+            assetModal.addEventListener('click', function(e) {
+                if (e.target === assetModal || e.target.classList.contains('close-modal')) {
+                    assetModal.style.display = 'none';
+                }
+            });
+            
+            // Handle asset form submission
+            assetForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const assetId = document.getElementById('asset-id').value;
+                const assetName = document.getElementById('asset-name').value;
+                const assetType = document.getElementById('asset-type').value;
+                const model = document.getElementById('model').value;
+                const assignedTo = document.getElementById('assigned-to').value || 'N/A';
+                const statusValue = document.getElementById('status-asset').value;
+                
+                // Format status display
+                let statusDisplay, statusClass;
+                switch(statusValue) {
+                    case 'active':
+                        statusDisplay = 'Active';
+                        statusClass = 'status-open';
+                        break;
+                    case 'maintenance':
+                        statusDisplay = 'Maintenance';
+                        statusClass = 'status-in-progress';
+                        break;
+                    case 'retired':
+                        statusDisplay = 'Retired';
+                        statusClass = 'status-closed';
+                        break;
+                    default:
+                        statusDisplay = 'Active';
+                        statusClass = 'status-open';
+                }
+                
+                // Format dates
+                const purchaseDateInput = document.getElementById('purchase-date').value;
+                const warrantyExpiresInput = document.getElementById('warranty-expires').value;
+                
+                const formatDateForDisplay = (dateInput) => {
+                    if (!dateInput) return '';
+                    const date = new Date(dateInput);
+                    return date.toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'});
+                };
+                
+                const purchaseDateDisplay = formatDateForDisplay(purchaseDateInput);
+                const warrantyExpiresDisplay = warrantyExpiresInput ? formatDateForDisplay(warrantyExpiresInput) : 'Expired';
+                
+                if (editMode.value === 'true') {
+                    // Find the row to update
+                    const row = document.querySelector(`tr[data-asset-id="${editAssetId.value}"]`);
+                    if (row) {
+                        // Update the cells
+                        row.setAttribute('data-asset-id', assetId);
+                        row.setAttribute('data-type', assetType);
+                        row.setAttribute('data-status', statusValue);
+                        row.setAttribute('data-purchase', purchaseDateInput);
+                        row.setAttribute('data-warranty', warrantyExpiresInput || 'expired');
+                        
+                        row.cells[0].textContent = assetId;
+                        row.cells[1].textContent = assetName;
+                        row.cells[2].textContent = assetType.charAt(0).toUpperCase() + assetType.slice(1);
+                        row.cells[3].textContent = model;
+                        row.cells[4].textContent = assignedTo;
+                        row.cells[5].innerHTML = `<span class="status ${statusClass}">${statusDisplay}</span>`;
+                        row.cells[6].textContent = purchaseDateDisplay;
+                        row.cells[7].textContent = warrantyExpiresDisplay;
+                    }
+                    
+                    alert(`Asset ${assetId} has been updated successfully!`);
+                } else {
+                    // Create new asset row
+                    const newRow = document.createElement('tr');
+                    newRow.setAttribute('data-asset-id', assetId);
+                    newRow.setAttribute('data-type', assetType);
+                    newRow.setAttribute('data-status', statusValue);
+                    newRow.setAttribute('data-purchase', purchaseDateInput);
+                    newRow.setAttribute('data-warranty', warrantyExpiresInput || 'expired');
+                    
+                    newRow.innerHTML = `
+                        <td>${assetId}</td>
+                        <td>${assetName}</td>
+                        <td>${assetType.charAt(0).toUpperCase() + assetType.slice(1)}</td>
+                        <td>${model}</td>
+                        <td>${assignedTo}</td>
+                        <td><span class="status ${statusClass}">${statusDisplay}</span></td>
+                        <td>${purchaseDateDisplay}</td>
+                        <td>${warrantyExpiresDisplay}</td>
+                        <td>
+                            <button class="btn btn-secondary edit-asset">Edit</button>
+                        </td>
+                    `;
+                    
+                    // Add to table
+                    document.getElementById('assets-table-body').prepend(newRow);
+                    
+                    // Reattach event listener to the new edit button
+                    attachEditAssetListener(newRow.querySelector('.edit-asset'));
+                    
+                    alert(`Asset ${assetId} has been added successfully!`);
+                }
+                
+                // Close modal
+                assetModal.style.display = 'none';
+                
+                // Apply current sorting if needed
+                if (currentAssetSortColumn) {
+                    sortAssets(currentAssetSortColumn, currentAssetSortDirection);
+                }
+            });
+            
+            // Function to attach edit asset listener
+            function attachEditAssetListener(button) {
+                button.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const assetId = row.getAttribute('data-asset-id');
+                    
+                    // Set edit mode
+                    editMode.value = 'true';
+                    editAssetId.value = assetId;
+                    modalTitle.textContent = 'Edit Asset';
+                    document.getElementById('save-asset').textContent = 'Update Asset';
+                    
+                    // Fill form with current data
+                    document.getElementById('asset-id').value = row.cells[0].textContent;
+                    document.getElementById('asset-name').value = row.cells[1].textContent;
+                    document.getElementById('asset-type').value = row.cells[2].textContent.toLowerCase();
+                    document.getElementById('model').value = row.cells[3].textContent;
+                    
+                    // Extract assigned to (handle N/A case)
+                    const assignedToText = row.cells[4].textContent;
+                    document.getElementById('assigned-to').value = assignedToText !== 'N/A' ? assignedToText : '';
+                    
+                    // Extract status 
+                    const statusClass = row.cells[5].querySelector('.status').className;
+                    const statusValue = statusClass.includes('status-open') ? 'active' : 
+                                       statusClass.includes('status-in-progress') ? 'maintenance' : 'retired';
+                    document.getElementById('status-asset').value = statusValue;
+                    
+                    // For dates, we would need to format them properly
+                    document.getElementById('purchase-date').value = formatDateForInput(row.cells[6].textContent);
+                    
+                    // Handle warranty expiration
+                    const warrantyText = row.cells[7].textContent;
+                    if (warrantyText !== 'Expired') {
+                        document.getElementById('warranty-expires').value = formatDateForInput(warrantyText);
+                    } else {
+                        document.getElementById('warranty-expires').value = '';
+                    }
+                    
+                    // Show modal
+                    assetModal.style.display = 'flex';
+                });
+            }
+            
+            // Attach listeners to all existing edit asset buttons
+            editAssetButtons.forEach(button => {
+                attachEditAssetListener(button);
+            });
+            
+            // Helper function to format date for input field
+            function formatDateForInput(dateString) {
+                // Format expected by date input is YYYY-MM-DD
+                const months = {
+                    'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04',
+                    'May': '05', 'Jun': '06', 'Jul': '07', 'Aug': '08',
+                    'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
+                };
+                
+                try {
+                    const parts = dateString.split(' ');
+                    if (parts.length === 3) {
+                        const month = months[parts[0]];
+                        const day = parts[1].replace(',', '').padStart(2, '0');
+                        const year = parts[2];
+                        return `${year}-${month}-${day}`;
+                    }
+                } catch (e) {
+                    console.log('Error parsing date:', dateString);
+                }
+                
+                return '';
+            }
+            
+            // Sorting functionality for tickets
+            const ticketHeaders = document.querySelectorAll('#tickets-table th[data-sort]');
+            
+            ticketHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const column = header.dataset.sort;
+                    
+                    // Determine sort direction
+                    if (currentSortColumn === column) {
+                        // If clicking the same column, toggle direction
+                        currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        // If clicking a new column, sort ascending
+                        currentSortColumn = column;
+                        currentSortDirection = 'asc';
+                    }
+                    
+                    // Remove sort indicators from all headers
+                    ticketHeaders.forEach(h => {
+                        h.classList.remove('sort-asc', 'sort-desc');
+                    });
+                    
+                    // Add sort indicator to current header
+                    header.classList.add(currentSortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+                    
+                    // Sort the table
+                    sortTickets(column, currentSortDirection);
+                });
+            });
+            
+            function sortTickets(column, direction) {
+                const tableBody = document.getElementById('tickets-table-body');
+                const rows = Array.from(tableBody.querySelectorAll('tr'));
+                
+                // Sort rows based on the column and direction
+                rows.sort((a, b) => {
+                    let aVal, bVal;
+                    
+                    switch (column) {
+                        case 'id':
+                            aVal = a.getAttribute('data-ticket-id');
+                            bVal = b.getAttribute('data-ticket-id');
+                            break;
+                        case 'subject':
+                            aVal = a.cells[1].textContent.toLowerCase();
+                            bVal = b.cells[1].textContent.toLowerCase();
+                            break;
+                        case 'requester':
+                            aVal = a.cells[2].textContent.toLowerCase();
+                            bVal = b.cells[2].textContent.toLowerCase();
+                            break;
+                        case 'assignee':
+                            aVal = a.cells[3].textContent.toLowerCase();
+                            bVal = b.cells[3].textContent.toLowerCase();
+                            break;
+                        case 'priority':
+                            aVal = a.getAttribute('data-priority');
+                            bVal = b.getAttribute('data-priority');
+                            // Define priority order
+                            const priorityOrder = { 'low': 1, 'medium': 2, 'high': 3 };
+                            return direction === 'asc' ? 
+                                priorityOrder[bVal] - priorityOrder[aVal] : 
+                                priorityOrder[aVal] - priorityOrder[bVal];
+                        case 'status':
+                            aVal = a.getAttribute('data-status');
+                            bVal = b.getAttribute('data-status');
+                            // Define status order
+                            const statusOrder = { 'open': 1, 'in-progress': 2, 'closed': 3 };
+                            return direction === 'asc' ? 
+                                statusOrder[bVal] - statusOrder[aVal] : 
+                                statusOrder[aVal] - statusOrder[bVal];
+                        case 'date':
+                            aVal = a.getAttribute('data-date');
+                            bVal = b.getAttribute('data-date');
+                            break;
+                        default:
+                            aVal = a.cells[0].textContent.toLowerCase();
+                            bVal = b.cells[0].textContent.toLowerCase();
+                    }
+                    
+                    // For string comparisons
+                    if (typeof aVal === 'string' && typeof bVal === 'string') {
+                        if (direction === 'asc') {
+                            return aVal.localeCompare(bVal);
+                        } else {
+                            return bVal.localeCompare(aVal);
+                        }
+                    }
+                    
+                    // For date comparisons
+                    if (column === 'date') {
+                        if (direction === 'asc') {
+                            return new Date(bVal) - new Date(aVal);
+                        } else {
+                            return new Date(aVal) - new Date(bVal);
+                        }
+                    }
+                    
+                    return 0;
+                });
+                
+                // Append sorted rows back to the table
+                rows.forEach(row => tableBody.appendChild(row));
+            }
+            
+            // Sorting functionality for assets
+            const assetHeaders = document.querySelectorAll('#assets-table th[data-sort]');
+            
+            assetHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const column = header.dataset.sort;
+                    
+                    // Determine sort direction
+                    if (currentAssetSortColumn === column) {
+                        // If clicking the same column, toggle direction
+                        currentAssetSortDirection = currentAssetSortDirection === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        // If clicking a new column, sort ascending
+                        currentAssetSortColumn = column;
+                        currentAssetSortDirection = 'asc';
+                    }
+                    
+                    // Remove sort indicators from all headers
+                    assetHeaders.forEach(h => {
+                        h.classList.remove('sort-asc', 'sort-desc');
+                    });
+                    
+                    // Add sort indicator to current header
+                    header.classList.add(currentAssetSortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+                    
+                    // Sort the table
+                    sortAssets(column, currentAssetSortDirection);
+                });
+            });
+            
+            function sortAssets(column, direction) {
+                const tableBody = document.getElementById('assets-table-body');
+                const rows = Array.from(tableBody.querySelectorAll('tr'));
+                
+                // Sort rows based on the column and direction
+                rows.sort((a, b) => {
+                    let aVal, bVal;
+                    
+                    switch (column) {
+                        case 'id':
+                            aVal = a.getAttribute('data-asset-id');
+                            bVal = b.getAttribute('data-asset-id');
+                            break;
+                        case 'name':
+                            aVal = a.cells[1].textContent.toLowerCase();
+                            bVal = b.cells[1].textContent.toLowerCase();
+                            break;
+                        case 'type':
+                            aVal = a.getAttribute('data-type');
+                            bVal = b.getAttribute('data-type');
+                            break;
+                        case 'model':
+                            aVal = a.cells[3].textContent.toLowerCase();
+                            bVal = b.cells[3].textContent.toLowerCase();
+                            break;
+                        case 'assigned':
+                            aVal = a.cells[4].textContent.toLowerCase();
+                            bVal = b.cells[4].textContent.toLowerCase();
+                            break;
+                        case 'status':
+                            aVal = a.getAttribute('data-status');
+                            bVal = b.getAttribute('data-status');
+                            // Define status order
+                            const statusOrder = { 'active': 1, 'maintenance': 2, 'retired': 3 };
+                            return direction === 'asc' ? 
+                                statusOrder[bVal] - statusOrder[aVal] : 
+                                statusOrder[aVal] - statusOrder[bVal];
+                        case 'purchase':
+                            aVal = a.getAttribute('data-purchase');
+                            bVal = b.getAttribute('data-purchase');
+                            break;
+                        case 'warranty':
+                            aVal = a.getAttribute('data-warranty');
+                            bVal = b.getAttribute('data-warranty');
+                            // Handle 'expired' value
+                            if (aVal === 'expired' && bVal === 'expired') return 0;
+                            if (aVal === 'expired') return 1;
+                            if (bVal === 'expired') return -1;
+                            break;
+                        default:
+                            aVal = a.cells[0].textContent.toLowerCase();
+                            bVal = b.cells[0].textContent.toLowerCase();
+                    }
+                    
+                    // For string comparisons
+                    if (typeof aVal === 'string' && typeof bVal === 'string') {
+                        if (direction === 'asc') {
+                            return aVal.localeCompare(bVal);
+                        } else {
+                            return bVal.localeCompare(aVal);
+                        }
+                    }
+                    
+                    // For date comparisons
+                    if (column === 'purchase' || column === 'warranty') {
+                        if (aVal === 'expired' && bVal === 'expired') return 0;
+                        if (aVal === 'expired') return 1;
+                        if (bVal === 'expired') return -1;
+                        
+                        if (direction === 'asc') {
+                            return new Date(bVal) - new Date(aVal);
+                        } else {
+                            return new Date(aVal) - new Date(bVal);
+                        }
+                    }
+                    
+                    return 0;
+                });
+                
+                // Append sorted rows back to the table
+                rows.forEach(row => tableBody.appendChild(row));
+            }
+            
+            // Filter functionality for tickets
+            const filterStatus = document.getElementById('filter-status');
+            const filterPriority = document.getElementById('filter-priority');
+            
+            filterStatus.addEventListener('change', filterTickets);
+            filterPriority.addEventListener('change', filterTickets);
+            
+            function filterTickets() {
+                const statusFilter = filterStatus.value;
+                const priorityFilter = filterPriority.value;
+                const rows = document.querySelectorAll('#tickets-table-body tr');
+                
+                rows.forEach(row => {
+                    const status = row.getAttribute('data-status');
+                    const priority = row.getAttribute('data-priority');
+                    
+                    const statusMatch = !statusFilter || status === statusFilter;
+                    const priorityMatch = !priorityFilter || priority === priorityFilter;
+                    
+                    if (statusMatch && priorityMatch) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Filter functionality for assets
+            const filterType = document.getElementById('filter-type');
+            const filterStatusAsset = document.getElementById('filter-status-asset');
+            
+            filterType.addEventListener('change', filterAssets);
+            filterStatusAsset.addEventListener('change', filterAssets);
+            
+            function filterAssets() {
+                const typeFilter = filterType.value;
+                const statusFilter = filterStatusAsset.value;
+                const rows = document.querySelectorAll('#assets-table-body tr');
+                
+                rows.forEach(row => {
+                    const type = row.getAttribute('data-type');
+                    const status = row.getAttribute('data-status');
+                    
+                    const typeMatch = !typeFilter || type === typeFilter;
+                    const statusMatch = !statusFilter || status === statusFilter;
+                    
+                    if (typeMatch && statusMatch) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Reports functionality
+            const generateReportBtn = document.getElementById('generate-report');
+            const reportTypeSelect = document.getElementById('report-type');
+            const reportPeriodSelect = document.getElementById('report-period');
+            const reportTitle = document.getElementById('report-title');
+            const reportTable = document.getElementById('report-table');
+            
+            // Sample data for reports
+            const sampleData = {
+                'ticket-volume': {
+                    title: 'Ticket Volume Report',
+                    data: [
+                        ['Oct 1-7, 2023', 15, 12, '2.4 days'],
+                        ['Sept 24-30, 2023', 18, 16, '1.8 days'],
+                        ['Sept 17-23, 2023', 12, 14, '2.1 days'],
+                        ['Sept 10-16, 2023', 20, 18, '1.5 days']
+                    ]
+                },
+                'response-time': {
+                    title: 'Average Response Time Report',
+                    data: [
+                        ['Oct 1-7, 2023', '1.2 hours', '0.8 hours', '2.1 hours'],
+                        ['Sept 24-30, 2023', '1.5 hours', '1.1 hours', '2.8 hours'],
+                        ['Sept 17-23, 2023', '0.9 hours', '0.7 hours', '1.9 hours'],
+                        ['Sept 10-16, 2023', '1.8 hours', '1.3 hours', '3.2 hours']
+                    ],
+                    headers: ['Period', 'Avg. Response Time', 'Min. Response Time', 'Max. Response Time']
+                },
+                'resolution-time': {
+                    title: 'Average Resolution Time Report',
+                    data: [
+                        ['Oct 1-7, 2023', '1.8 days', '1.2 days', '2.4 days'],
+                        ['Sept 24-30, 2023', '1.5 days', '1.0 days', '2.1 days'],
+                        ['Sept 17-23, 2023', '2.1 days', '1.5 days', '3.0 days'],
+                        ['Sept 10-16, 2023', '1.2 days', '0.8 days', '1.8 days']
+                    ],
+                    headers: ['Period', 'Avg. Resolution Time', 'Min. Resolution Time', 'Max. Resolution Time']
+                },
+                'asset-inventory': {
+                    title: 'Asset Inventory Report',
+                    data: [
+                        ['Laptops', '15', '14', '1', '0'],
+                        ['Desktops', '12', '12', '0', '0'],
+                        ['Printers', '3', '2', '1', '0'],
+                        ['Phones', '8', '8', '0', '0'],
+                        ['Monitors', '9', '9', '0', '0']
+                    ],
+                    headers: ['Asset Type', 'Total', 'Active', 'Under Maintenance', 'Retired']
+                },
+                'warranty-status': {
+                    title: 'Warranty Status Report',
+                    data: [
+                        ['Dell Latitude 5420', 'AS-1001', 'Mar 15, 2025', 'Active'],
+                        ['HP EliteDesk 800', 'AS-1002', 'Jan 10, 2024', 'Active'],
+                        ['MacBook Pro 14"', 'AS-1003', 'Nov 3, 2025', 'Active'],
+                        ['Brother MFC-L8900CDW', 'AS-2001', 'Expired', 'Expired']
+                    ],
+                    headers: ['Asset Name', 'Asset ID', 'Warranty Expires', 'Status']
+                }
+            };
+            
+            // Generate report button click handler
+            generateReportBtn.addEventListener('click', function() {
+                const reportType = reportTypeSelect.value;
+                const reportPeriod = reportPeriodSelect.value;
+                
+                // Get the report data
+                const reportData = sampleData[reportType];
+                
+                // Update report title
+                reportTitle.textContent = reportData.title;
+                
+                // Update table headers if needed
+                if (reportData.headers) {
+                    const headerRow = reportTable.querySelector('thead tr');
+                    headerRow.innerHTML = '';
+                    reportData.headers.forEach(header => {
+                        const th = document.createElement('th');
+                        th.textContent = header;
+                        headerRow.appendChild(th);
+                    });
+                } else {
+                    // Reset to default headers if needed
+                    const defaultHeaders = ['Period', 'New Tickets', 'Closed Tickets', 'Avg. Resolution Time'];
+                    const headerRow = reportTable.querySelector('thead tr');
+                    if (headerRow.children.length !== defaultHeaders.length) {
+                        headerRow.innerHTML = '';
+                        defaultHeaders.forEach(header => {
+                            const th = document.createElement('th');
+                            th.textContent = header;
+                            headerRow.appendChild(th);
+                        });
+                    }
+                }
+                
+                // Update table body
+                const tbody = reportTable.querySelector('tbody');
+                tbody.innerHTML = '';
+                
+                reportData.data.forEach(rowData => {
+                    const row = document.createElement('tr');
+                    rowData.forEach(cellData => {
+                        const cell = document.createElement('td');
+                        cell.textContent = cellData;
+                        row.appendChild(cell);
+                    });
+                    tbody.appendChild(row);
+                });
+                
+                // Show success message
+                alert(`Report generated successfully!\n\nType: ${reportData.title}\nPeriod: ${reportPeriodSelect.options[reportPeriodSelect.selectedIndex].text}`);
+            });
+        });
+    </script>
+</body>
+</html>
