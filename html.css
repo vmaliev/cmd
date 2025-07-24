@@ -532,3 +532,19 @@
             background: #a94442;
             color: #fff;
         }
+
+/* Make card headers, nav, and header bars darker in dark mode */
+body.dark-theme .card-header,
+body.dark-theme header,
+body.dark-theme nav {
+    background-color: #181a1b !important;
+    color: #e0e0e0 !important;
+    border-bottom: 1px solid #333 !important;
+}
+
+/* Make table headers dark */
+body.dark-theme th {
+    background-color: #23272b !important;
+    color: #e0e0e0 !important;
+    border-bottom: 1px solid #333 !important;
+}
