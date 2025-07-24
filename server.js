@@ -54,6 +54,7 @@ app.get('/api/assets', (req, res) => {
 app.post('/api/assets', (req, res) => {
   const data = readData();
   const asset = req.body;
+  // Accept all fields, no validation
   data.assets.unshift(asset);
   writeData(data);
   io.emit('assets-updated');
@@ -61,7 +62,8 @@ app.post('/api/assets', (req, res) => {
 });
 app.put('/api/assets/:id', (req, res) => {
   const data = readData();
-  const idx = data.assets.findIndex(a => a.id === req.params.id);
+  // Find by assetNo (new unique field)
+  const idx = data.assets.findIndex(a => a.assetNo === req.params.id || a.id === req.params.id);
   if (idx !== -1) {
     data.assets[idx] = req.body;
     writeData(data);
@@ -71,10 +73,10 @@ app.put('/api/assets/:id', (req, res) => {
     res.status(404).json({ error: 'Asset not found' });
   }
 });
-
 app.delete('/api/assets/:id', (req, res) => {
   const data = readData();
-  const idx = data.assets.findIndex(a => a.id === req.params.id);
+  // Find by assetNo (new unique field)
+  const idx = data.assets.findIndex(a => a.assetNo === req.params.id || a.id === req.params.id);
   if (idx !== -1) {
     const removed = data.assets.splice(idx, 1);
     writeData(data);

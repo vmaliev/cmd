@@ -548,3 +548,23 @@ body.dark-theme th {
     color: #e0e0e0 !important;
     border-bottom: 1px solid #333 !important;
 }
+
+/* Make the assets table more compact for many columns */
+#assets-table th, #assets-table td {
+    font-size: 0.75rem;
+    padding: 3px 4px;
+    white-space: nowrap;
+}
+#assets-table {
+    font-size: 0.75rem;
+    table-layout: auto;
+    width: 100%;
+    overflow-x: auto;
+    display: block;
+    max-width: 100vw;
+}
+#assets-table thead, #assets-table tbody {
+    display: table;
+    width: 100%;
+    table-layout: auto;
+}

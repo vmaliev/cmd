@@ -404,14 +404,22 @@
                         <table id="assets-table">
                             <thead>
                                 <tr>
-                                    <th data-sort="id">Asset ID</th>
-                                    <th data-sort="name">Name</th>
-                                    <th data-sort="type">Type</th>
-                                    <th data-sort="model">Model</th>
-                                    <th data-sort="assigned">Assigned To</th>
-                                    <th data-sort="status">Status</th>
-                                    <th data-sort="purchase">Purchase Date</th>
-                                    <th data-sort="warranty">Warranty Expires</th>
+                                    <th>Asset No.</th>
+                                    <th>Asset TAG</th>
+                                    <th>Type</th>
+                                    <th>Brand</th>
+                                    <th>Model</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Hostname</th>
+                                    <th>Number/Serial</th>
+                                    <th>IMEI</th>
+                                    <th>ID No.</th>
+                                    <th>Current user</th>
+                                    <th>Department</th>
+                                    <th>Previous user</th>
+                                    <th>Comment</th>
+                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -484,12 +492,12 @@
                             <input type="hidden" id="edit-asset-id">
                             <div class="form-row">
                                 <div>
-                                    <label for="asset-name">Asset Name *</label>
-                                    <input type="text" id="asset-name" required>
+                                    <label for="asset-no">Asset No. *</label>
+                                    <input type="text" id="asset-no" required>
                                 </div>
                                 <div>
-                                    <label for="asset-id">Asset ID *</label>
-                                    <input type="text" id="asset-id" required>
+                                    <label for="asset-tag">Asset TAG</label>
+                                    <input type="text" id="asset-tag">
                                 </div>
                             </div>
                             <div class="form-row">
@@ -505,24 +513,58 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label for="model">Model *</label>
-                                    <input type="text" id="model" required>
+                                    <label for="brand">Brand</label>
+                                    <input type="text" id="brand">
+                                </div>
+                                <div>
+                                    <label for="model">Model</label>
+                                    <input type="text" id="model">
+                                </div>
+                                <div>
+                                    <label for="amount">Amount</label>
+                                    <input type="number" id="amount" min="1" value="1">
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div>
-                                    <label for="serial-number">Serial Number</label>
-                                    <input type="text" id="serial-number">
+                                    <label for="date">Date</label>
+                                    <input type="date" id="date">
                                 </div>
                                 <div>
-                                    <label for="purchase-date">Purchase Date</label>
-                                    <input type="date" id="purchase-date">
+                                    <label for="hostname">Hostname</label>
+                                    <input type="text" id="hostname">
+                                </div>
+                                <div>
+                                    <label for="serial">Number/Serial</label>
+                                    <input type="text" id="serial">
+                                </div>
+                                <div>
+                                    <label for="imei">IMEI</label>
+                                    <input type="text" id="imei">
+                                </div>
+                                <div>
+                                    <label for="id-no">ID No.</label>
+                                    <input type="text" id="id-no">
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div>
-                                    <label for="warranty-expires">Warranty Expires</label>
-                                    <input type="date" id="warranty-expires">
+                                    <label for="current-user">Current user</label>
+                                    <input type="text" id="current-user">
+                                </div>
+                                <div>
+                                    <label for="department">Department</label>
+                                    <input type="text" id="department">
+                                </div>
+                                <div>
+                                    <label for="previous-user">Previous user</label>
+                                    <input type="text" id="previous-user">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div style="flex: 1;">
+                                    <label for="comment">Comment</label>
+                                    <textarea id="comment" rows="2"></textarea>
                                 </div>
                                 <div>
                                     <label for="status-asset">Status</label>
@@ -533,10 +575,6 @@
                                     </select>
                                 </div>
                             </div>
-                            <label for="assigned-to">Assigned To</label>
-                            <input type="text" id="assigned-to">
-                            <label for="notes">Notes</label>
-                            <textarea id="notes" rows="3"></textarea>
                             <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
                                 <button type="button" class="btn btn-secondary" id="cancel-asset">Cancel</button>
                                 <button type="submit" class="btn" id="save-asset">Save Asset</button>
@@ -1059,20 +1097,26 @@
                 tbody.innerHTML = '';
                 assets.forEach(asset => {
                     const row = document.createElement('tr');
-                    row.setAttribute('data-asset-id', asset.id);
+                    row.setAttribute('data-asset-no', asset.assetNo);
                     row.setAttribute('data-type', asset.type);
                     row.setAttribute('data-status', asset.status);
-                    row.setAttribute('data-purchase', asset.purchase);
-                    row.setAttribute('data-warranty', asset.warranty);
                     row.innerHTML = `
-                        <td>${asset.id}</td>
-                        <td>${asset.name}</td>
-                        <td>${asset.type.charAt(0).toUpperCase() + asset.type.slice(1)}</td>
-                        <td>${asset.model}</td>
-                        <td>${asset.assigned}</td>
-                        <td><span class="status status-${asset.status}">${asset.status.charAt(0).toUpperCase() + asset.status.slice(1)}</span></td>
-                        <td>${asset.purchase}</td>
-                        <td>${asset.warranty}</td>
+                        <td>${asset.assetNo || ''}</td>
+                        <td>${asset.assetTag || ''}</td>
+                        <td>${asset.type || ''}</td>
+                        <td>${asset.brand || ''}</td>
+                        <td>${asset.model || ''}</td>
+                        <td>${asset.amount || ''}</td>
+                        <td>${asset.date || ''}</td>
+                        <td>${asset.hostname || ''}</td>
+                        <td>${asset.serial || ''}</td>
+                        <td>${asset.imei || ''}</td>
+                        <td>${asset.idNo || ''}</td>
+                        <td>${asset.currentUser || ''}</td>
+                        <td>${asset.department || ''}</td>
+                        <td>${asset.previousUser || ''}</td>
+                        <td>${asset.comment || ''}</td>
+                        <td><span class="status status-${asset.status}">${asset.status ? asset.status.charAt(0).toUpperCase() + asset.status.slice(1) : ''}</span></td>
                         <td>
                             <button class="btn btn-secondary edit-asset">Edit</button>
                             <button class="btn btn-secondary delete-asset">Delete</button>
@@ -1084,9 +1128,9 @@
                 document.querySelectorAll('.delete-asset').forEach(button => {
                     button.addEventListener('click', async function() {
                         const row = this.closest('tr');
-                        const assetId = row.getAttribute('data-asset-id');
+                        const assetNo = row.getAttribute('data-asset-no');
                         if (confirm('Are you sure you want to delete this asset?')) {
-                            await fetch(`/api/assets/${assetId}`, { method: 'DELETE' });
+                            await fetch(`/api/assets/${assetNo}`, { method: 'DELETE' });
                             await renderAssets();
                             await updateDashboardStats();
                         }
@@ -1200,14 +1244,22 @@
                     editMode.value = 'true';
                     modalTitle.textContent = 'Edit Asset';
                     assetForm.reset();
-                    document.getElementById('asset-id').value = row.cells[0].textContent;
-                    document.getElementById('asset-name').value = row.cells[1].textContent;
-                    document.getElementById('asset-type').value = row.cells[2].textContent.toLowerCase();
-                    document.getElementById('model').value = row.cells[3].textContent;
-                    document.getElementById('assigned-to').value = row.cells[4].textContent !== 'N/A' ? row.cells[4].textContent : '';
-                    document.getElementById('status-asset').value = row.getAttribute('data-status');
-                    document.getElementById('purchase-date').value = row.getAttribute('data-purchase');
-                    document.getElementById('warranty-expires').value = row.getAttribute('data-warranty') !== 'Expired' ? row.getAttribute('data-warranty') : '';
+                    document.getElementById('asset-no').value = row.cells[0].textContent;
+                    document.getElementById('asset-tag').value = row.cells[1].textContent;
+                    document.getElementById('asset-type').value = row.cells[2].textContent;
+                    document.getElementById('brand').value = row.cells[3].textContent;
+                    document.getElementById('model').value = row.cells[4].textContent;
+                    document.getElementById('amount').value = row.cells[5].textContent;
+                    document.getElementById('date').value = row.cells[6].textContent;
+                    document.getElementById('hostname').value = row.cells[7].textContent;
+                    document.getElementById('serial').value = row.cells[8].textContent;
+                    document.getElementById('imei').value = row.cells[9].textContent;
+                    document.getElementById('id-no').value = row.cells[10].textContent;
+                    document.getElementById('current-user').value = row.cells[11].textContent;
+                    document.getElementById('department').value = row.cells[12].textContent;
+                    document.getElementById('previous-user').value = row.cells[13].textContent;
+                    document.getElementById('comment').value = row.cells[14].textContent;
+                    document.getElementById('status-asset').value = row.cells[15].textContent.toLowerCase();
                     assetModal.style.display = 'flex';
                 });
             }
@@ -1219,37 +1271,23 @@
             });
             assetForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                const assetId = document.getElementById('asset-id').value;
-                const assetName = document.getElementById('asset-name').value;
-                const assetType = document.getElementById('asset-type').value;
-                const model = document.getElementById('model').value;
-                const assignedTo = document.getElementById('assigned-to').value || 'N/A';
-                const statusValue = document.getElementById('status-asset').value;
-                let statusDisplay, statusClass;
-                switch(statusValue) {
-                    case 'active': statusDisplay = 'Active'; statusClass = 'status-open'; break;
-                    case 'maintenance': statusDisplay = 'Maintenance'; statusClass = 'status-in-progress'; break;
-                    case 'retired': statusDisplay = 'Retired'; statusClass = 'status-closed'; break;
-                    default: statusDisplay = 'Active'; statusClass = 'status-open';
-                }
-                const purchaseDateInput = document.getElementById('purchase-date').value;
-                const warrantyExpiresInput = document.getElementById('warranty-expires').value;
-                const formatDateForDisplay = (dateInput) => {
-                    if (!dateInput) return '';
-                    const date = new Date(dateInput);
-                    return date.toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'});
-                };
-                const purchaseDateDisplay = formatDateForDisplay(purchaseDateInput);
-                const warrantyExpiresDisplay = warrantyExpiresInput ? formatDateForDisplay(warrantyExpiresInput) : 'Expired';
                 const asset = {
-                    id: assetId,
-                    name: assetName,
-                    type: assetType,
-                    model,
-                    assigned: assignedTo,
-                    status: statusValue,
-                    purchase: purchaseDateInput,
-                    warranty: warrantyExpiresInput || 'expired'
+                    assetNo: document.getElementById('asset-no').value,
+                    assetTag: document.getElementById('asset-tag').value,
+                    type: document.getElementById('asset-type').value,
+                    brand: document.getElementById('brand').value,
+                    model: document.getElementById('model').value,
+                    amount: document.getElementById('amount').value,
+                    date: document.getElementById('date').value,
+                    hostname: document.getElementById('hostname').value,
+                    serial: document.getElementById('serial').value,
+                    imei: document.getElementById('imei').value,
+                    idNo: document.getElementById('id-no').value,
+                    currentUser: document.getElementById('current-user').value,
+                    department: document.getElementById('department').value,
+                    previousUser: document.getElementById('previous-user').value,
+                    comment: document.getElementById('comment').value,
+                    status: document.getElementById('status-asset').value
                 };
                 try {
                     const res = await fetch('/api/assets', {
@@ -1262,8 +1300,8 @@
                     assetForm.reset();
                     await renderAssets();
                     await updateDashboardStats();
-                    await renderDashboardAssets(); // Call after asset add
-                    alert(`Asset ${assetId} has been added successfully!`);
+                    await renderDashboardAssets();
+                    alert(`Asset ${asset.assetNo} has been added successfully!`);
                 } catch (e) {
                     alert('Error adding asset: ' + e.message);
                 }

@@ -15,24 +15,44 @@
   ],
   "assets": [
     {
-      "id": "rtest",
-      "name": "testr",
+      "assetNo": "A-001",
+      "assetTag": "TAG-001",
       "type": "laptop",
-      "model": "trset",
-      "assigned": "test",
+      "brand": "Dell",
+      "model": "XPS 13",
+      "amount": "1",
+      "date": "2023-01-01",
+      "hostname": "LAPTOP-001",
+      "serial": "SN123456",
+      "imei": "",
+      "idNo": "ID001",
+      "currentUser": "John Doe",
+      "department": "IT",
+      "previousUser": "Jane Smith",
+      "comment": "First asset entry",
       "status": "active",
-      "purchase": "",
-      "warranty": "expired"
+      "purchase": "2023-01-01",
+      "warranty": "2026-01-01"
     },
     {
-      "id": "test",
-      "name": "test",
+      "assetNo": "A-002",
+      "assetTag": "TAG-002",
       "type": "desktop",
-      "model": "tset",
-      "assigned": "test",
+      "brand": "HP",
+      "model": "EliteDesk",
+      "amount": "1",
+      "date": "2023-02-01",
+      "hostname": "DESKTOP-002",
+      "serial": "SN654321",
+      "imei": "",
+      "idNo": "ID002",
+      "currentUser": "Alice Brown",
+      "department": "Finance",
+      "previousUser": "Bob White",
+      "comment": "Second asset entry",
       "status": "active",
-      "purchase": "",
-      "warranty": "expired"
+      "purchase": "2023-02-01",
+      "warranty": "2026-02-01"
     }
   ]
 }
