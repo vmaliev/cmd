@@ -1302,6 +1302,16 @@
                 }
             });
             // Remove all localStorage code and calls
+            const closeAssetModal = document.getElementById('close-asset-modal');
+            const cancelAssetBtn = document.getElementById('cancel-asset');
+            closeAssetModal.addEventListener('click', function() {
+                assetModal.style.display = 'none';
+                assetForm.reset();
+            });
+            cancelAssetBtn.addEventListener('click', function() {
+                assetModal.style.display = 'none';
+                assetForm.reset();
+            });
         });
     </script>
     <script src="theme.js"></script>
