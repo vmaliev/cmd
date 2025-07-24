@@ -1,4 +1,38 @@
 {
-  "tickets": [],
-  "assets": []
-} 
+  "tickets": [
+    {
+      "id": "TKT-005",
+      "subject": "test",
+      "requester": "test",
+      "assignee": "Unassigned",
+      "priority": "low",
+      "status": "in-progress",
+      "date": "2025-07-23",
+      "email": "test@test.com",
+      "description": "test",
+      "category": "hardware"
+    }
+  ],
+  "assets": [
+    {
+      "id": "rtest",
+      "name": "testr",
+      "type": "laptop",
+      "model": "trset",
+      "assigned": "test",
+      "status": "active",
+      "purchase": "",
+      "warranty": "expired"
+    },
+    {
+      "id": "test",
+      "name": "test",
+      "type": "desktop",
+      "model": "tset",
+      "assigned": "test",
+      "status": "active",
+      "purchase": "",
+      "warranty": "expired"
+    }
+  ]
+}

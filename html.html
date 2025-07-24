@@ -110,31 +110,8 @@
                                     <th>Last Maintenance</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>AS-1001</td>
-                                    <td>Dell Latitude 5420</td>
-                                    <td>Laptop</td>
-                                    <td>Sarah Johnson</td>
-                                    <td><span class="status status-open">Active</span></td>
-                                    <td>Sept 15, 2023</td>
-                                </tr>
-                                <tr>
-                                    <td>AS-1002</td>
-                                    <td>HP EliteDesk 800</td>
-                                    <td>Desktop</td>
-                                    <td>Michael Chen</td>
-                                    <td><span class="status status-open">Active</span></td>
-                                    <td>Aug 22, 2023</td>
-                                </tr>
-                                <tr>
-                                    <td>AS-2001</td>
-                                    <td>Brother MFC-L8900CDW</td>
-                                    <td>Printer</td>
-                                    <td>N/A</td>
-                                    <td><span class="status status-in-progress">Maintenance</span></td>
-                                    <td>Oct 5, 2023</td>
-                                </tr>
+                            <tbody id="dashboard-assets-body">
+                                <!-- Asset rows will be rendered dynamically by JS -->
                             </tbody>
                         </table>
                     </div>
@@ -1096,11 +1073,25 @@
                         <td><span class="status status-${asset.status}">${asset.status.charAt(0).toUpperCase() + asset.status.slice(1)}</span></td>
                         <td>${asset.purchase}</td>
                         <td>${asset.warranty}</td>
-                        <td><button class="btn btn-secondary edit-asset">Edit</button></td>
+                        <td>
+                            <button class="btn btn-secondary edit-asset">Edit</button>
+                            <button class="btn btn-secondary delete-asset">Delete</button>
+                        </td>
                     `;
                     tbody.appendChild(row);
                 });
                 document.querySelectorAll('.edit-asset').forEach(attachEditAssetListener);
+                document.querySelectorAll('.delete-asset').forEach(button => {
+                    button.addEventListener('click', async function() {
+                        const row = this.closest('tr');
+                        const assetId = row.getAttribute('data-asset-id');
+                        if (confirm('Are you sure you want to delete this asset?')) {
+                            await fetch(`/api/assets/${assetId}`, { method: 'DELETE' });
+                            await renderAssets();
+                            await updateDashboardStats();
+                        }
+                    });
+                });
             }
             async function updateDashboardStats() {
                 const tickets = await fetchTickets();
@@ -1122,10 +1113,30 @@
                 const assets = await fetchAssets();
                 document.querySelector('.stat-card:nth-child(4) .number').textContent = assets.length;
             }
+            async function renderDashboardAssets() {
+                const assets = await fetchAssets();
+                // Select the Asset Overview table in the dashboard
+                const dashboardAssetTable = document.getElementById('dashboard-assets-body');
+                if (!dashboardAssetTable) return;
+                dashboardAssetTable.innerHTML = '';
+                assets.forEach(asset => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${asset.id}</td>
+                        <td>${asset.name}</td>
+                        <td>${asset.type.charAt(0).toUpperCase() + asset.type.slice(1)}</td>
+                        <td>${asset.assigned}</td>
+                        <td><span class="status status-${asset.status}">${asset.status.charAt(0).toUpperCase() + asset.status.slice(1)}</span></td>
+                        <td>${asset.purchase}</td>
+                    `;
+                    dashboardAssetTable.appendChild(row);
+                });
+            }
             // On page load
             renderTickets();
             renderAssets();
             updateDashboardStats();
+            renderDashboardAssets(); // Call on page load
             // --- Ticket Form Submission ---
             ticketForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
@@ -1178,6 +1189,34 @@
                 }
             });
             // --- Asset Form Submission ---
+            const newAssetBtn = document.getElementById('new-asset-btn');
+            const assetModal = document.getElementById('asset-modal');
+            const assetForm = document.getElementById('asset-form');
+            const modalTitle = document.getElementById('modal-title');
+            const editMode = document.getElementById('edit-mode');
+            function attachEditAssetListener(button) {
+                button.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    editMode.value = 'true';
+                    modalTitle.textContent = 'Edit Asset';
+                    assetForm.reset();
+                    document.getElementById('asset-id').value = row.cells[0].textContent;
+                    document.getElementById('asset-name').value = row.cells[1].textContent;
+                    document.getElementById('asset-type').value = row.cells[2].textContent.toLowerCase();
+                    document.getElementById('model').value = row.cells[3].textContent;
+                    document.getElementById('assigned-to').value = row.cells[4].textContent !== 'N/A' ? row.cells[4].textContent : '';
+                    document.getElementById('status-asset').value = row.getAttribute('data-status');
+                    document.getElementById('purchase-date').value = row.getAttribute('data-purchase');
+                    document.getElementById('warranty-expires').value = row.getAttribute('data-warranty') !== 'Expired' ? row.getAttribute('data-warranty') : '';
+                    assetModal.style.display = 'flex';
+                });
+            }
+            newAssetBtn.addEventListener('click', function() {
+                editMode.value = 'false';
+                modalTitle.textContent = 'Add New Asset';
+                assetForm.reset();
+                assetModal.style.display = 'flex';
+            });
             assetForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 const assetId = document.getElementById('asset-id').value;
@@ -1223,13 +1262,45 @@
                     assetForm.reset();
                     await renderAssets();
                     await updateDashboardStats();
+                    await renderDashboardAssets(); // Call after asset add
                     alert(`Asset ${assetId} has been added successfully!`);
                 } catch (e) {
                     alert('Error adding asset: ' + e.message);
                 }
             });
             // --- Ticket/Asset Update Logic ---
-            // (You can add PUT logic for editing if needed, similar to POST above)
+            document.getElementById('update-ticket').addEventListener('click', async function() {
+                try {
+                    const ticketId = document.getElementById('ticket-id').textContent.replace('#', '');
+                    const currentStatus = document.getElementById('ticket-status').querySelector('.status').classList.contains('status-open') ? 'open' :
+                        document.getElementById('ticket-status').querySelector('.status').classList.contains('status-in-progress') ? 'in-progress' : 'closed';
+                    const newStatus = document.getElementById('update-status').value;
+                    if (newStatus === currentStatus) {
+                        alert(`Ticket #${ticketId} is already ${newStatus}. Please select a different status.`);
+                        return;
+                    }
+                    // Fetch the ticket from backend
+                    const tickets = await fetchTickets();
+                    const ticket = tickets.find(t => t.id === ticketId);
+                    if (!ticket) {
+                        alert('Ticket not found');
+                        return;
+                    }
+                    ticket.status = newStatus;
+                    // Optionally update date/updated fields here
+                    await fetch(`/api/tickets/${ticketId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(ticket)
+                    });
+                    viewTicketModal.style.display = 'none';
+                    await renderTickets();
+                    await updateDashboardStats();
+                    alert(`Ticket #${ticketId} status updated to ${newStatus}`);
+                } catch (e) {
+                    alert('Error updating ticket: ' + e.message);
+                }
+            });
             // Remove all localStorage code and calls
         });
     </script>

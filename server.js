@@ -72,6 +72,19 @@ app.put('/api/assets/:id', (req, res) => {
   }
 });
 
+app.delete('/api/assets/:id', (req, res) => {
+  const data = readData();
+  const idx = data.assets.findIndex(a => a.id === req.params.id);
+  if (idx !== -1) {
+    const removed = data.assets.splice(idx, 1);
+    writeData(data);
+    io.emit('assets-updated');
+    res.json({ success: true, removed: removed[0] });
+  } else {
+    res.status(404).json({ error: 'Asset not found' });
+  }
+});
+
 io.on('connection', (socket) => {
   // No-op, just keep the connection open
 });
