@@ -30,19 +30,97 @@ app.get('/api/tickets', (req, res) => {
 app.post('/api/tickets', (req, res) => {
   const data = readData();
   const ticket = req.body;
+  
+  // Generate ticket ID
+  const ticketId = `TKT-${String(data.tickets.length + 1).padStart(3, '0')}`;
+  ticket.id = ticketId;
+  
+  // Create initial timeline with greetings and priority-based progress
+  const now = new Date();
+  const timeline = [
+    {
+      id: `timeline-${Date.now()}-1`,
+      author: 'System',
+      authorType: 'system',
+      date: now.toISOString(),
+      content: `Hello ${ticket.requester}! Thank you for submitting your ticket. We have received your request and will begin working on it shortly.`,
+      type: 'greeting'
+    },
+    {
+      id: `timeline-${Date.now()}-2`,
+      author: 'System',
+      authorType: 'system',
+      date: now.toISOString(),
+      content: getPriorityBasedMessage(ticket.priority),
+      type: 'priority-info'
+    },
+    {
+      id: `timeline-${Date.now()}-3`,
+      author: 'System',
+      authorType: 'system',
+      date: now.toISOString(),
+      content: `Ticket created with ID: ${ticketId}. Status: Open.`,
+      type: 'creation'
+    }
+  ];
+  
+  ticket.timeline = timeline;
+  ticket.createdDate = now.toISOString();
+  ticket.lastUpdated = now.toISOString();
+  
   data.tickets.unshift(ticket);
   writeData(data);
   io.emit('tickets-updated');
   res.json(ticket);
 });
+
+// Helper function to get priority-based messages
+function getPriorityBasedMessage(priority) {
+  const messages = {
+    low: 'This ticket has been classified as LOW priority. Expected response time: 24-48 hours. We will address this as soon as possible.',
+    medium: 'This ticket has been classified as MEDIUM priority. Expected response time: 4-8 hours. Our team will begin working on this shortly.',
+    high: 'This ticket has been classified as HIGH priority. Expected response time: 1-2 hours. This will be escalated immediately to our support team.'
+  };
+  return messages[priority] || messages.medium;
+}
 app.put('/api/tickets/:id', (req, res) => {
   const data = readData();
   const idx = data.tickets.findIndex(t => t.id === req.params.id);
   if (idx !== -1) {
     data.tickets[idx] = req.body;
+    data.tickets[idx].lastUpdated = new Date().toISOString();
     writeData(data);
     io.emit('tickets-updated');
     res.json(data.tickets[idx]);
+  } else {
+    res.status(404).json({ error: 'Ticket not found' });
+  }
+});
+
+// Add timeline entry to a ticket
+app.post('/api/tickets/:id/timeline', (req, res) => {
+  const data = readData();
+  const idx = data.tickets.findIndex(t => t.id === req.params.id);
+  if (idx !== -1) {
+    const timelineEntry = {
+      id: `timeline-${Date.now()}`,
+      author: req.body.author || 'Agent',
+      authorType: req.body.authorType || 'agent',
+      date: new Date().toISOString(),
+      content: req.body.content,
+      type: req.body.type || 'note'
+    };
+    
+    if (!data.tickets[idx].timeline) {
+      data.tickets[idx].timeline = [];
+    }
+    
+    data.tickets[idx].timeline.unshift(timelineEntry);
+    data.tickets[idx].lastUpdated = new Date().toISOString();
+    
+    writeData(data);
+    io.emit('tickets-updated');
+    res.json(timelineEntry);
   } else {
     res.status(404).json({ error: 'Ticket not found' });
   }

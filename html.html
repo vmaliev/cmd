@@ -315,33 +315,7 @@
                             <div class="timeline">
                                 <h3>Activity Timeline</h3>
                                 <div id="ticket-timeline">
-                                    <div class="timeline-item">
-                                        <div class="timeline-header">
-                                            <span class="timeline-author">John Smith (Agent)</span>
-                                            <span class="timeline-date">Oct 10, 2023, 10:30 AM</span>
-                                        </div>
-                                        <div class="timeline-content">
-                                            <p>Assigned to John Smith for resolution. Checking network settings on the user's laptop.</p>
-                                        </div>
-                                    </div>
-                                    <div class="timeline-item">
-                                        <div class="timeline-header">
-                                            <span class="timeline-author">John Smith (Agent)</span>
-                                            <span class="timeline-date">Oct 10, 2023, 10:15 AM</span>
-                                        </div>
-                                        <div class="timeline-content">
-                                            <p>Status changed from Open to In Progress.</p>
-                                        </div>
-                                    </div>
-                                    <div class="timeline-item">
-                                        <div class="timeline-header">
-                                            <span class="timeline-author">Sarah Johnson (Requester)</span>
-                                            <span class="timeline-date">Oct 10, 2023, 9:45 AM</span>
-                                        </div>
-                                        <div class="timeline-content">
-                                            <p>Ticket created with description: "My laptop cannot connect to the company Wi-Fi network. I've tried restarting the computer and the router, but the issue persists. The Wi-Fi icon shows no available networks."</p>
-                                        </div>
-                                    </div>
+                                    <!-- Timeline items will be dynamically populated here -->
                                 </div>
                                 <div id="add-note-section">
                                     <h3>Add Note</h3>
@@ -420,62 +394,12 @@
                                     <th>Previous user</th>
                                     <th>Comment</th>
                                     <th>Status</th>
-                                    <th>Actions</th>
+                                    <th>Warranty End Date</th>
+                                    <th class="actions-col">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="assets-table-body">
-                                <tr data-asset-id="AS-1001" data-type="laptop" data-status="active" data-purchase="2022-03-15" data-warranty="2025-03-15">
-                                    <td>AS-1001</td>
-                                    <td>Dell Latitude 5420</td>
-                                    <td>Laptop</td>
-                                    <td>Latitude 5420</td>
-                                    <td>Sarah Johnson</td>
-                                    <td><span class="status status-open">Active</span></td>
-                                    <td>Mar 15, 2022</td>
-                                    <td>Mar 15, 2025</td>
-                                    <td>
-                                        <button class="btn btn-secondary edit-asset">Edit</button>
-                                    </td>
-                                </tr>
-                                <tr data-asset-id="AS-1002" data-type="desktop" data-status="active" data-purchase="2022-01-10" data-warranty="2024-01-10">
-                                    <td>AS-1002</td>
-                                    <td>HP EliteDesk 800</td>
-                                    <td>Desktop</td>
-                                    <td>EliteDesk 800 G6</td>
-                                    <td>Michael Chen</td>
-                                    <td><span class="status status-open">Active</span></td>
-                                    <td>Jan 10, 2022</td>
-                                    <td>Jan 10, 2024</td>
-                                    <td>
-                                        <button class="btn btn-secondary edit-asset">Edit</button>
-                                    </td>
-                                </tr>
-                                <tr data-asset-id="AS-1003" data-type="laptop" data-status="active" data-purchase="2022-11-03" data-warranty="2025-11-03">
-                                    <td>AS-1003</td>
-                                    <td>MacBook Pro 14"</td>
-                                    <td>Laptop</td>
-                                    <td>MacBook Pro M1</td>
-                                    <td>Emily Davis</td>
-                                    <td><span class="status status-open">Active</span></td>
-                                    <td>Nov 3, 2022</td>
-                                    <td>Nov 3, 2025</td>
-                                    <td>
-                                        <button class="btn btn-secondary edit-asset">Edit</button>
-                                    </td>
-                                </tr>
-                                <tr data-asset-id="AS-2001" data-type="printer" data-status="maintenance" data-purchase="2021-02-28" data-warranty="expired">
-                                    <td>AS-2001</td>
-                                    <td>Brother MFC-L8900CDW</td>
-                                    <td>Printer</td>
-                                    <td>MFC-L8900CDW</td>
-                                    <td>N/A</td>
-                                    <td><span class="status status-in-progress">Maintenance</span></td>
-                                    <td>Feb 28, 2021</td>
-                                    <td>Expired</td>
-                                    <td>
-                                        <button class="btn btn-secondary edit-asset">Edit</button>
-                                    </td>
-                                </tr>
+                                <!-- Asset rows will be rendered dynamically by JS -->
                             </tbody>
                         </table>
                     </div>
@@ -573,6 +497,12 @@
                                         <option value="maintenance">Maintenance</option>
                                         <option value="retired">Retired</option>
                                     </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div>
+                                    <label for="warranty-end-date">Warranty End Date</label>
+                                    <input type="date" id="warranty-end-date">
                                 </div>
                             </div>
                             <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
@@ -985,24 +915,72 @@
             const closeViewModal = document.getElementById('close-view-modal');
             // View ticket buttons
             function attachViewTicketListener(button) {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', async function() {
                     const row = this.closest('tr');
                     const ticketId = row.getAttribute('data-ticket-id');
-                    document.getElementById('ticket-id').textContent = '#' + ticketId;
-                    const statusCell = row.cells[5].querySelector('.status');
-                    document.getElementById('ticket-status').innerHTML = statusCell.outerHTML;
-                    const priorityCell = row.cells[4].querySelector('.priority-high, .priority-medium, .priority-low');
-                    document.getElementById('ticket-priority').innerHTML = priorityCell.outerHTML;
-                    document.getElementById('ticket-requester').textContent = row.cells[2].textContent;
-                    document.getElementById('ticket-assignee').textContent = row.cells[3].textContent;
-                    document.getElementById('ticket-created').textContent = row.cells[6].textContent;
-                    document.getElementById('ticket-updated').textContent = row.cells[6].textContent;
-                    document.getElementById('ticket-email').textContent = row.cells[2].textContent.toLowerCase().replace(' ', '.') + '@company.com';
-                    document.getElementById('ticket-category').textContent = 'Hardware';
-                    document.getElementById('ticket-subject').textContent = row.cells[1].textContent;
-                    document.getElementById('ticket-description').textContent = 'This is the detailed description of the issue reported by the user. It provides context and specific information about the problem they are experiencing.';
+                    
+                    // Fetch ticket details from backend
+                    try {
+                        const response = await fetch(`/api/tickets`);
+                        const tickets = await response.json();
+                        const ticket = tickets.find(t => t.id === ticketId);
+                        
+                        if (ticket) {
+                            // Populate ticket details
+                            document.getElementById('ticket-id').textContent = '#' + ticket.id;
+                            document.getElementById('ticket-status').innerHTML = `<span class="status status-${ticket.status}">${ticket.status.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>`;
+                            document.getElementById('ticket-priority').innerHTML = `<span class="priority-${ticket.priority}">${ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1)}</span>`;
+                            document.getElementById('ticket-requester').textContent = ticket.requester;
+                            document.getElementById('ticket-assignee').textContent = ticket.assignee || 'Unassigned';
+                            document.getElementById('ticket-created').textContent = ticket.createdDate ? new Date(ticket.createdDate).toLocaleDateString() : ticket.date;
+                            document.getElementById('ticket-updated').textContent = ticket.lastUpdated ? new Date(ticket.lastUpdated).toLocaleDateString() : ticket.date;
+                            document.getElementById('ticket-email').textContent = ticket.email;
+                            document.getElementById('ticket-category').textContent = ticket.category ? ticket.category.charAt(0).toUpperCase() + ticket.category.slice(1) : 'Other';
+                            document.getElementById('ticket-subject').textContent = ticket.subject;
+                            document.getElementById('ticket-description').textContent = ticket.description;
+                            
+                            // Render timeline
+                            renderTicketTimeline(ticket);
+                            
+                            // Store current ticket ID for note form
+                            document.getElementById('note-form').setAttribute('data-ticket-id', ticket.id);
+                        }
+                    } catch (error) {
+                        console.error('Error fetching ticket details:', error);
+                    }
+                    
                     viewTicketModal.style.display = 'flex';
                 });
+            }
+            
+            // Render ticket timeline
+            function renderTicketTimeline(ticket) {
+                const timelineContainer = document.getElementById('ticket-timeline');
+                timelineContainer.innerHTML = '';
+                
+                if (ticket.timeline && ticket.timeline.length > 0) {
+                    ticket.timeline.forEach(entry => {
+                        const timelineItem = document.createElement('div');
+                        timelineItem.className = `timeline-item ${entry.type || 'note'}`;
+                        
+                        const authorClass = entry.authorType === 'system' ? 'timeline-author-system' : 'timeline-author';
+                        const authorText = entry.authorType === 'system' ? entry.author : `${entry.author} (${entry.authorType === 'requester' ? 'Requester' : 'Agent'})`;
+                        
+                        timelineItem.innerHTML = `
+                            <div class="timeline-header">
+                                <span class="${authorClass}">${authorText}</span>
+                                <span class="timeline-date">${new Date(entry.date).toLocaleString()}</span>
+                            </div>
+                            <div class="timeline-content">
+                                <p>${entry.content}</p>
+                            </div>
+                        `;
+                        
+                        timelineContainer.appendChild(timelineItem);
+                    });
+                } else {
+                    timelineContainer.innerHTML = '<p>No timeline entries yet.</p>';
+                }
             }
             document.querySelectorAll('.view-ticket').forEach(attachViewTicketListener);
             newTicketBtn.addEventListener('click', function() {
@@ -1097,9 +1075,11 @@
                 tbody.innerHTML = '';
                 assets.forEach(asset => {
                     const row = document.createElement('tr');
-                    row.setAttribute('data-asset-no', asset.assetNo);
+                    row.setAttribute('data-asset-id', asset.id); // Assuming 'id' is the primary key for assets
                     row.setAttribute('data-type', asset.type);
                     row.setAttribute('data-status', asset.status);
+                    row.setAttribute('data-purchase', asset.purchaseDate);
+                    row.setAttribute('data-warranty', asset.warrantyEndDate);
                     row.innerHTML = `
                         <td>${asset.assetNo || ''}</td>
                         <td>${asset.assetTag || ''}</td>
@@ -1117,7 +1097,8 @@
                         <td>${asset.previousUser || ''}</td>
                         <td>${asset.comment || ''}</td>
                         <td><span class="status status-${asset.status}">${asset.status ? asset.status.charAt(0).toUpperCase() + asset.status.slice(1) : ''}</span></td>
-                        <td>
+                        <td>${asset.warrantyEndDate || ''}</td>
+                        <td class="actions-col">
                             <button class="btn btn-secondary edit-asset">Edit</button>
                             <button class="btn btn-secondary delete-asset">Delete</button>
                         </td>
@@ -1128,9 +1109,9 @@
                 document.querySelectorAll('.delete-asset').forEach(button => {
                     button.addEventListener('click', async function() {
                         const row = this.closest('tr');
-                        const assetNo = row.getAttribute('data-asset-no');
+                        const assetId = row.getAttribute('data-asset-id');
                         if (confirm('Are you sure you want to delete this asset?')) {
-                            await fetch(`/api/assets/${assetNo}`, { method: 'DELETE' });
+                            await fetch(`/api/assets/${assetId}`, { method: 'DELETE' });
                             await renderAssets();
                             await updateDashboardStats();
                         }
@@ -1159,19 +1140,29 @@
             }
             async function renderDashboardAssets() {
                 const assets = await fetchAssets();
-                // Select the Asset Overview table in the dashboard
                 const dashboardAssetTable = document.getElementById('dashboard-assets-body');
                 if (!dashboardAssetTable) return;
                 dashboardAssetTable.innerHTML = '';
                 assets.forEach(asset => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${asset.id}</td>
-                        <td>${asset.name}</td>
-                        <td>${asset.type.charAt(0).toUpperCase() + asset.type.slice(1)}</td>
-                        <td>${asset.assigned}</td>
-                        <td><span class="status status-${asset.status}">${asset.status.charAt(0).toUpperCase() + asset.status.slice(1)}</span></td>
-                        <td>${asset.purchase}</td>
+                        <td>${asset.assetNo || ''}</td>
+                        <td>${asset.assetTag || ''}</td>
+                        <td>${asset.type || ''}</td>
+                        <td>${asset.brand || ''}</td>
+                        <td>${asset.model || ''}</td>
+                        <td>${asset.amount || ''}</td>
+                        <td>${asset.date || ''}</td>
+                        <td>${asset.hostname || ''}</td>
+                        <td>${asset.serial || ''}</td>
+                        <td>${asset.imei || ''}</td>
+                        <td>${asset.idNo || ''}</td>
+                        <td>${asset.currentUser || ''}</td>
+                        <td>${asset.department || ''}</td>
+                        <td>${asset.previousUser || ''}</td>
+                        <td>${asset.comment || ''}</td>
+                        <td><span class="status status-${asset.status}">${asset.status ? asset.status.charAt(0).toUpperCase() + asset.status.slice(1) : ''}</span></td>
+                        <td>${asset.warrantyEndDate || ''}</td>
                     `;
                     dashboardAssetTable.appendChild(row);
                 });
@@ -1232,6 +1223,91 @@
                     alert('Error creating ticket: ' + e.message);
                 }
             });
+            
+            // --- Note Form Submission ---
+            const noteForm = document.getElementById('note-form');
+            const cancelNoteBtn = document.getElementById('cancel-note');
+            
+            noteForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const ticketId = this.getAttribute('data-ticket-id');
+                const noteContent = document.getElementById('note-content').value;
+                const updateStatus = document.getElementById('update-status').value;
+                
+                if (!noteContent.trim()) {
+                    alert('Please enter a note or update.');
+                    return;
+                }
+                
+                try {
+                    // Add timeline entry
+                    const timelineEntry = {
+                        author: 'Agent',
+                        authorType: 'agent',
+                        content: noteContent,
+                        type: 'note'
+                    };
+                    
+                    const res = await fetch(`/api/tickets/${ticketId}/timeline`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(timelineEntry)
+                    });
+                    
+                    if (!res.ok) throw new Error('Failed to add timeline entry');
+                    
+                    // Update ticket status if changed
+                    const tickets = await fetchTickets();
+                    const ticket = tickets.find(t => t.id === ticketId);
+                    if (ticket && ticket.status !== updateStatus) {
+                        const updatedTicket = { ...ticket, status: updateStatus };
+                        await fetch(`/api/tickets/${ticketId}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(updatedTicket)
+                        });
+                        
+                        // Add status change to timeline
+                        const statusEntry = {
+                            author: 'System',
+                            authorType: 'system',
+                            content: `Status changed from ${ticket.status.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())} to ${updateStatus.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}.`,
+                            type: 'status-change'
+                        };
+                        
+                        await fetch(`/api/tickets/${ticketId}/timeline`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(statusEntry)
+                        });
+                    }
+                    
+                    // Reset form and refresh
+                    noteForm.reset();
+                    document.getElementById('update-status').value = 'in-progress';
+                    
+                    // Refresh ticket view
+                    await renderTickets();
+                    
+                    // Re-fetch and display updated ticket
+                    const updatedTickets = await fetchTickets();
+                    const updatedTicket = updatedTickets.find(t => t.id === ticketId);
+                    if (updatedTicket) {
+                        renderTicketTimeline(updatedTicket);
+                    }
+                    
+                    alert('Note added successfully!');
+                } catch (error) {
+                    console.error('Error adding note:', error);
+                    alert('Error adding note: ' + error.message);
+                }
+            });
+            
+            cancelNoteBtn.addEventListener('click', function() {
+                noteForm.reset();
+                document.getElementById('update-status').value = 'in-progress';
+            });
+            
             // --- Asset Form Submission ---
             const newAssetBtn = document.getElementById('new-asset-btn');
             const assetModal = document.getElementById('asset-modal');
@@ -1260,6 +1336,7 @@
                     document.getElementById('previous-user').value = row.cells[13].textContent;
                     document.getElementById('comment').value = row.cells[14].textContent;
                     document.getElementById('status-asset').value = row.cells[15].textContent.toLowerCase();
+                    document.getElementById('warranty-end-date').value = row.cells[16].textContent;
                     assetModal.style.display = 'flex';
                 });
             }
@@ -1287,23 +1364,35 @@
                     department: document.getElementById('department').value,
                     previousUser: document.getElementById('previous-user').value,
                     comment: document.getElementById('comment').value,
-                    status: document.getElementById('status-asset').value
+                    status: document.getElementById('status-asset').value,
+                    warrantyEndDate: document.getElementById('warranty-end-date').value
                 };
                 try {
-                    const res = await fetch('/api/assets', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(asset)
-                    });
-                    if (!res.ok) throw new Error('Failed to add asset');
+                    let res;
+                    if (editMode.value === 'true') {
+                        // Edit mode: update existing asset
+                        res = await fetch(`/api/assets/${encodeURIComponent(asset.assetNo)}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(asset)
+                        });
+                    } else {
+                        // Add mode: create new asset
+                        res = await fetch('/api/assets', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(asset)
+                        });
+                    }
+                    if (!res.ok) throw new Error('Failed to save asset');
                     assetModal.style.display = 'none';
                     assetForm.reset();
                     await renderAssets();
                     await updateDashboardStats();
                     await renderDashboardAssets();
-                    alert(`Asset ${asset.assetNo} has been added successfully!`);
+                    alert(`Asset ${asset.assetNo} has been ${editMode.value === 'true' ? 'updated' : 'added'} successfully!`);
                 } catch (e) {
-                    alert('Error adding asset: ' + e.message);
+                    alert('Error saving asset: ' + e.message);
                 }
             });
             // --- Ticket/Asset Update Logic ---

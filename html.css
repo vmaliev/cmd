@@ -335,17 +335,25 @@
             margin-top: 20px;
             border-left: 2px solid #e1e5f2;
             padding-left: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px 20px;
         }
         
         .timeline-item {
             margin-bottom: 15px;
             position: relative;
-            padding-bottom: 15px;
+            padding: 12px 15px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 3px solid #3a4da5;
         }
         
         .timeline-item:last-child {
             margin-bottom: 0;
-            padding-bottom: 0;
         }
         
         .timeline-item::before {
@@ -356,26 +364,57 @@
             border-radius: 50%;
             background-color: #3a4da5;
             left: -27px;
-            top: 4px;
+            top: 15px;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px #3a4da5;
+        }
+        
+        .timeline-item.system-message::before {
+            background-color: #28a745;
+            box-shadow: 0 0 0 2px #28a745;
+        }
+        
+        .timeline-item.status-change::before {
+            background-color: #ffc107;
+            box-shadow: 0 0 0 2px #ffc107;
+        }
+        
+        .timeline-item.note::before {
+            background-color: #17a2b8;
+            box-shadow: 0 0 0 2px #17a2b8;
         }
         
         .timeline-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            align-items: center;
         }
         
         .timeline-author {
             font-weight: 600;
+            color: #3a4da5;
+            font-size: 0.9em;
+        }
+        
+        .timeline-author-system {
+            font-weight: 600;
+            color: #28a745;
+            font-size: 0.9em;
         }
         
         .timeline-date {
             color: #6c757d;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
         }
         
         .timeline-content {
             line-height: 1.5;
+            color: #333;
+        }
+        
+        .timeline-content p {
+            margin: 0;
         }
         
         .ticket-actions {
@@ -551,20 +590,52 @@ body.dark-theme th {
 
 /* Make the assets table more compact for many columns */
 #assets-table th, #assets-table td {
-    font-size: 0.75rem;
-    padding: 3px 4px;
+    font-size: 0.68rem;
+    padding: 2px 3px;
     white-space: nowrap;
+    text-align: left;
 }
 #assets-table {
-    font-size: 0.75rem;
-    table-layout: auto;
-    width: 100%;
-    overflow-x: auto;
     display: block;
+    overflow-x: auto;
+    width: 100%;
     max-width: 100vw;
+    position: relative;
 }
 #assets-table thead, #assets-table tbody {
     display: table;
     width: 100%;
     table-layout: auto;
+}
+#assets-table .btn, #assets-table .btn-secondary {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    min-width: 40px;
+}
+#assets-table tbody tr:nth-child(even) {
+    background-color: #23272b;
+}
+#assets-table tbody tr:nth-child(odd) {
+    background-color: #181a1b;
+}
+#assets-table th, #assets-table td {
+    border-right: 1px solid #333;
+    line-height: 1.4;
+}
+#assets-table th:last-child, #assets-table td:last-child {
+    border-right: none;
+}
+#assets-table thead th {
+    position: sticky;
+    top: 0;
+    background: #202225;
+    z-index: 2;
+}
+#assets-table th.actions-col,
+#assets-table td.actions-col {
+    position: sticky;
+    right: 0;
+    background: #202225;
+    z-index: 10;
+    box-shadow: -2px 0 4px rgba(0,0,0,0.08);
 }

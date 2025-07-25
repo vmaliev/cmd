@@ -1,6 +1,62 @@
 {
   "tickets": [
     {
+      "id": "TKT-006",
+      "subject": "Connection issue with Plotter",
+      "requester": "Ammar Tivari",
+      "assignee": "Unassigned",
+      "priority": "medium",
+      "status": "closed",
+      "date": "2025-07-25",
+      "email": "ammar.tivari@adriatic42.com",
+      "description": "I have issue connecting with Plotter",
+      "category": "network",
+      "createdDate": "2025-07-25T10:00:00.000Z",
+      "lastUpdated": "2025-07-25T16:30:00.000Z",
+      "timeline": [
+        {
+          "id": "timeline-1",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-25T10:00:00.000Z",
+          "content": "Hello Ammar Tivari! Thank you for submitting your ticket. We have received your request and will begin working on it shortly.",
+          "type": "greeting"
+        },
+        {
+          "id": "timeline-2",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-25T10:00:00.000Z",
+          "content": "This ticket has been classified as MEDIUM priority. Expected response time: 4-8 hours. Our team will begin working on this shortly.",
+          "type": "priority-info"
+        },
+        {
+          "id": "timeline-3",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-25T10:00:00.000Z",
+          "content": "Ticket created with ID: TKT-006. Status: Open.",
+          "type": "creation"
+        },
+        {
+          "id": "timeline-4",
+          "author": "John Smith (Agent)",
+          "authorType": "agent",
+          "date": "2025-07-25T14:30:00.000Z",
+          "content": "Investigating the plotter connection issue. Checking network connectivity and driver status.",
+          "type": "note"
+        },
+        {
+          "id": "timeline-5",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-25T16:30:00.000Z",
+          "content": "Status changed from In Progress to Closed.",
+          "type": "status-change"
+        }
+      ]
+    },
+    {
       "id": "TKT-005",
       "subject": "test",
       "requester": "test",
@@ -10,10 +66,65 @@
       "date": "2025-07-23",
       "email": "test@test.com",
       "description": "test",
-      "category": "hardware"
+      "category": "hardware",
+      "createdDate": "2025-07-23T09:00:00.000Z",
+      "lastUpdated": "2025-07-23T11:15:00.000Z",
+      "timeline": [
+        {
+          "id": "timeline-1",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-23T09:00:00.000Z",
+          "content": "Hello test! Thank you for submitting your ticket. We have received your request and will begin working on it shortly.",
+          "type": "greeting"
+        },
+        {
+          "id": "timeline-2",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-23T09:00:00.000Z",
+          "content": "This ticket has been classified as LOW priority. Expected response time: 24-48 hours. We will address this as soon as possible.",
+          "type": "priority-info"
+        },
+        {
+          "id": "timeline-3",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-23T09:00:00.000Z",
+          "content": "Ticket created with ID: TKT-005. Status: Open.",
+          "type": "creation"
+        },
+        {
+          "id": "timeline-4",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-23T11:15:00.000Z",
+          "content": "Status changed from Open to In Progress.",
+          "type": "status-change"
+        }
+      ]
     }
   ],
   "assets": [
+    {
+      "assetNo": "A-001",
+      "assetTag": "TAG-888",
+      "type": "laptop",
+      "brand": "Dell",
+      "model": "XPS 13",
+      "amount": "1",
+      "date": "2023-01-01",
+      "hostname": "LAPTOP-001",
+      "serial": "SN123456",
+      "imei": "",
+      "idNo": "ID001",
+      "currentUser": "John Doe",
+      "department": "IT",
+      "previousUser": "Jane Smith",
+      "comment": "First asset entry",
+      "status": "active",
+      "warrantyEndDate": "2026-01-01"
+    },
     {
       "assetNo": "A-001",
       "assetTag": "TAG-001",
@@ -32,7 +143,8 @@
       "comment": "First asset entry",
       "status": "active",
       "purchase": "2023-01-01",
-      "warranty": "2026-01-01"
+      "warranty": "2026-01-01",
+      "warrantyEndDate": "2026-01-01"
     },
     {
       "assetNo": "A-002",
@@ -52,7 +164,8 @@
       "comment": "Second asset entry",
       "status": "active",
       "purchase": "2023-02-01",
-      "warranty": "2026-02-01"
+      "warranty": "2026-02-01",
+      "warrantyEndDate": "2026-02-01"
     }
   ]
 }
