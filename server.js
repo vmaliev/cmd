@@ -4,6 +4,7 @@ const path = require('path');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
+const PORT = 80;
 const PORT1 = 3000;
 const PORT2 = 80;
 const DATA_FILE = path.join(__dirname, 'data.json');
@@ -92,8 +93,8 @@ io.on('connection', (socket) => {
   // No-op, just keep the connection open
 });
 
-http.listen(PORT1, () => {
-  console.log(`Server running at http://localhost:${PORT1}`);
+http.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
 });
 try {
   http.listen(PORT2, () => {
