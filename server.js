@@ -4,7 +4,8 @@ const path = require('path');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
-const PORT = 3000;
+const PORT1 = 3000;
+const PORT2 = 80;
 const DATA_FILE = path.join(__dirname, 'data.json');
 
 app.use(express.json());
@@ -91,6 +92,13 @@ io.on('connection', (socket) => {
   // No-op, just keep the connection open
 });
 
-http.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-}); 
+http.listen(PORT1, () => {
+  console.log(`Server running at http://localhost:${PORT1}`);
+});
+try {
+  http.listen(PORT2, () => {
+    console.log(`Server also running at http://localhost:${PORT2}`);
+  });
+} catch (err) {
+  console.error('Could not bind to port 80 (try running with sudo):', err.message);
+} 
