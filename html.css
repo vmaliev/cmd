@@ -612,14 +612,16 @@ body.dark-theme th {
     padding: 2px 8px;
     min-width: 40px;
 }
+
+/* Light theme assets table */
 #assets-table tbody tr:nth-child(even) {
-    background-color: #23272b;
+    background-color: #f8f9fa;
 }
 #assets-table tbody tr:nth-child(odd) {
-    background-color: #181a1b;
+    background-color: #ffffff;
 }
 #assets-table th, #assets-table td {
-    border-right: 1px solid #333;
+    border-right: 1px solid #dee2e6;
     line-height: 1.4;
 }
 #assets-table th:last-child, #assets-table td:last-child {
@@ -628,16 +630,40 @@ body.dark-theme th {
 #assets-table thead th {
     position: sticky;
     top: 0;
-    background: #202225;
+    background: #e9ecef;
     z-index: 2;
 }
 #assets-table th.actions-col,
 #assets-table td.actions-col {
     position: sticky;
     right: 0;
-    background: #202225;
+    background: #e9ecef;
     z-index: 10;
     box-shadow: -2px 0 4px rgba(0,0,0,0.08);
+}
+
+/* Dark theme assets table */
+body.dark-theme #assets-table tbody tr:nth-child(even) {
+    background-color: #23272b;
+}
+body.dark-theme #assets-table tbody tr:nth-child(odd) {
+    background-color: #181a1b;
+}
+body.dark-theme #assets-table th, 
+body.dark-theme #assets-table td {
+    border-right: 1px solid #333;
+    color: #dcddde;
+}
+body.dark-theme #assets-table thead th {
+    background: #202225;
+    color: #e0e0e0;
+}
+body.dark-theme #assets-table th.actions-col,
+body.dark-theme #assets-table td.actions-col {
+    background: #202225;
+}
+body.dark-theme #assets-table tbody tr:hover {
+    background-color: #2c2f33;
 }
 
 /* Dark theme styles for timeline */
