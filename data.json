@@ -119,6 +119,25 @@
   ],
   "assets": [
     {
+      "assetNo": "324234",
+      "assetTag": "r23",
+      "type": "laptop",
+      "brand": "werw",
+      "model": "rwerwe",
+      "amount": "1",
+      "date": "",
+      "hostname": "rwerw",
+      "serial": "234234",
+      "imei": "324234234",
+      "idNo": "23",
+      "currentUser": "werwer",
+      "department": "werwer",
+      "previousUser": "werwer",
+      "comment": "werwer",
+      "status": "active",
+      "warrantyEndDate": "2025-08-02"
+    },
+    {
       "assetNo": "A-001",
       "assetTag": "TAG-888",
       "type": "laptop",

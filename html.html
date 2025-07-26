@@ -1082,7 +1082,7 @@
                 tbody.innerHTML = '';
                 assets.forEach(asset => {
                     const row = document.createElement('tr');
-                    row.setAttribute('data-asset-id', asset.id); // Assuming 'id' is the primary key for assets
+                    row.setAttribute('data-asset-id', asset.assetNo); // Use assetNo as the unique identifier
                     row.setAttribute('data-type', asset.type);
                     row.setAttribute('data-status', asset.status);
                     row.setAttribute('data-purchase', asset.purchaseDate);
@@ -1357,7 +1357,7 @@
                     fetch(`/api/assets`)
                         .then(response => response.json())
                         .then(assets => {
-                            const asset = assets.find(a => a.id === assetId || a.assetNo === assetId);
+                            const asset = assets.find(a => a.assetNo === assetId);
                             if (asset) {
                                 document.getElementById('asset-no').value = asset.assetNo || '';
                                 document.getElementById('id-no').value = asset.idNo || '';
