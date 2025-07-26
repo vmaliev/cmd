@@ -366,6 +366,9 @@
                         <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <button class="btn" id="new-asset-btn">Add New Asset</button>
+                                <button class="btn" id="export-assets-btn" style="margin-left: 8px;">Export to Excel</button>
+                                <button class="btn" id="import-assets-btn" style="margin-left: 8px;">Import from Excel</button>
+                                <input type="file" id="import-assets-input" accept=".xlsx,.xls" style="display:none">
                             </div>
                             <div>
                                 <select id="filter-type">
@@ -1472,6 +1475,108 @@
             });
         });
     </script>
+    <script>
+// Export assets table to real .xlsx using SheetJS, excluding the Actions column
+function exportTableToXLSX(tableId, filename = 'assets.xlsx') {
+    const table = document.getElementById(tableId);
+    // Clone the table to manipulate columns without affecting the DOM
+    const clone = table.cloneNode(true);
+    // Remove the last cell from each row (Actions column)
+    for (let row of clone.rows) {
+        if (row.cells.length > 0) {
+            row.deleteCell(row.cells.length - 1);
+        }
+    }
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.table_to_sheet(clone);
+    XLSX.utils.book_append_sheet(wb, ws, 'Assets');
+    XLSX.writeFile(wb, filename);
+}
+
+document.getElementById('export-assets-btn').addEventListener('click', function() {
+    exportTableToXLSX('assets-table');
+});
+
+// Import assets from Excel using SheetJS and send to backend, handling duplicates and errors
+async function importAssetsFromXLSX(file) {
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const json = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+        // Fetch existing assets for duplicate check
+        let existingAssets = [];
+        try {
+            existingAssets = await fetch('/api/assets').then(r => r.json());
+        } catch (err) {
+            alert('Failed to fetch existing assets for duplicate check. Import aborted.');
+            return;
+        }
+        // Use Asset TAG and Serial as unique keys
+        const existingKeys = new Set(existingAssets.map(a => (a.assetTag || '') + '|' + (a.serial || '')));
+        let imported = 0, skipped = 0, failed = 0;
+        let skippedRows = [], failedRows = [];
+        for (const [i, asset] of json.entries()) {
+            const key = (asset['Asset TAG'] || '') + '|' + (asset['Number/Serial'] || '');
+            if (existingKeys.has(key)) {
+                skipped++;
+                skippedRows.push(i + 2); // +2 for Excel row number (header + 1-based)
+                continue;
+            }
+            // Map Excel columns to backend asset structure
+            const assetObj = {
+                assetTag: asset['Asset TAG'] || '',
+                type: asset['Type'] || '',
+                brand: asset['Brand'] || '',
+                model: asset['Model'] || '',
+                amount: asset['Amount'] || '',
+                date: asset['Date'] || '',
+                hostname: asset['Hostname'] || '',
+                serial: asset['Number/Serial'] || '',
+                imei: asset['IMEI'] || '',
+                currentUser: asset['Current user'] || '',
+                department: asset['Department'] || '',
+                previousUser: asset['Previous user'] || '',
+                comment: asset['Comment'] || '',
+                status: (asset['Status'] || '').toLowerCase(),
+                warrantyEndDate: asset['Warranty End Date'] || ''
+            };
+            try {
+                const res = await fetch('/api/assets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(assetObj)
+                });
+                if (!res.ok) throw new Error('Server error');
+                imported++;
+            } catch (err) {
+                failed++;
+                failedRows.push(i + 2);
+            }
+        }
+        await renderAssets();
+        await updateDashboardStats();
+        let msg = `Import complete.\nImported: ${imported}\nSkipped (duplicates): ${skipped}`;
+        if (skippedRows.length) msg += `\nSkipped rows: ${skippedRows.join(', ')}`;
+        if (failed) msg += `\nFailed: ${failed}\nFailed rows: ${failedRows.join(', ')}`;
+        alert(msg);
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+document.getElementById('import-assets-btn').addEventListener('click', function() {
+    document.getElementById('import-assets-input').click();
+});
+document.getElementById('import-assets-input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        importAssetsFromXLSX(file);
+    }
+});
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="theme.js"></script>
 </body>
 </html> 
