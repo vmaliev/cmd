@@ -639,3 +639,52 @@ body.dark-theme th {
     z-index: 10;
     box-shadow: -2px 0 4px rgba(0,0,0,0.08);
 }
+
+/* Dark theme styles for timeline */
+body.dark-theme .timeline {
+    background: #2c2f33;
+    border-left-color: #40444b;
+}
+
+body.dark-theme .timeline-item {
+    background: #36393f;
+    border-left-color: #7289da;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+body.dark-theme .timeline-content {
+    color: #dcddde;
+}
+
+body.dark-theme .timeline-date {
+    color: #72767d;
+}
+
+body.dark-theme .timeline-author {
+    color: #7289da;
+}
+
+body.dark-theme .timeline-author-system {
+    color: #43b581;
+}
+
+/* Dark theme timeline dots */
+body.dark-theme .timeline-item::before {
+    background-color: #7289da;
+    box-shadow: 0 0 0 2px #7289da;
+}
+
+body.dark-theme .timeline-item.system-message::before {
+    background-color: #43b581;
+    box-shadow: 0 0 0 2px #43b581;
+}
+
+body.dark-theme .timeline-item.status-change::before {
+    background-color: #faa61a;
+    box-shadow: 0 0 0 2px #faa61a;
+}
+
+body.dark-theme .timeline-item.note::before {
+    background-color: #00b0f4;
+    box-shadow: 0 0 0 2px #00b0f4;
+}
