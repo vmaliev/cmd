@@ -102,12 +102,21 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Asset ID</th>
-                                    <th>Name</th>
+                                    <th>Asset TAG</th>
                                     <th>Type</th>
-                                    <th>Assigned To</th>
+                                    <th>Brand</th>
+                                    <th>Model</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Hostname</th>
+                                    <th>Number/Serial</th>
+                                    <th>IMEI</th>
+                                    <th>Current user</th>
+                                    <th>Department</th>
+                                    <th>Previous user</th>
+                                    <th>Comment</th>
                                     <th>Status</th>
-                                    <th>Last Maintenance</th>
+                                    <th>Warranty End Date</th>
                                 </tr>
                             </thead>
                             <tbody id="dashboard-assets-body">
@@ -378,7 +387,6 @@
                         <table id="assets-table">
                             <thead>
                                 <tr>
-                                    <th>Asset No.</th>
                                     <th>Asset TAG</th>
                                     <th>Type</th>
                                     <th>Brand</th>
@@ -388,7 +396,6 @@
                                     <th>Hostname</th>
                                     <th>Number/Serial</th>
                                     <th>IMEI</th>
-                                    <th>ID No.</th>
                                     <th>Current user</th>
                                     <th>Department</th>
                                     <th>Previous user</th>
@@ -1081,7 +1088,6 @@
                     row.setAttribute('data-purchase', asset.purchaseDate);
                     row.setAttribute('data-warranty', asset.warrantyEndDate);
                     row.innerHTML = `
-                        <td>${asset.assetNo || ''}</td>
                         <td>${asset.assetTag || ''}</td>
                         <td>${asset.type || ''}</td>
                         <td>${asset.brand || ''}</td>
@@ -1091,7 +1097,6 @@
                         <td>${asset.hostname || ''}</td>
                         <td>${asset.serial || ''}</td>
                         <td>${asset.imei || ''}</td>
-                        <td>${asset.idNo || ''}</td>
                         <td>${asset.currentUser || ''}</td>
                         <td>${asset.department || ''}</td>
                         <td>${asset.previousUser || ''}</td>
@@ -1146,7 +1151,6 @@
                 assets.forEach(asset => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${asset.assetNo || ''}</td>
                         <td>${asset.assetTag || ''}</td>
                         <td>${asset.type || ''}</td>
                         <td>${asset.brand || ''}</td>
@@ -1156,7 +1160,6 @@
                         <td>${asset.hostname || ''}</td>
                         <td>${asset.serial || ''}</td>
                         <td>${asset.imei || ''}</td>
-                        <td>${asset.idNo || ''}</td>
                         <td>${asset.currentUser || ''}</td>
                         <td>${asset.department || ''}</td>
                         <td>${asset.previousUser || ''}</td>
@@ -1320,23 +1323,50 @@
                     editMode.value = 'true';
                     modalTitle.textContent = 'Edit Asset';
                     assetForm.reset();
-                    document.getElementById('asset-no').value = row.cells[0].textContent;
-                    document.getElementById('asset-tag').value = row.cells[1].textContent;
-                    document.getElementById('asset-type').value = row.cells[2].textContent;
-                    document.getElementById('brand').value = row.cells[3].textContent;
-                    document.getElementById('model').value = row.cells[4].textContent;
-                    document.getElementById('amount').value = row.cells[5].textContent;
-                    document.getElementById('date').value = row.cells[6].textContent;
-                    document.getElementById('hostname').value = row.cells[7].textContent;
-                    document.getElementById('serial').value = row.cells[8].textContent;
-                    document.getElementById('imei').value = row.cells[9].textContent;
-                    document.getElementById('id-no').value = row.cells[10].textContent;
-                    document.getElementById('current-user').value = row.cells[11].textContent;
-                    document.getElementById('department').value = row.cells[12].textContent;
-                    document.getElementById('previous-user').value = row.cells[13].textContent;
-                    document.getElementById('comment').value = row.cells[14].textContent;
-                    document.getElementById('status-asset').value = row.cells[15].textContent.toLowerCase();
-                    document.getElementById('warranty-end-date').value = row.cells[16].textContent;
+                    
+                    // Get asset data from the row's data attributes instead of cells
+                    const assetId = row.getAttribute('data-asset-id');
+                    
+                    // Set the asset ID for editing
+                    document.getElementById('edit-asset-id').value = assetId;
+                    
+                    // Populate form fields with current data
+                    document.getElementById('asset-tag').value = row.cells[0].textContent;
+                    document.getElementById('asset-type').value = row.cells[1].textContent.toLowerCase();
+                    document.getElementById('brand').value = row.cells[2].textContent;
+                    document.getElementById('model').value = row.cells[3].textContent;
+                    document.getElementById('amount').value = row.cells[4].textContent;
+                    document.getElementById('date').value = row.cells[5].textContent;
+                    document.getElementById('hostname').value = row.cells[6].textContent;
+                    document.getElementById('serial').value = row.cells[7].textContent;
+                    document.getElementById('imei').value = row.cells[8].textContent;
+                    document.getElementById('current-user').value = row.cells[9].textContent;
+                    document.getElementById('department').value = row.cells[10].textContent;
+                    document.getElementById('previous-user').value = row.cells[11].textContent;
+                    document.getElementById('comment').value = row.cells[12].textContent;
+                    
+                    // Handle status field (it has a span with class)
+                    const statusSpan = row.cells[13].querySelector('.status');
+                    const statusValue = statusSpan ? statusSpan.textContent.toLowerCase() : 'active';
+                    document.getElementById('status-asset').value = statusValue;
+                    
+                    document.getElementById('warranty-end-date').value = row.cells[14].textContent;
+                    
+                    // For Asset No. and ID No., we'll need to get them from the backend
+                    // since they're not displayed in the table anymore
+                    fetch(`/api/assets`)
+                        .then(response => response.json())
+                        .then(assets => {
+                            const asset = assets.find(a => a.id === assetId || a.assetNo === assetId);
+                            if (asset) {
+                                document.getElementById('asset-no').value = asset.assetNo || '';
+                                document.getElementById('id-no').value = asset.idNo || '';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching asset details:', error);
+                        });
+                    
                     assetModal.style.display = 'flex';
                 });
             }
@@ -1371,7 +1401,8 @@
                     let res;
                     if (editMode.value === 'true') {
                         // Edit mode: update existing asset
-                        res = await fetch(`/api/assets/${encodeURIComponent(asset.assetNo)}`, {
+                        const editAssetId = document.getElementById('edit-asset-id').value;
+                        res = await fetch(`/api/assets/${encodeURIComponent(editAssetId)}`, {
                             method: 'PUT',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(asset)
