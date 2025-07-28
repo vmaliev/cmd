@@ -3,12 +3,20 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const https = require('https');
 const app = express();
-const http = require('http').createServer(app);
-const io = require('socket.io')(http);
+
+// SSL certificate configuration
+const sslOptions = {
+  key: fs.readFileSync(path.join(__dirname, 'ssl', 'key.pem')),
+  cert: fs.readFileSync(path.join(__dirname, 'ssl', 'cert.pem'))
+};
+
+const server = https.createServer(sslOptions, app);
+const io = require('socket.io')(server);
 const PORT = 3000;
 const PORT1 = 3000;
-const PORT2 = 80;
+const PORT2 = 443; // HTTPS default port
 const DATA_FILE = path.join(__dirname, 'data.json');
 const nodemailer = require('nodemailer');
 
@@ -103,7 +111,7 @@ app.post('/api/admin/login', (req, res) => {
     
     res.cookie('adminSession', sessionId, {
       httpOnly: true,
-      secure: false, // Set to true in production with HTTPS
+      secure: true, // Set to true for HTTPS
       maxAge: 24 * 60 * 60 * 1000 // 24 hours
     });
     
@@ -388,13 +396,13 @@ io.on('connection', (socket) => {
   // No-op, just keep the connection open
 });
 
-http.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+server.listen(PORT, () => {
+  console.log(`HTTPS Server running at https://localhost:${PORT}`);
 });
 try {
-  http.listen(PORT2, () => {
-    console.log(`Server also running at http://localhost:${PORT2}`);
+  server.listen(PORT2, () => {
+    console.log(`HTTPS Server also running at https://localhost:${PORT2}`);
   });
 } catch (err) {
-  console.error('Could not bind to port 80 (try running with sudo):', err.message);
+  console.error('Could not bind to port 443 (try running with sudo):', err.message);
 } 

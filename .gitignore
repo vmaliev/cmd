@@ -27,3 +27,9 @@ node_modules/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# SSL certificates
+ssl/
+*.pem
+*.key
+*.crt
