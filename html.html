@@ -18,8 +18,12 @@
                     <li><a href="#" class="tab" id="reports-tab">Reports</a></li>
                 </ul>
             </nav>
-            <button id="language-toggle" class="btn">🇷🇸 Serbian</button>
-            <button id="theme-toggle" class="btn">🌙 Dark Mode</button>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <span id="admin-username" style="color: #3a4da5; font-weight: 600; font-size: 0.9rem;"></span>
+                <button id="language-toggle" class="btn">🇷🇸 Serbian</button>
+                <button id="theme-toggle" class="btn">🌙 Dark Mode</button>
+                <button id="logout-btn" class="btn" style="background: #dc3545; color: white;">🚪 Logout</button>
+            </div>
         </header>
         <div class="tab-container">
             <!-- Dashboard Tab -->
@@ -670,8 +674,49 @@
         </div>
     </div>
     <script>
+        // Admin authentication check
+        async function checkAdminAuth() {
+            try {
+                const response = await fetch('/api/admin/check-auth');
+                const data = await response.json();
+                
+                if (!data.authenticated) {
+                    window.location.href = '/login';
+                    return;
+                }
+                
+                // Display username
+                if (data.username) {
+                    document.getElementById('admin-username').textContent = `Welcome, ${data.username}`;
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                window.location.href = '/login';
+            }
+        }
+
         // Tab functionality
         document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication status
+            checkAdminAuth();
+            
+            // Logout functionality
+            document.getElementById('logout-btn').addEventListener('click', async function() {
+                try {
+                    const response = await fetch('/api/admin/logout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    if (response.ok) {
+                        window.location.href = '/login';
+                    }
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    window.location.href = '/login';
+                }
+            });
+            
             const tabs = document.querySelectorAll('.tab');
             const tabContents = document.querySelectorAll('.tab-content');
             tabs.forEach(tab => {

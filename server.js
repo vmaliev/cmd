@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
@@ -12,22 +13,38 @@ const DATA_FILE = path.join(__dirname, 'data.json');
 const nodemailer = require('nodemailer');
 
 app.use(express.json()); // <-- Move this to the top, before any routes
+app.use(express.urlencoded({ extended: true })); // For form data parsing
+app.use(cookieParser()); // For parsing cookies
 
 // In-memory OTP store: { email: { otp, expiresAt } }
 const otpStore = {};
 
-// In-memory session store: { email: { verifiedAt, expiresAt } }
+// In-memory session store: { email: { deviceId: { verifiedAt, expiresAt } } }
 const clientSessions = {};
+
+// Admin authentication store
+const adminSessions = {};
+
+// Admin credentials
+const ADMIN_CREDENTIALS = {
+  username: 'admin',
+  password: 'admin'
+};
 
 // Check if email is already authenticated
 app.post('/api/check-auth', (req, res) => {
-  const { email } = req.body || {};
+  const { email, deviceId } = req.body;
   if (!email) return res.status(400).json({ error: 'Email required' });
-  const session = clientSessions[email.toLowerCase()];
-  if (session && Date.now() < session.expiresAt) {
+  
+  const emailSessions = clientSessions[email.toLowerCase()];
+  if (emailSessions && emailSessions[deviceId] && Date.now() < emailSessions[deviceId].expiresAt) {
+    // Session exists for this device and is valid
     res.json({ authenticated: true });
   } else {
-    if (session) delete clientSessions[email.toLowerCase()];
+    // No valid session for this device
+    if (emailSessions && emailSessions[deviceId]) {
+      delete emailSessions[deviceId];
+    }
     res.json({ authenticated: false });
   }
 });
@@ -43,10 +60,82 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-app.use(express.static(__dirname)); // Serve static files (html.html, etc.)
+// Admin authentication middleware
+function requireAdminAuth(req, res, next) {
+  const sessionId = req.cookies?.adminSession;
+  
+  if (!sessionId || !adminSessions[sessionId] || Date.now() > adminSessions[sessionId].expiresAt) {
+    return res.redirect('/login');
+  }
+  
+  // Extend session
+  adminSessions[sessionId].expiresAt = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+  next();
+}
 
-// Serve the main admin page
-app.get('/', (req, res) => {
+// Serve static files (but protect admin routes)
+app.use(express.static(__dirname, {
+  setHeaders: (res, path) => {
+    // Don't cache HTML files
+    if (path.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+  }
+}));
+
+// Serve login page
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'login.html'));
+});
+
+// Admin login endpoint
+app.post('/api/admin/login', (req, res) => {
+  const { username, password } = req.body;
+  
+  if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+    const sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    
+    adminSessions[sessionId] = {
+      username: username,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+    };
+    
+    res.cookie('adminSession', sessionId, {
+      httpOnly: true,
+      secure: false, // Set to true in production with HTTPS
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+    
+    res.json({ success: true });
+  } else {
+    res.status(401).json({ error: 'Invalid credentials' });
+  }
+});
+
+// Admin logout endpoint
+app.post('/api/admin/logout', (req, res) => {
+  const sessionId = req.cookies?.adminSession;
+  if (sessionId && adminSessions[sessionId]) {
+    delete adminSessions[sessionId];
+  }
+  res.clearCookie('adminSession');
+  res.json({ success: true });
+});
+
+// Check admin authentication status
+app.get('/api/admin/check-auth', (req, res) => {
+  const sessionId = req.cookies?.adminSession;
+  
+  if (sessionId && adminSessions[sessionId] && Date.now() < adminSessions[sessionId].expiresAt) {
+    res.json({ authenticated: true, username: adminSessions[sessionId].username });
+  } else {
+    res.json({ authenticated: false });
+  }
+});
+
+// Serve the main admin page (protected)
+app.get('/', requireAdminAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'html.html'));
 });
 
@@ -266,8 +355,10 @@ app.post('/api/request-otp', async (req, res) => {
 
 // Verify OTP
 app.post('/api/verify-otp', (req, res) => {
-  const { email, otp } = req.body;
+  const { email, otp, deviceId } = req.body;
   if (!email || !otp) return res.status(400).json({ error: 'Email and OTP required' });
+  if (!deviceId) return res.status(400).json({ error: 'Device ID required' });
+  
   const record = otpStore[email.toLowerCase()];
   if (!record) return res.status(400).json({ error: 'No OTP requested for this email' });
   if (Date.now() > record.expiresAt) {
@@ -275,11 +366,20 @@ app.post('/api/verify-otp', (req, res) => {
     return res.status(400).json({ error: 'OTP expired' });
   }
   if (record.otp !== otp) return res.status(400).json({ error: 'Invalid OTP' });
+  
   // OTP valid, create session and delete OTP
   delete otpStore[email.toLowerCase()];
-  clientSessions[email.toLowerCase()] = {
+  
+  // Create new session for this device (allows multiple devices)
+  console.log(`Creating session for ${email} on device ${deviceId}`);
+  
+  if (!clientSessions[email.toLowerCase()]) {
+    clientSessions[email.toLowerCase()] = {};
+  }
+  clientSessions[email.toLowerCase()][deviceId] = {
     verifiedAt: Date.now(),
-    expiresAt: Date.now() + 24 * 60 * 60 * 1000 // 1 day
+    expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 1 day
+    deviceId: deviceId // Add deviceId to session
   };
   res.json({ success: true });
 });
