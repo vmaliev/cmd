@@ -202,6 +202,174 @@
             color: #3a4da5;
         }
         
+        .my-tickets-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .my-tickets-section h2 {
+            margin-bottom: 1.5rem;
+            color: #3a4da5;
+        }
+        
+        .tickets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .ticket-card {
+            border: 1px solid #e1e5f2;
+            border-radius: 8px;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .ticket-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .ticket-id {
+            font-weight: 700;
+            color: #3a4da5;
+            font-size: 1.1rem;
+        }
+        
+        .ticket-date {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .ticket-subject {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+        
+        .ticket-description {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .ticket-meta {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        
+        .ticket-category {
+            background: #e9ecef;
+            color: #495057;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .no-tickets-message {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px dashed #dee2e6;
+        }
+        
+        .no-tickets-message h3 {
+            margin-bottom: 1rem;
+            color: #3a4da5;
+        }
+        
+        .my-assets-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .my-assets-section h2 {
+            margin-bottom: 1.5rem;
+            color: #3a4da5;
+        }
+        
+        .assets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .asset-card {
+            border: 1px solid #e1e5f2;
+            border-radius: 8px;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        
+        .asset-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .asset-name {
+            font-weight: 700;
+            color: #3a4da5;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .asset-type {
+            background: #e9ecef;
+            color: #495057;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 0.75rem;
+        }
+        
+        .asset-details {
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .no-assets-message {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px dashed #dee2e6;
+        }
+        
+        .no-assets-message h3 {
+            margin-bottom: 1rem;
+            color: #3a4da5;
+        }
+        
         .client-form {
             display: grid;
             gap: 1.5rem;
@@ -323,6 +491,33 @@
                 Welcome! You are now authenticated and can access all features.
             </div>
 
+            <!-- My Tickets Section -->
+            <div class="my-tickets-section" id="my-tickets-section">
+                <h2>My Support Tickets</h2>
+                <div id="tickets-loading" class="loading">Loading your tickets...</div>
+                <div id="tickets-grid" class="tickets-grid" style="display: none;">
+                    <!-- Tickets will be populated here -->
+                </div>
+                <div id="no-tickets-message" class="no-tickets-message" style="display: none;">
+                    <h3>No Tickets Found</h3>
+                    <p>You haven't created any support tickets yet.</p>
+                    <p>Create your first ticket using the form below.</p>
+                </div>
+            </div>
+
+            <!-- My Assets Section -->
+            <div class="my-assets-section" id="my-assets-section">
+                <h2>My Assets</h2>
+                <div id="assets-loading" class="loading">Loading your assets...</div>
+                <div id="assets-grid" class="assets-grid" style="display: none;">
+                    <!-- Assets will be populated here -->
+                </div>
+                <div id="no-assets-message" class="no-assets-message" style="display: none;">
+                    <h3>No Assets Found</h3>
+                    <p>No assets are currently assigned to your account.</p>
+                </div>
+            </div>
+
             <!-- Ticket Status Search -->
             <div class="ticket-search">
                 <h2>Check Ticket Status</h2>
@@ -442,8 +637,43 @@
     <script>
         let authenticatedEmail = null;
 
+        // Generate a unique device fingerprint
+        function generateDeviceId() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.textBaseline = 'top';
+            ctx.font = '14px Arial';
+            ctx.fillText('Device fingerprint', 2, 2);
+            
+            const userAgent = navigator.userAgent;
+            const screenInfo = `${screen.width}x${screen.height}x${screen.colorDepth}`;
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const language = navigator.language;
+            
+            // Create a hash from device characteristics
+            const deviceString = userAgent + screenInfo + timezone + language + canvas.toDataURL();
+            let hash = 0;
+            for (let i = 0; i < deviceString.length; i++) {
+                const char = deviceString.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32-bit integer
+            }
+            return Math.abs(hash).toString(36);
+        }
+
+        // Get or create device ID
+        function getDeviceId() {
+            let deviceId = localStorage.getItem('deviceId');
+            if (!deviceId) {
+                deviceId = generateDeviceId();
+                localStorage.setItem('deviceId', deviceId);
+            }
+            return deviceId;
+        }
+
         // Check authentication status on page load
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, checking for existing session...');
             checkExistingSession();
         });
 
@@ -454,36 +684,50 @@
                 try {
                     const session = JSON.parse(savedSession);
                     const now = Date.now();
+                    const currentDeviceId = getDeviceId();
                     
-                    // Check if session is still valid locally
-                    if (session.expiresAt && now < session.expiresAt) {
+                    // Check if session is still valid locally and for the same device
+                    if (session.expiresAt && now < session.expiresAt && session.deviceId === currentDeviceId) {
+                        console.log('Found valid local session for:', session.email, 'on device:', session.deviceId);
                         // Verify with server
                         const res = await fetch('/api/check-auth', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email: session.email })
+                            body: JSON.stringify({ 
+                                email: session.email,
+                                deviceId: currentDeviceId
+                            })
                         });
                         const data = await res.json();
                         
                         if (data.authenticated) {
-                            // Session is valid, authenticate user
+                            // Session is valid, authenticate user immediately
+                            console.log('Server confirmed valid session, authenticating user');
                             authenticateUser(session.email);
                             return;
                         } else {
-                            // Server session expired, remove local session
+                            // Server session expired or different device, remove local session
+                            console.log('Server session invalid:', data.message || 'Session expired');
                             localStorage.removeItem('clientSession');
                         }
                     } else {
-                        // Local session expired, remove it
+                        // Session expired or different device, remove it
+                        if (session.deviceId !== currentDeviceId) {
+                            console.log('Session from different device, removing. Current device:', currentDeviceId, 'Session device:', session.deviceId);
+                        } else {
+                            console.log('Local session expired, removing');
+                        }
                         localStorage.removeItem('clientSession');
                     }
                 } catch (e) {
                     // Error checking session, remove it
+                    console.error('Error checking session:', e);
                     localStorage.removeItem('clientSession');
                 }
             }
             
             // No valid session found, show auth form
+            console.log('No valid session found, showing auth form');
             showAuthRequired();
         }
 
@@ -510,11 +754,12 @@
         function authenticateUser(email) {
             authenticatedEmail = email.toLowerCase();
             
-            // Store session locally with expiry
+            // Store session locally with expiry and device ID
             const session = {
                 email: email,
                 authenticatedAt: Date.now(),
-                expiresAt: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+                expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
+                deviceId: getDeviceId() // Add device ID to session
             };
             localStorage.setItem('clientSession', JSON.stringify(session));
             
@@ -528,6 +773,10 @@
             
             // Show welcome message
             document.getElementById('welcome-message').textContent = `Welcome back, ${email}! You are authenticated and can access all features.`;
+            
+            // Load user's tickets and assets
+            loadUserTickets(email);
+            loadUserAssets(email);
         }
 
         function showAuthRequired() {
@@ -536,9 +785,153 @@
             document.getElementById('otp-form').style.display = 'none';
         }
 
+        // Load user's tickets
+        async function loadUserTickets(email) {
+            try {
+                const response = await fetch('/api/tickets');
+                const allTickets = await response.json();
+                
+                // Filter tickets for this user
+                const userTickets = allTickets.filter(ticket => 
+                    ticket.email && ticket.email.toLowerCase() === email.toLowerCase()
+                );
+                
+                displayUserTickets(userTickets);
+            } catch (error) {
+                console.error('Error loading tickets:', error);
+                showErrorMessage('Error loading your tickets. Please try again.');
+            }
+        }
+
+        // Display user's tickets
+        function displayUserTickets(tickets) {
+            const ticketsGrid = document.getElementById('tickets-grid');
+            const ticketsLoading = document.getElementById('tickets-loading');
+            const noTicketsMessage = document.getElementById('no-tickets-message');
+            
+            // Hide loading
+            ticketsLoading.style.display = 'none';
+            
+            if (tickets.length === 0) {
+                noTicketsMessage.style.display = 'block';
+                ticketsGrid.style.display = 'none';
+                return;
+            }
+            
+            // Sort tickets by date (newest first)
+            tickets.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            ticketsGrid.innerHTML = '';
+            tickets.forEach(ticket => {
+                const ticketCard = document.createElement('div');
+                ticketCard.className = 'ticket-card';
+                ticketCard.onclick = () => {
+                    // Auto-fill search form and show ticket details
+                    document.getElementById('ticket-id').value = ticket.id;
+                    document.getElementById('email').value = ticket.email;
+                    document.getElementById('ticket-search-form').dispatchEvent(new Event('submit'));
+                };
+                
+                ticketCard.innerHTML = `
+                    <div class="ticket-header">
+                        <div class="ticket-id">${ticket.id}</div>
+                        <div class="ticket-date">${ticket.date}</div>
+                    </div>
+                    <div class="ticket-subject">${ticket.subject}</div>
+                    <div class="ticket-description">${ticket.description || 'No description provided'}</div>
+                    <div class="ticket-meta">
+                        <span class="status ${getStatusClass(ticket.status)}">${getStatusText(ticket.status)}</span>
+                        <span class="priority-${ticket.priority}">${getPriorityText(ticket.priority)}</span>
+                        ${ticket.category ? `<span class="ticket-category">${getCategoryText(ticket.category)}</span>` : ''}
+                    </div>
+                `;
+                
+                ticketsGrid.appendChild(ticketCard);
+            });
+            
+            ticketsGrid.style.display = 'grid';
+            noTicketsMessage.style.display = 'none';
+        }
+
+        // Load user's assets
+        async function loadUserAssets(email) {
+            try {
+                const response = await fetch('/api/assets');
+                const allAssets = await response.json();
+                
+                // Filter assets for this user (assuming assets have an 'assignedTo' field)
+                const userAssets = allAssets.filter(asset => 
+                    asset.assignedTo && asset.assignedTo.toLowerCase() === email.toLowerCase()
+                );
+                
+                displayUserAssets(userAssets);
+            } catch (error) {
+                console.error('Error loading assets:', error);
+                // Don't show error for assets as they might not be implemented yet
+            }
+        }
+
+        // Display user's assets
+        function displayUserAssets(assets) {
+            const assetsGrid = document.getElementById('assets-grid');
+            const assetsLoading = document.getElementById('assets-loading');
+            const noAssetsMessage = document.getElementById('no-assets-message');
+            
+            // Hide loading
+            assetsLoading.style.display = 'none';
+            
+            if (assets.length === 0) {
+                noAssetsMessage.style.display = 'block';
+                assetsGrid.style.display = 'none';
+                return;
+            }
+            
+            assetsGrid.innerHTML = '';
+            assets.forEach(asset => {
+                const assetCard = document.createElement('div');
+                assetCard.className = 'asset-card';
+                
+                assetCard.innerHTML = `
+                    <div class="asset-name">${asset.name || asset.id}</div>
+                    <div class="asset-type">${getAssetTypeText(asset.type)}</div>
+                    <div class="asset-details">
+                        ${asset.description || 'No description available'}
+                    </div>
+                `;
+                
+                assetsGrid.appendChild(assetCard);
+            });
+            
+            assetsGrid.style.display = 'grid';
+            noAssetsMessage.style.display = 'none';
+        }
+
+        // Helper functions for status, priority, and category text
+        function getStatusClass(status) {
+            return status === 'open' ? 'status-open' : 
+                   status === 'in-progress' ? 'status-in-progress' : 'status-closed';
+        }
+
+        function getStatusText(status) {
+            return status.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase());
+        }
+
+        function getPriorityText(priority) {
+            return priority.charAt(0).toUpperCase() + priority.slice(1);
+        }
+
+        function getCategoryText(category) {
+            return category.charAt(0).toUpperCase() + category.slice(1);
+        }
+
+        function getAssetTypeText(type) {
+            return type ? type.charAt(0).toUpperCase() + type.slice(1) : 'Asset';
+        }
+
         // Enter button handler
         document.getElementById('enter-btn').addEventListener('click', async function() {
             const email = document.getElementById('auth-email').value.trim();
+            console.log('Enter button clicked with email:', email);
             if (!email) {
                 showErrorMessage('Please enter your email address.');
                 return;
@@ -547,30 +940,70 @@
             this.textContent = 'Checking...';
             
             try {
+                console.log('Checking authentication for:', email);
                 const res = await fetch('/api/check-auth', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email })
                 });
                 const data = await res.json();
+                console.log('Auth check response:', data);
                 
                 if (data.authenticated) {
                     // Session exists, authenticate user
+                    console.log('User already authenticated');
                     authenticateUser(email);
                 } else {
-                    // No session, show OTP form
-                    showOTPForm();
+                    // No session, automatically request OTP
+                    console.log('No session found, automatically requesting OTP');
+                    await requestOTP(email);
                 }
             } catch (e) {
+                console.error('Error checking authentication:', e);
                 showErrorMessage('Error checking authentication. Please try again.');
-                showOTPForm();
+                // Fallback: try to request OTP anyway
+                await requestOTP(email);
             } finally {
                 this.disabled = false;
                 this.textContent = 'Enter';
             }
         });
 
+        // Function to request OTP
+        async function requestOTP(email) {
+            try {
+                console.log('Sending OTP request to server for:', email);
+                const res = await fetch('/api/request-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+                console.log('OTP request response:', data);
+                
+                if (!res.ok) throw new Error(data.error || 'Failed to send OTP');
+                
+                if (data.otp) {
+                    // Development mode - show OTP code
+                    console.log('Development mode - OTP received:', data.otp);
+                    showSuccessMessage(`Development mode: Your OTP code is ${data.otp}. In production, this would be sent to your email.`);
+                    document.getElementById('otp-code').value = data.otp;
+                } else {
+                    // Production mode - OTP sent via email
+                    console.log('Production mode - OTP sent via email');
+                    showSuccessMessage('OTP code sent to your email. Please check your inbox.');
+                }
+                
+                // Show OTP form after sending
+                showOTPForm();
+            } catch (e) {
+                console.error('Error sending OTP:', e);
+                showErrorMessage('Failed to send OTP: ' + e.message);
+            }
+        }
+
         function showOTPForm() {
+            console.log('Showing OTP form');
             document.getElementById('otp-form').style.display = 'block';
             document.getElementById('otp-code').focus();
         }
@@ -578,36 +1011,16 @@
         // OTP flow handlers
         document.getElementById('request-otp-btn').addEventListener('click', async function() {
             const email = document.getElementById('auth-email').value.trim();
+            console.log('Request OTP button clicked for email:', email);
             if (!email) {
                 showErrorMessage('Please enter your email address.');
                 return;
             }
             this.disabled = true;
             this.textContent = 'Sending...';
-            try {
-                const res = await fetch('/api/request-otp', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
-                });
-                const data = await res.json();
-                
-                if (!res.ok) throw new Error(data.error || 'Failed to send OTP');
-                
-                if (data.otp) {
-                    // Development mode - show OTP code
-                    showSuccessMessage(`Development mode: Your OTP code is ${data.otp}. In production, this would be sent to your email.`);
-                    document.getElementById('otp-code').value = data.otp;
-                } else {
-                    // Production mode - OTP sent via email
-                    showSuccessMessage('OTP code sent to your email. Please check your inbox.');
-                }
-            } catch (e) {
-                showErrorMessage('Failed to send OTP: ' + e.message);
-            } finally {
-                this.disabled = false;
-                this.textContent = 'Request OTP';
-            }
+            await requestOTP(email);
+            this.disabled = false;
+            this.textContent = 'Request OTP';
         });
 
         document.getElementById('verify-otp-btn').addEventListener('click', async function() {
@@ -623,7 +1036,11 @@
                 const res = await fetch('/api/verify-otp', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, otp })
+                    body: JSON.stringify({ 
+                        email, 
+                        otp,
+                        deviceId: getDeviceId()
+                    })
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'OTP verification failed');
@@ -764,6 +1181,9 @@
                 
                 // Auto-populate search form
                 document.getElementById('ticket-id').value = ticketId;
+                
+                // Refresh the tickets list to show the new ticket
+                loadUserTickets(authenticatedEmail);
                 
             } catch (error) {
                 console.error('Error creating ticket:', error);
