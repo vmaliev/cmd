@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -8,9 +9,51 @@ const PORT = 3000;
 const PORT1 = 3000;
 const PORT2 = 80;
 const DATA_FILE = path.join(__dirname, 'data.json');
+const nodemailer = require('nodemailer');
 
-app.use(express.json());
+app.use(express.json()); // <-- Move this to the top, before any routes
+
+// In-memory OTP store: { email: { otp, expiresAt } }
+const otpStore = {};
+
+// In-memory session store: { email: { verifiedAt, expiresAt } }
+const clientSessions = {};
+
+// Check if email is already authenticated
+app.post('/api/check-auth', (req, res) => {
+  const { email } = req.body || {};
+  if (!email) return res.status(400).json({ error: 'Email required' });
+  const session = clientSessions[email.toLowerCase()];
+  if (session && Date.now() < session.expiresAt) {
+    res.json({ authenticated: true });
+  } else {
+    if (session) delete clientSessions[email.toLowerCase()];
+    res.json({ authenticated: false });
+  }
+});
+
+// Configure nodemailer (use env vars or placeholder)
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.example.com',
+  port: process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) : 587,
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER || 'user@example.com',
+    pass: process.env.SMTP_PASS || 'password'
+  }
+});
+
 app.use(express.static(__dirname)); // Serve static files (html.html, etc.)
+
+// Serve the main admin page
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'html.html'));
+});
+
+// Serve the client portal page
+app.get('/client', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client.html'));
+});
 
 function readData() {
   if (!fs.existsSync(DATA_FILE)) {
@@ -165,6 +208,80 @@ app.delete('/api/assets/:id', (req, res) => {
   } else {
     res.status(404).json({ error: 'Asset not found' });
   }
+});
+
+// Generate and send OTP
+app.post('/api/request-otp', async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email required' });
+  
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
+  otpStore[email.toLowerCase()] = { otp, expiresAt };
+  
+  console.log(`OTP requested for ${email}: ${otp}`);
+  
+  try {
+    // Log SMTP config for debugging (do not log passwords in production)
+    console.log('SMTP Config:', {
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      user: process.env.SMTP_USER,
+      from: process.env.SMTP_FROM
+    });
+    console.log('Attempting to send OTP email to:', email);
+    
+    const smtpHost = process.env.SMTP_HOST || 'smtp.example.com';
+    const smtpUser = process.env.SMTP_USER || 'user@example.com';
+    
+    if (smtpHost === 'smtp.example.com' || smtpUser === 'user@example.com') {
+      // Development mode - just return the OTP in response
+      console.log('Development mode: OTP not actually sent via email');
+      res.json({ 
+        success: true, 
+        message: 'Development mode - OTP not sent via email',
+        otp: otp, // Only include OTP in development
+        expiresAt: expiresAt
+      });
+    } else {
+      // Production mode - send actual email
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM || 'support@example.com',
+        to: email,
+        subject: 'Your IT Support OTP Code',
+        text: `Your OTP code is: ${otp}\nThis code is valid for 5 minutes.`
+      });
+      console.log('OTP email sent successfully to:', email);
+      res.json({ success: true, message: 'OTP sent to your email' });
+    }
+  } catch (err) {
+    console.error('Email sending error:', err);
+    res.status(500).json({ 
+      error: 'Failed to send OTP email',
+      details: err.message,
+      suggestion: 'Check SMTP configuration or use development mode'
+    });
+  }
+});
+
+// Verify OTP
+app.post('/api/verify-otp', (req, res) => {
+  const { email, otp } = req.body;
+  if (!email || !otp) return res.status(400).json({ error: 'Email and OTP required' });
+  const record = otpStore[email.toLowerCase()];
+  if (!record) return res.status(400).json({ error: 'No OTP requested for this email' });
+  if (Date.now() > record.expiresAt) {
+    delete otpStore[email.toLowerCase()];
+    return res.status(400).json({ error: 'OTP expired' });
+  }
+  if (record.otp !== otp) return res.status(400).json({ error: 'Invalid OTP' });
+  // OTP valid, create session and delete OTP
+  delete otpStore[email.toLowerCase()];
+  clientSessions[email.toLowerCase()] = {
+    verifiedAt: Date.now(),
+    expiresAt: Date.now() + 24 * 60 * 60 * 1000 // 1 day
+  };
+  res.json({ success: true });
 });
 
 io.on('connection', (socket) => {

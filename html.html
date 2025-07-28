@@ -18,6 +18,7 @@
                     <li><a href="#" class="tab" id="reports-tab">Reports</a></li>
                 </ul>
             </nav>
+            <button id="language-toggle" class="btn">🇷🇸 Serbian</button>
             <button id="theme-toggle" class="btn">🌙 Dark Mode</button>
         </header>
         <div class="tab-container">
@@ -1574,6 +1575,454 @@ document.getElementById('import-assets-input').addEventListener('change', functi
     if (file) {
         importAssetsFromXLSX(file);
     }
+});
+
+// Language switching functionality
+const translations = {
+    en: {
+        // Header
+        'IT Support System': 'IT Support System',
+        'Dashboard': 'Dashboard',
+        'Tickets': 'Tickets',
+        'Assets': 'Assets',
+        'Reports': 'Reports',
+        'Dark Mode': 'Dark Mode',
+        'Serbian': 'Serbian',
+        
+        // Dashboard
+        'Open Tickets': 'Open Tickets',
+        'In Progress': 'In Progress',
+        'Closed Today': 'Closed Today',
+        'Total Assets': 'Total Assets',
+        'Recent Tickets': 'Recent Tickets',
+        'Asset Overview': 'Asset Overview',
+        
+        // Table headers
+        'Ticket #': 'Ticket #',
+        'Subject': 'Subject',
+        'Requester': 'Requester',
+        'Priority': 'Priority',
+        'Status': 'Status',
+        'Date': 'Date',
+        'Actions': 'Actions',
+        'Assignee': 'Assignee',
+        'Asset TAG': 'Asset TAG',
+        'Type': 'Type',
+        'Brand': 'Brand',
+        'Model': 'Model',
+        'Amount': 'Amount',
+        'Hostname': 'Hostname',
+        'Number/Serial': 'Number/Serial',
+        'IMEI': 'IMEI',
+        'Current user': 'Current user',
+        'Department': 'Department',
+        'Previous user': 'Previous user',
+        'Comment': 'Comment',
+        'Warranty End Date': 'Warranty End Date',
+        
+        // Status and Priority
+        'High': 'High',
+        'Medium': 'Medium',
+        'Low': 'Low',
+        'Open': 'Open',
+        'Closed': 'Closed',
+        'Active': 'Active',
+        'Maintenance': 'Maintenance',
+        'Retired': 'Retired',
+        
+        // Buttons
+        'Create New Ticket': 'Create New Ticket',
+        'Add New Asset': 'Add New Asset',
+        'Export to Excel': 'Export to Excel',
+        'Import from Excel': 'Import from Excel',
+        'Generate Report': 'Generate Report',
+        'View': 'View',
+        'Edit': 'Edit',
+        'Delete': 'Delete',
+        'Save Asset': 'Save Asset',
+        'Cancel': 'Cancel',
+        'Submit Ticket': 'Submit Ticket',
+        'Update': 'Update',
+        'Update Ticket': 'Update Ticket',
+        
+        // Form labels
+        'Requester Name *': 'Requester Name *',
+        'Email *': 'Email *',
+        'Subject *': 'Subject *',
+        'Priority *': 'Priority *',
+        'Description *': 'Description *',
+        'Category': 'Category',
+        'Asset No. *': 'Asset No. *',
+        'Asset TAG': 'Asset TAG',
+        'Type *': 'Type *',
+        'Brand': 'Brand',
+        'Model': 'Model',
+        'Amount': 'Amount',
+        'Date': 'Date',
+        'Hostname': 'Hostname',
+        'Number/Serial': 'Number/Serial',
+        'IMEI': 'IMEI',
+        'ID No.': 'ID No.',
+        'Current user': 'Current user',
+        'Department': 'Department',
+        'Previous user': 'Previous user',
+        'Comment': 'Comment',
+        'Status': 'Status',
+        'Warranty End Date': 'Warranty End Date',
+        
+        // Categories
+        'Hardware': 'Hardware',
+        'Software': 'Software',
+        'Network': 'Network',
+        'Access/Permissions': 'Access/Permissions',
+        'Other': 'Other',
+        
+        // Asset types
+        'Laptop': 'Laptop',
+        'Desktop': 'Desktop',
+        'Printer': 'Printer',
+        'Phone': 'Phone',
+        'Monitor': 'Monitor',
+        
+        // Modal titles
+        'Create New Ticket': 'Create New Ticket',
+        'Ticket Details': 'Ticket Details',
+        'Add New Asset': 'Add New Asset',
+        'Edit Asset': 'Edit Asset',
+        'Reports & Analytics': 'Reports & Analytics',
+        
+        // Filter options
+        'All Status': 'All Status',
+        'All Priorities': 'All Priorities',
+        'All Types': 'All Types',
+        
+        // Messages
+        'Unassigned': 'Unassigned',
+        'Add Note': 'Add Note',
+        'Add your note or update here...': 'Add your note or update here...',
+        'Update Status:': 'Update Status:',
+        'Activity Timeline': 'Activity Timeline',
+        'No timeline entries yet.': 'No timeline entries yet.',
+        
+        // Report types
+        'Ticket Volume': 'Ticket Volume',
+        'Average Response Time': 'Average Response Time',
+        'Average Resolution Time': 'Average Resolution Time',
+        'Asset Inventory': 'Asset Inventory',
+        'Warranty Status': 'Warranty Status',
+        
+        // Time periods
+        'Last 7 days': 'Last 7 days',
+        'Last 30 days': 'Last 30 days',
+        'Last 90 days': 'Last 90 days',
+        'Last 6 months': 'Last 6 months',
+        'Last year': 'Last year',
+        
+        // Report headers
+        'Period': 'Period',
+        'New Tickets': 'New Tickets',
+        'Closed Tickets': 'Closed Tickets',
+        'Avg. Resolution Time': 'Avg. Resolution Time',
+        'Asset Type': 'Asset Type',
+        'Total': 'Total',
+        'Under Maintenance': 'Under Maintenance',
+        'Asset Name': 'Asset Name',
+        'Asset ID': 'Asset ID',
+        'Warranty Expires': 'Warranty Expires',
+        'Avg. Response Time': 'Avg. Response Time',
+        'Min. Response Time': 'Min. Response Time',
+        'Max. Response Time': 'Max. Response Time',
+        'Avg. Resolution Time': 'Avg. Resolution Time',
+        'Min. Resolution Time': 'Min. Resolution Time',
+        'Max. Resolution Time': 'Max. Resolution Time',
+        'Asset Summary': 'Asset Summary'
+    },
+    sr: {
+        // Header
+        'IT Support System': 'IT Sistem Podrške',
+        'Dashboard': 'Kontrolna Tabla',
+        'Tickets': 'Tiketi',
+        'Assets': 'Sredstva',
+        'Reports': 'Izveštaji',
+        'Dark Mode': 'Tamni Režim',
+        'Serbian': 'Srpski',
+        
+        // Dashboard
+        'Open Tickets': 'Otvoreni Tiketi',
+        'In Progress': 'U Toku',
+        'Closed Today': 'Zatvoreni Danas',
+        'Total Assets': 'Ukupno Sredstava',
+        'Recent Tickets': 'Skorašnji Tiketi',
+        'Asset Overview': 'Pregled Sredstava',
+        
+        // Table headers
+        'Ticket #': 'Tiket #',
+        'Subject': 'Predmet',
+        'Requester': 'Podnosioc',
+        'Priority': 'Prioritet',
+        'Status': 'Status',
+        'Date': 'Datum',
+        'Actions': 'Akcije',
+        'Assignee': 'Dodeljen',
+        'Asset TAG': 'Oznaka Sredstva',
+        'Type': 'Tip',
+        'Brand': 'Brend',
+        'Model': 'Model',
+        'Amount': 'Količina',
+        'Hostname': 'Hostname',
+        'Number/Serial': 'Broj/Serijski',
+        'IMEI': 'IMEI',
+        'Current user': 'Trenutni korisnik',
+        'Department': 'Odeljenje',
+        'Previous user': 'Prethodni korisnik',
+        'Comment': 'Komentar',
+        'Warranty End Date': 'Datum Isteka Garancije',
+        
+        // Status and Priority
+        'High': 'Visok',
+        'Medium': 'Srednji',
+        'Low': 'Nizak',
+        'Open': 'Otvoren',
+        'Closed': 'Zatvoren',
+        'Active': 'Aktivan',
+        'Maintenance': 'Održavanje',
+        'Retired': 'Povučen',
+        
+        // Buttons
+        'Create New Ticket': 'Kreiraj Novi Tiket',
+        'Add New Asset': 'Dodaj Novo Sredstvo',
+        'Export to Excel': 'Izvezi u Excel',
+        'Import from Excel': 'Uvezi iz Excel-a',
+        'Generate Report': 'Generiši Izveštaj',
+        'View': 'Pregled',
+        'Edit': 'Izmeni',
+        'Delete': 'Obriši',
+        'Save Asset': 'Sačuvaj Sredstvo',
+        'Cancel': 'Otkaži',
+        'Submit Ticket': 'Pošalji Tiket',
+        'Update': 'Ažuriraj',
+        'Update Ticket': 'Ažuriraj Tiket',
+        
+        // Form labels
+        'Requester Name *': 'Ime Podnosioca *',
+        'Email *': 'Email *',
+        'Subject *': 'Predmet *',
+        'Priority *': 'Prioritet *',
+        'Description *': 'Opis *',
+        'Category': 'Kategorija',
+        'Asset No. *': 'Broj Sredstva *',
+        'Asset TAG': 'Oznaka Sredstva',
+        'Type *': 'Tip *',
+        'Brand': 'Brend',
+        'Model': 'Model',
+        'Amount': 'Količina',
+        'Date': 'Datum',
+        'Hostname': 'Hostname',
+        'Number/Serial': 'Broj/Serijski',
+        'IMEI': 'IMEI',
+        'ID No.': 'ID Broj',
+        'Current user': 'Trenutni korisnik',
+        'Department': 'Odeljenje',
+        'Previous user': 'Prethodni korisnik',
+        'Comment': 'Komentar',
+        'Status': 'Status',
+        'Warranty End Date': 'Datum Isteka Garancije',
+        
+        // Categories
+        'Hardware': 'Hardver',
+        'Software': 'Softver',
+        'Network': 'Mreža',
+        'Access/Permissions': 'Pristup/Dozvole',
+        'Other': 'Ostalo',
+        
+        // Asset types
+        'Laptop': 'Laptop',
+        'Desktop': 'Desktop',
+        'Printer': 'Štampač',
+        'Phone': 'Telefon',
+        'Monitor': 'Monitor',
+        
+        // Modal titles
+        'Create New Ticket': 'Kreiraj Novi Tiket',
+        'Ticket Details': 'Detalji Tiketa',
+        'Add New Asset': 'Dodaj Novo Sredstvo',
+        'Edit Asset': 'Izmeni Sredstvo',
+        'Reports & Analytics': 'Izveštaji i Analitika',
+        
+        // Filter options
+        'All Status': 'Svi Statusi',
+        'All Priorities': 'Svi Prioriteti',
+        'All Types': 'Svi Tipovi',
+        
+        // Messages
+        'Unassigned': 'Nedodeljen',
+        'Add Note': 'Dodaj Napomenu',
+        'Add your note or update here...': 'Dodajte svoju napomenu ili ažuriranje ovde...',
+        'Update Status:': 'Ažuriraj Status:',
+        'Activity Timeline': 'Vremenska Linija Aktivnosti',
+        'No timeline entries yet.': 'Još uvek nema unosa u vremenskoj liniji.',
+        
+        // Report types
+        'Ticket Volume': 'Obim Tiketa',
+        'Average Response Time': 'Prosečno Vreme Odgovora',
+        'Average Resolution Time': 'Prosečno Vreme Rešavanja',
+        'Asset Inventory': 'Inventar Sredstava',
+        'Warranty Status': 'Status Garancije',
+        
+        // Time periods
+        'Last 7 days': 'Poslednjih 7 dana',
+        'Last 30 days': 'Poslednjih 30 dana',
+        'Last 90 days': 'Poslednjih 90 dana',
+        'Last 6 months': 'Poslednjih 6 meseci',
+        'Last year': 'Prošle godine',
+        
+        // Report headers
+        'Period': 'Period',
+        'New Tickets': 'Novi Tiketi',
+        'Closed Tickets': 'Zatvoreni Tiketi',
+        'Avg. Resolution Time': 'Prosečno Vreme Rešavanja',
+        'Asset Type': 'Tip Sredstva',
+        'Total': 'Ukupno',
+        'Under Maintenance': 'Pod Održavanjem',
+        'Asset Name': 'Naziv Sredstva',
+        'Asset ID': 'ID Sredstva',
+        'Warranty Expires': 'Garancija Ističe',
+        'Avg. Response Time': 'Prosečno Vreme Odgovora',
+        'Min. Response Time': 'Min. Vreme Odgovora',
+        'Max. Response Time': 'Max. Vreme Odgovora',
+        'Avg. Resolution Time': 'Prosečno Vreme Rešavanja',
+        'Min. Resolution Time': 'Min. Vreme Rešavanja',
+        'Max. Resolution Time': 'Max. Vreme Rešavanja',
+        'Asset Summary': 'Pregled Sredstava'
+    }
+};
+
+let currentLanguage = 'en';
+
+function switchLanguage() {
+    currentLanguage = currentLanguage === 'en' ? 'sr' : 'en';
+    const languageToggle = document.getElementById('language-toggle');
+    languageToggle.textContent = currentLanguage === 'en' ? '🇷🇸 Serbian' : '🇺🇸 English';
+    
+    // Update all translatable elements
+    updatePageLanguage();
+    
+    // Save language preference
+    localStorage.setItem('language', currentLanguage);
+}
+
+function updatePageLanguage() {
+    const elements = document.querySelectorAll('[data-translate]');
+    elements.forEach(element => {
+        const key = element.getAttribute('data-translate');
+        if (translations[currentLanguage][key]) {
+            element.textContent = translations[currentLanguage][key];
+        }
+    });
+    
+    // Update elements without data-translate attribute
+    updateStaticElements();
+}
+
+function updateStaticElements() {
+    // Update header elements
+    const logo = document.querySelector('.logo');
+    if (logo) logo.textContent = translations[currentLanguage]['IT Support System'];
+    
+    // Update navigation tabs
+    const dashboardTab = document.getElementById('dashboard-tab');
+    const ticketsTab = document.getElementById('tickets-tab');
+    const assetsTab = document.getElementById('assets-tab');
+    const reportsTab = document.getElementById('reports-tab');
+    
+    if (dashboardTab) dashboardTab.textContent = translations[currentLanguage]['Dashboard'];
+    if (ticketsTab) ticketsTab.textContent = translations[currentLanguage]['Tickets'];
+    if (assetsTab) assetsTab.textContent = translations[currentLanguage]['Assets'];
+    if (reportsTab) reportsTab.textContent = translations[currentLanguage]['Reports'];
+    
+    // Update theme toggle button
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) themeToggle.textContent = translations[currentLanguage]['Dark Mode'];
+    
+    // Update dashboard stats
+    const statCards = document.querySelectorAll('.stat-card h3');
+    if (statCards.length >= 4) {
+        statCards[0].textContent = translations[currentLanguage]['Open Tickets'];
+        statCards[1].textContent = translations[currentLanguage]['In Progress'];
+        statCards[2].textContent = translations[currentLanguage]['Closed Today'];
+        statCards[3].textContent = translations[currentLanguage]['Total Assets'];
+    }
+    
+    // Update card headers
+    const cardHeaders = document.querySelectorAll('.card-header h2');
+    cardHeaders.forEach(header => {
+        const text = header.textContent;
+        if (translations[currentLanguage][text]) {
+            header.textContent = translations[currentLanguage][text];
+        }
+    });
+    
+    // Update table headers
+    updateTableHeaders();
+    
+    // Update buttons
+    updateButtons();
+    
+    // Update form labels
+    updateFormLabels();
+}
+
+function updateTableHeaders() {
+    const tables = document.querySelectorAll('table');
+    tables.forEach(table => {
+        const headers = table.querySelectorAll('th');
+        headers.forEach(header => {
+            const text = header.textContent;
+            if (translations[currentLanguage][text]) {
+                header.textContent = translations[currentLanguage][text];
+            }
+        });
+    });
+}
+
+function updateButtons() {
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(button => {
+        const text = button.textContent;
+        if (translations[currentLanguage][text]) {
+            button.textContent = translations[currentLanguage][text];
+        }
+    });
+}
+
+function updateFormLabels() {
+    const labels = document.querySelectorAll('label');
+    labels.forEach(label => {
+        const text = label.textContent;
+        if (translations[currentLanguage][text]) {
+            label.textContent = translations[currentLanguage][text];
+        }
+    });
+}
+
+// Initialize language on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Load saved language preference
+    const savedLanguage = localStorage.getItem('language');
+    if (savedLanguage) {
+        currentLanguage = savedLanguage;
+        const languageToggle = document.getElementById('language-toggle');
+        languageToggle.textContent = currentLanguage === 'en' ? '🇷🇸 Serbian' : '🇺🇸 English';
+    }
+    
+    // Add event listener for language toggle
+    const languageToggle = document.getElementById('language-toggle');
+    if (languageToggle) {
+        languageToggle.addEventListener('click', switchLanguage);
+    }
+    
+    // Initial language update
+    updatePageLanguage();
 });
 </script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>

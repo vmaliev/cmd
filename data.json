@@ -12,7 +12,78 @@
       "description": "testtest",
       "category": "hardware"
     },
-
+    {
+      "id": "TKT-006",
+      "subject": "Connection issue with Plotter",
+      "requester": "Ammar Tivari",
+      "assignee": "Unassigned",
+      "priority": "medium",
+      "status": "in-progress",
+      "date": "2025-07-25",
+      "email": "ammar.tivari@adriatic42.com",
+      "description": "I have issue connecting with Plotter",
+      "category": "network",
+      "createdDate": "2025-07-25T10:00:00.000Z",
+      "lastUpdated": "2025-07-28T06:02:39.860Z",
+      "timeline": [
+        {
+          "id": "timeline-1753682540621",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-28T06:02:20.621Z",
+          "content": "Status changed from Closed to In Progress.",
+          "type": "status-change"
+        },
+        {
+          "id": "timeline-1753682540610",
+          "author": "Agent",
+          "authorType": "agent",
+          "date": "2025-07-28T06:02:20.610Z",
+          "content": "alls goods",
+          "type": "note"
+        },
+        {
+          "id": "timeline-1",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-25T10:00:00.000Z",
+          "content": "Hello Ammar Tivari! Thank you for submitting your ticket. We have received your request and will begin working on it shortly.",
+          "type": "greeting"
+        },
+        {
+          "id": "timeline-2",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-25T10:00:00.000Z",
+          "content": "This ticket has been classified as MEDIUM priority. Expected response time: 4-8 hours. Our team will begin working on this shortly.",
+          "type": "priority-info"
+        },
+        {
+          "id": "timeline-3",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-25T10:00:00.000Z",
+          "content": "Ticket created with ID: TKT-006. Status: Open.",
+          "type": "creation"
+        },
+        {
+          "id": "timeline-4",
+          "author": "John Smith (Agent)",
+          "authorType": "agent",
+          "date": "2025-07-25T14:30:00.000Z",
+          "content": "Investigating the plotter connection issue. Checking network connectivity and driver status.",
+          "type": "note"
+        },
+        {
+          "id": "timeline-5",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-25T16:30:00.000Z",
+          "content": "Status changed from In Progress to Closed.",
+          "type": "status-change"
+        }
+      ]
+    },
     {
       "id": "TKT-005",
       "subject": "test",

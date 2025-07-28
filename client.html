@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Support - Client Portal</title>
+    <link rel="stylesheet" href="html.css">
+    <style>
+        .client-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .client-header h1 {
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+        
+        .client-header p {
+            opacity: 0.9;
+            margin: 0;
+        }
+        
+        .auth-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .auth-section h2 {
+            margin-bottom: 1.5rem;
+            color: #3a4da5;
+        }
+        
+        .auth-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .auth-form .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .auth-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+            text-align: left;
+        }
+        
+        .auth-form input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        
+        .main-content {
+            display: none;
+        }
+        
+        .main-content.authenticated {
+            display: block;
+        }
+        
+        .welcome-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 2rem;
+            border: 1px solid #c3e6cb;
+            text-align: center;
+        }
+        
+        .ticket-search {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .search-form {
+            display: flex;
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .search-form input {
+            flex: 1;
+        }
+        
+        .ticket-status {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+            border-left: 4px solid #3a4da5;
+        }
+        
+        .ticket-status h3 {
+            margin: 0 0 1rem 0;
+            color: #3a4da5;
+        }
+        
+        .ticket-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .info-value {
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .timeline-simple {
+            border-left: 2px solid #e1e5f2;
+            padding-left: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .timeline-item-simple {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 4px;
+            position: relative;
+        }
+        
+        .timeline-item-simple::before {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #3a4da5;
+            left: -1.25rem;
+            top: 1rem;
+        }
+        
+        .timeline-date-simple {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+        
+        .timeline-content-simple {
+            color: #333;
+        }
+        
+        .no-ticket {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        
+        .no-ticket h3 {
+            margin-bottom: 1rem;
+        }
+        
+        .create-ticket-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .create-ticket-section h2 {
+            margin-bottom: 1.5rem;
+            color: #3a4da5;
+        }
+        
+        .client-form {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .submit-btn {
+            background: #3a4da5;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background: #2c3a8a;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @media (max-width: 768px) {
+            .search-form {
+                flex-direction: column;
+            }
+            
+            .ticket-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .auth-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Client Header -->
+        <div class="client-header">
+            <h1>IT Support Client Portal</h1>
+            <p>Create tickets and track your support requests</p>
+        </div>
+
+        <!-- Authentication Section -->
+        <div class="auth-section" id="auth-section">
+            <h2>Welcome to IT Support Portal</h2>
+            <p style="margin-bottom: 2rem; color: #666;">Please authenticate to access your tickets and create new support requests.</p>
+            
+            <form class="auth-form" id="auth-form">
+                <div class="form-group">
+                    <label for="auth-email">Email Address</label>
+                    <input type="email" id="auth-email" placeholder="Enter your email address" required>
+                </div>
+                <div class="auth-buttons">
+                    <button type="button" class="submit-btn" id="enter-btn">Enter</button>
+                </div>
+            </form>
+            
+            <form class="auth-form" id="otp-form" style="display:none; margin-top:2rem;">
+                <div class="form-group">
+                    <label for="otp-code">Enter OTP Code</label>
+                    <input type="text" id="otp-code" maxlength="6" placeholder="6-digit code" required>
+                </div>
+                <div class="auth-buttons">
+                    <button type="button" class="submit-btn" id="request-otp-btn">Request OTP</button>
+                    <button type="button" class="submit-btn" id="verify-otp-btn">Verify OTP</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Main Content (Hidden until authenticated) -->
+        <div class="main-content" id="main-content">
+            <!-- Welcome Message -->
+            <div class="welcome-message" id="welcome-message">
+                Welcome! You are now authenticated and can access all features.
+            </div>
+
+            <!-- Ticket Status Search -->
+            <div class="ticket-search">
+                <h2>Check Ticket Status</h2>
+                <form class="search-form" id="ticket-search-form">
+                    <div class="form-group">
+                        <label for="ticket-id">Ticket ID</label>
+                        <input type="text" id="ticket-id" placeholder="Enter your ticket ID (e.g., TKT-001)" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" placeholder="Enter the email used when creating the ticket" required readonly>
+                    </div>
+                    <button type="submit" class="submit-btn">View Ticket Status</button>
+                </form>
+            </div>
+
+            <!-- Ticket Status Display -->
+            <div id="ticket-status-display" style="display: none;">
+                <div class="ticket-status">
+                    <h3>Ticket Details</h3>
+                    <div class="ticket-info">
+                        <div class="info-item">
+                            <span class="info-label">Ticket ID</span>
+                            <span class="info-value" id="display-ticket-id"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Subject</span>
+                            <span class="info-value" id="display-subject"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Status</span>
+                            <span class="info-value" id="display-status"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Priority</span>
+                            <span class="info-value" id="display-priority"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Created Date</span>
+                            <span class="info-value" id="display-date"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Category</span>
+                            <span class="info-value" id="display-category"></span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Description</span>
+                        <span class="info-value" id="display-description"></span>
+                    </div>
+                    
+                    <h4 style="margin: 1.5rem 0 1rem 0; color: #3a4da5;">Activity Timeline</h4>
+                    <div class="timeline-simple" id="timeline-display">
+                        <!-- Timeline items will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- No Ticket Found Message -->
+            <div id="no-ticket-message" class="no-ticket" style="display: none;">
+                <h3>No Ticket Found</h3>
+                <p>No ticket found with the provided ID and email combination.</p>
+                <p>Please check your ticket ID and email address, or create a new ticket below.</p>
+            </div>
+
+            <!-- Create New Ticket -->
+            <div class="create-ticket-section">
+                <h2>Create New Support Ticket</h2>
+                <form class="client-form" id="new-ticket-form">
+                    <div class="form-group">
+                        <label for="requester-name">Your Name *</label>
+                        <input type="text" id="requester-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="requester-email">Email Address *</label>
+                        <input type="email" id="requester-email" required readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ticket-subject">Subject *</label>
+                        <input type="text" id="ticket-subject" placeholder="Brief description of your issue" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ticket-description">Description *</label>
+                        <textarea id="ticket-description" placeholder="Please provide detailed information about your issue..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ticket-priority">Priority *</label>
+                        <select id="ticket-priority" required>
+                            <option value="">Select priority level</option>
+                            <option value="low">Low - General inquiry or minor issue</option>
+                            <option value="medium">Medium - Affects work but not critical</option>
+                            <option value="high">High - Critical issue affecting work</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ticket-category">Category</label>
+                        <select id="ticket-category">
+                            <option value="hardware">Hardware</option>
+                            <option value="software">Software</option>
+                            <option value="network">Network</option>
+                            <option value="access">Access/Permissions</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Submit Ticket</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let authenticatedEmail = null;
+
+        // Check authentication status on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkExistingSession();
+        });
+
+        // Check for existing session automatically
+        async function checkExistingSession() {
+            const savedSession = localStorage.getItem('clientSession');
+            if (savedSession) {
+                try {
+                    const session = JSON.parse(savedSession);
+                    const now = Date.now();
+                    
+                    // Check if session is still valid locally
+                    if (session.expiresAt && now < session.expiresAt) {
+                        // Verify with server
+                        const res = await fetch('/api/check-auth', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: session.email })
+                        });
+                        const data = await res.json();
+                        
+                        if (data.authenticated) {
+                            // Session is valid, authenticate user
+                            authenticateUser(session.email);
+                            return;
+                        } else {
+                            // Server session expired, remove local session
+                            localStorage.removeItem('clientSession');
+                        }
+                    } else {
+                        // Local session expired, remove it
+                        localStorage.removeItem('clientSession');
+                    }
+                } catch (e) {
+                    // Error checking session, remove it
+                    localStorage.removeItem('clientSession');
+                }
+            }
+            
+            // No valid session found, show auth form
+            showAuthRequired();
+        }
+
+        // Check authentication status for specific email
+        async function checkAuthStatus(email) {
+            try {
+                const res = await fetch('/api/check-auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+                if (data.authenticated) {
+                    authenticateUser(email);
+                } else {
+                    localStorage.removeItem('clientSession');
+                    showAuthRequired();
+                }
+            } catch (e) {
+                showAuthRequired();
+            }
+        }
+
+        function authenticateUser(email) {
+            authenticatedEmail = email.toLowerCase();
+            
+            // Store session locally with expiry
+            const session = {
+                email: email,
+                authenticatedAt: Date.now(),
+                expiresAt: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+            };
+            localStorage.setItem('clientSession', JSON.stringify(session));
+            
+            // Hide auth section and show main content
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('main-content').classList.add('authenticated');
+            
+            // Set email in forms
+            document.getElementById('email').value = email;
+            document.getElementById('requester-email').value = email;
+            
+            // Show welcome message
+            document.getElementById('welcome-message').textContent = `Welcome back, ${email}! You are authenticated and can access all features.`;
+        }
+
+        function showAuthRequired() {
+            document.getElementById('auth-section').style.display = 'block';
+            document.getElementById('main-content').classList.remove('authenticated');
+            document.getElementById('otp-form').style.display = 'none';
+        }
+
+        // Enter button handler
+        document.getElementById('enter-btn').addEventListener('click', async function() {
+            const email = document.getElementById('auth-email').value.trim();
+            if (!email) {
+                showErrorMessage('Please enter your email address.');
+                return;
+            }
+            this.disabled = true;
+            this.textContent = 'Checking...';
+            
+            try {
+                const res = await fetch('/api/check-auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+                
+                if (data.authenticated) {
+                    // Session exists, authenticate user
+                    authenticateUser(email);
+                } else {
+                    // No session, show OTP form
+                    showOTPForm();
+                }
+            } catch (e) {
+                showErrorMessage('Error checking authentication. Please try again.');
+                showOTPForm();
+            } finally {
+                this.disabled = false;
+                this.textContent = 'Enter';
+            }
+        });
+
+        function showOTPForm() {
+            document.getElementById('otp-form').style.display = 'block';
+            document.getElementById('otp-code').focus();
+        }
+
+        // OTP flow handlers
+        document.getElementById('request-otp-btn').addEventListener('click', async function() {
+            const email = document.getElementById('auth-email').value.trim();
+            if (!email) {
+                showErrorMessage('Please enter your email address.');
+                return;
+            }
+            this.disabled = true;
+            this.textContent = 'Sending...';
+            try {
+                const res = await fetch('/api/request-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+                
+                if (!res.ok) throw new Error(data.error || 'Failed to send OTP');
+                
+                if (data.otp) {
+                    // Development mode - show OTP code
+                    showSuccessMessage(`Development mode: Your OTP code is ${data.otp}. In production, this would be sent to your email.`);
+                    document.getElementById('otp-code').value = data.otp;
+                } else {
+                    // Production mode - OTP sent via email
+                    showSuccessMessage('OTP code sent to your email. Please check your inbox.');
+                }
+            } catch (e) {
+                showErrorMessage('Failed to send OTP: ' + e.message);
+            } finally {
+                this.disabled = false;
+                this.textContent = 'Request OTP';
+            }
+        });
+
+        document.getElementById('verify-otp-btn').addEventListener('click', async function() {
+            const email = document.getElementById('auth-email').value.trim();
+            const otp = document.getElementById('otp-code').value.trim();
+            if (!otp) {
+                showErrorMessage('Please enter the OTP code.');
+                return;
+            }
+            this.disabled = true;
+            this.textContent = 'Verifying...';
+            try {
+                const res = await fetch('/api/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, otp })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'OTP verification failed');
+                showSuccessMessage('Authentication successful! Welcome to the IT Support Portal.');
+                authenticateUser(email);
+            } catch (e) {
+                showErrorMessage(e.message);
+            } finally {
+                this.disabled = false;
+                this.textContent = 'Verify OTP';
+            }
+        });
+
+        // Ticket search functionality
+        document.getElementById('ticket-search-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const ticketId = document.getElementById('ticket-id').value.trim();
+            const email = document.getElementById('email').value.trim();
+            
+            if (!authenticatedEmail || authenticatedEmail !== email.toLowerCase()) {
+                showErrorMessage('You must be authenticated first.');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/tickets');
+                const tickets = await response.json();
+                
+                const ticket = tickets.find(t => 
+                    t.id === ticketId && 
+                    t.email.toLowerCase() === email.toLowerCase()
+                );
+                
+                if (ticket) {
+                    displayTicketStatus(ticket);
+                } else {
+                    showNoTicketMessage();
+                }
+            } catch (error) {
+                console.error('Error searching for ticket:', error);
+                showErrorMessage('Error searching for ticket. Please try again.');
+            }
+        });
+
+        // Create new ticket functionality
+        document.getElementById('new-ticket-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!authenticatedEmail) {
+                showErrorMessage('You must be authenticated first.');
+                return;
+            }
+            
+            const formData = {
+                requester: document.getElementById('requester-name').value,
+                email: document.getElementById('requester-email').value,
+                subject: document.getElementById('ticket-subject').value,
+                description: document.getElementById('ticket-description').value,
+                priority: document.getElementById('ticket-priority').value,
+                category: document.getElementById('ticket-category').value
+            };
+            
+            try {
+                // Generate ticket ID
+                const response = await fetch('/api/tickets');
+                const tickets = await response.json();
+                let ticketCounter = 1;
+                if (tickets.length > 0) {
+                    const lastId = tickets[0].id;
+                    const lastNum = parseInt(lastId.split('-')[1], 10);
+                    ticketCounter = Math.max(ticketCounter, lastNum);
+                }
+                ticketCounter++;
+                const ticketId = `TKT-${String(ticketCounter).padStart(3, '0')}`;
+                
+                const now = new Date();
+                const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+                const formattedDate = now.toLocaleDateString('en-US', dateOptions);
+                const isoDate = now.toISOString().split('T')[0];
+                
+                const ticket = {
+                    id: ticketId,
+                    subject: formData.subject,
+                    requester: formData.requester,
+                    assignee: 'Unassigned',
+                    priority: formData.priority,
+                    status: 'open',
+                    date: isoDate,
+                    email: formData.email,
+                    description: formData.description,
+                    category: formData.category,
+                    createdDate: now.toISOString(),
+                    lastUpdated: now.toISOString(),
+                    timeline: [
+                        {
+                            id: 'timeline-1',
+                            author: 'System',
+                            authorType: 'system',
+                            date: now.toISOString(),
+                            content: `Hello ${formData.requester}! Thank you for submitting your ticket. We have received your request and will begin working on it shortly.`,
+                            type: 'greeting'
+                        },
+                        {
+                            id: 'timeline-2',
+                            author: 'System',
+                            authorType: 'system',
+                            date: now.toISOString(),
+                            content: `This ticket has been classified as ${formData.priority.toUpperCase()} priority. Expected response time: ${getResponseTime(formData.priority)}. Our team will begin working on this shortly.`,
+                            type: 'priority-info'
+                        },
+                        {
+                            id: 'timeline-3',
+                            author: 'System',
+                            authorType: 'system',
+                            date: now.toISOString(),
+                            content: `Ticket created with ID: ${ticketId}. Status: Open.`,
+                            type: 'creation'
+                        }
+                    ]
+                };
+                
+                const createResponse = await fetch('/api/tickets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(ticket)
+                });
+                
+                if (!createResponse.ok) {
+                    throw new Error('Failed to create ticket');
+                }
+                
+                // Reset form
+                this.reset();
+                document.getElementById('requester-email').value = authenticatedEmail;
+                
+                // Show success message
+                showSuccessMessage(`Ticket #${ticketId} has been created successfully! You can search for it using the ticket ID above.`);
+                
+                // Auto-populate search form
+                document.getElementById('ticket-id').value = ticketId;
+                
+            } catch (error) {
+                console.error('Error creating ticket:', error);
+                showErrorMessage('Error creating ticket. Please try again.');
+            }
+        });
+
+        function displayTicketStatus(ticket) {
+            // Hide other messages
+            document.getElementById('no-ticket-message').style.display = 'none';
+            
+            // Populate ticket information
+            document.getElementById('display-ticket-id').textContent = '#' + ticket.id;
+            document.getElementById('display-subject').textContent = ticket.subject;
+            document.getElementById('display-status').innerHTML = getStatusBadge(ticket.status);
+            document.getElementById('display-priority').innerHTML = getPriorityBadge(ticket.priority);
+            document.getElementById('display-date').textContent = ticket.date;
+            document.getElementById('display-category').textContent = ticket.category ? 
+                ticket.category.charAt(0).toUpperCase() + ticket.category.slice(1) : 'Other';
+            document.getElementById('display-description').textContent = ticket.description;
+            
+            // Populate timeline
+            const timelineContainer = document.getElementById('timeline-display');
+            timelineContainer.innerHTML = '';
+            
+            if (ticket.timeline && ticket.timeline.length > 0) {
+                ticket.timeline.forEach(entry => {
+                    const timelineItem = document.createElement('div');
+                    timelineItem.className = 'timeline-item-simple';
+                    
+                    timelineItem.innerHTML = `
+                        <div class="timeline-date-simple">${new Date(entry.date).toLocaleString()}</div>
+                        <div class="timeline-content-simple">${entry.content}</div>
+                    `;
+                    
+                    timelineContainer.appendChild(timelineItem);
+                });
+            } else {
+                timelineContainer.innerHTML = '<p>No activity recorded yet.</p>';
+            }
+            
+            // Show the ticket status
+            document.getElementById('ticket-status-display').style.display = 'block';
+        }
+
+        function showNoTicketMessage() {
+            document.getElementById('ticket-status-display').style.display = 'none';
+            document.getElementById('no-ticket-message').style.display = 'block';
+        }
+
+        function getStatusBadge(status) {
+            const statusText = status.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase());
+            const statusClass = status === 'open' ? 'status-open' : 
+                              status === 'in-progress' ? 'status-in-progress' : 'status-closed';
+            return `<span class="status ${statusClass}">${statusText}</span>`;
+        }
+
+        function getPriorityBadge(priority) {
+            const priorityText = priority.charAt(0).toUpperCase() + priority.slice(1);
+            return `<span class="priority-${priority}">${priorityText}</span>`;
+        }
+
+        function showSuccessMessage(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = message;
+            
+            const container = document.querySelector('.container');
+            container.insertBefore(successDiv, container.firstChild);
+            
+            setTimeout(() => {
+                successDiv.remove();
+            }, 5000);
+        }
+
+        function showErrorMessage(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            
+            const container = document.querySelector('.container');
+            container.insertBefore(errorDiv, container.firstChild);
+            
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        function getResponseTime(priority) {
+            switch (priority) {
+                case 'high': return '1-4 hours';
+                case 'medium': return '4-8 hours';
+                case 'low': return '24-48 hours';
+                default: return '24-48 hours';
+            }
+        }
+    </script>
+</body>
+</html> 
