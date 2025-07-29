@@ -493,8 +493,8 @@
                                     <input type="text" id="current-user">
                                 </div>
                                 <div>
-                                    <label for="email">Email</label>
-                                    <input type="email" id="email">
+                                    <label for="asset-email">Email</label>
+                                    <input type="email" id="asset-email">
                                 </div>
                                 <div>
                                     <label for="department">Department</label>
@@ -1414,8 +1414,12 @@
                                 document.getElementById('imei').value = asset.imei || '';
                                 document.getElementById('id-no').value = asset.idNo || '';
                                 document.getElementById('current-user').value = asset.currentUser || '';
-                                document.getElementById('email').value = asset.email || '';
+                                document.getElementById('asset-email').value = asset.email || '';
                                 document.getElementById('department').value = asset.department || '';
+                                
+                                // Debug logging
+                                console.log('Populating edit form - Asset email:', asset.email);
+                                console.log('Email field value after setting:', document.getElementById('asset-email').value);
                                 document.getElementById('previous-user').value = asset.previousUser || '';
                                 document.getElementById('comment').value = asset.comment || '';
                                 document.getElementById('status-asset').value = asset.status || 'active';
@@ -1450,13 +1454,17 @@
                     imei: document.getElementById('imei').value,
                     idNo: document.getElementById('id-no').value,
                     currentUser: document.getElementById('current-user').value,
-                    email: document.getElementById('email').value,
+                    email: document.getElementById('asset-email').value,
                     department: document.getElementById('department').value,
                     previousUser: document.getElementById('previous-user').value,
                     comment: document.getElementById('comment').value,
                     status: document.getElementById('status-asset').value,
                     warrantyEndDate: document.getElementById('warranty-end-date').value
                 };
+                
+                // Debug logging
+                console.log('Asset form submission - Email value:', document.getElementById('asset-email').value);
+                console.log('Asset object being sent:', asset);
                 try {
                     let res;
                     if (editMode.value === 'true') {
