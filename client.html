@@ -859,9 +859,9 @@
                 const response = await fetch('/api/assets');
                 const allAssets = await response.json();
                 
-                // Filter assets for this user (assuming assets have an 'assignedTo' field)
+                // Filter assets for this user by email field
                 const userAssets = allAssets.filter(asset => 
-                    asset.assignedTo && asset.assignedTo.toLowerCase() === email.toLowerCase()
+                    asset.email && asset.email.toLowerCase() === email.toLowerCase()
                 );
                 
                 displayUserAssets(userAssets);
@@ -892,10 +892,14 @@
                 assetCard.className = 'asset-card';
                 
                 assetCard.innerHTML = `
-                    <div class="asset-name">${asset.name || asset.id}</div>
+                    <div class="asset-name">${asset.assetTag || asset.assetNo || 'Asset'}</div>
                     <div class="asset-type">${getAssetTypeText(asset.type)}</div>
                     <div class="asset-details">
-                        ${asset.description || 'No description available'}
+                        <strong>Brand:</strong> ${asset.brand || 'N/A'}<br>
+                        <strong>Model:</strong> ${asset.model || 'N/A'}<br>
+                        <strong>Serial:</strong> ${asset.serial || 'N/A'}<br>
+                        <strong>Status:</strong> ${getAssetStatusText(asset.status)}<br>
+                        ${asset.comment ? `<strong>Comment:</strong> ${asset.comment}` : ''}
                     </div>
                 `;
                 
@@ -926,6 +930,10 @@
 
         function getAssetTypeText(type) {
             return type ? type.charAt(0).toUpperCase() + type.slice(1) : 'Asset';
+        }
+
+        function getAssetStatusText(status) {
+            return status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Active';
         }
 
         // Enter button handler
