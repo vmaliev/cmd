@@ -1397,20 +1397,18 @@
                     document.getElementById('serial').value = row.cells[7].textContent;
                     document.getElementById('imei').value = row.cells[8].textContent;
                     document.getElementById('current-user').value = row.cells[9].textContent;
-                    document.getElementById('email').value = row.cells[10].textContent;
-                    document.getElementById('department').value = row.cells[11].textContent;
-                    document.getElementById('previous-user').value = row.cells[12].textContent;
-                    document.getElementById('comment').value = row.cells[13].textContent;
+                    document.getElementById('department').value = row.cells[10].textContent;
+                    document.getElementById('previous-user').value = row.cells[11].textContent;
+                    document.getElementById('comment').value = row.cells[12].textContent;
                     
                     // Handle status field (it has a span with class)
-                    const statusSpan = row.cells[14].querySelector('.status');
+                    const statusSpan = row.cells[13].querySelector('.status');
                     const statusValue = statusSpan ? statusSpan.textContent.toLowerCase() : 'active';
                     document.getElementById('status-asset').value = statusValue;
                     
-                    document.getElementById('warranty-end-date').value = row.cells[15].textContent;
+                    document.getElementById('warranty-end-date').value = row.cells[14].textContent;
                     
-                    // For Asset No. and ID No., we'll need to get them from the backend
-                    // since they're not displayed in the table anymore
+                    // Get complete asset data from backend to ensure all fields are properly populated
                     fetch(`/api/assets`)
                         .then(response => response.json())
                         .then(assets => {
@@ -1418,6 +1416,7 @@
                             if (asset) {
                                 document.getElementById('asset-no').value = asset.assetNo || '';
                                 document.getElementById('id-no').value = asset.idNo || '';
+                                document.getElementById('email').value = asset.email || '';
                             }
                         })
                         .catch(error => {
