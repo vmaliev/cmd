@@ -751,6 +751,41 @@
             }
         }
 
+        // Extract last name from email address
+        function extractLastNameFromEmail(email) {
+            // Remove domain part (everything after @)
+            const localPart = email.split('@')[0];
+            
+            // Handle different email formats
+            if (localPart.includes('.')) {
+                // Format: firstname.lastname@domain.com
+                const parts = localPart.split('.');
+                return parts[parts.length - 1]; // Get the last part as last name
+            } else if (localPart.includes('_')) {
+                // Format: firstname_lastname@domain.com
+                const parts = localPart.split('_');
+                return parts[parts.length - 1]; // Get the last part as last name
+            } else if (localPart.includes('-')) {
+                // Format: firstname-lastname@domain.com
+                const parts = localPart.split('-');
+                return parts[parts.length - 1]; // Get the last part as last name
+            } else {
+                // Format: firstnamelastname@domain.com (no separator)
+                // Try to extract last name by looking for common patterns
+                const commonLastNames = ['smith', 'johnson', 'williams', 'brown', 'jones', 'garcia', 'miller', 'davis', 'rodriguez', 'martinez', 'hernandez', 'lopez', 'gonzalez', 'wilson', 'anderson', 'thomas', 'taylor', 'moore', 'jackson', 'martin', 'lee', 'perez', 'thompson', 'white', 'harris', 'sanchez', 'clark', 'ramirez', 'lewis', 'robinson', 'walker', 'young', 'allen', 'king', 'wright', 'scott', 'torres', 'nguyen', 'hill', 'flores', 'green', 'adams', 'nelson', 'baker', 'hall', 'rivera', 'campbell', 'mitchell', 'carter', 'roberts'];
+                
+                const lowerLocalPart = localPart.toLowerCase();
+                for (const lastName of commonLastNames) {
+                    if (lowerLocalPart.endsWith(lastName)) {
+                        return lastName.charAt(0).toUpperCase() + lastName.slice(1);
+                    }
+                }
+                
+                // If no pattern found, return the full local part
+                return localPart.charAt(0).toUpperCase() + localPart.slice(1);
+            }
+        }
+
         function authenticateUser(email) {
             authenticatedEmail = email.toLowerCase();
             
@@ -770,6 +805,10 @@
             // Set email in forms
             document.getElementById('email').value = email;
             document.getElementById('requester-email').value = email;
+            
+            // Extract last name from email and populate the name field
+            const lastName = extractLastNameFromEmail(email);
+            document.getElementById('requester-name').value = lastName;
             
             // Show welcome message
             document.getElementById('welcome-message').textContent = `Welcome back, ${email}! You are authenticated and can access all features.`;
