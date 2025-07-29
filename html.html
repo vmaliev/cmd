@@ -2020,9 +2020,17 @@ function updateStaticElements() {
     // Update card headers
     const cardHeaders = document.querySelectorAll('.card-header h2');
     cardHeaders.forEach(header => {
-        const text = header.textContent;
-        if (translations[currentLanguage][text]) {
-            header.textContent = translations[currentLanguage][text];
+        // Get the original English text from data attribute, or use current text if not set
+        let originalText = header.getAttribute('data-original-text');
+        if (!originalText) {
+            // Store the original text for future translations
+            originalText = header.textContent;
+            header.setAttribute('data-original-text', originalText);
+        }
+        
+        // Translate using the original text
+        if (translations[currentLanguage][originalText]) {
+            header.textContent = translations[currentLanguage][originalText];
         }
     });
     
@@ -2041,9 +2049,17 @@ function updateTableHeaders() {
     tables.forEach(table => {
         const headers = table.querySelectorAll('th');
         headers.forEach(header => {
-            const text = header.textContent;
-            if (translations[currentLanguage][text]) {
-                header.textContent = translations[currentLanguage][text];
+            // Get the original English text from data attribute, or use current text if not set
+            let originalText = header.getAttribute('data-original-text');
+            if (!originalText) {
+                // Store the original text for future translations
+                originalText = header.textContent;
+                header.setAttribute('data-original-text', originalText);
+            }
+            
+            // Translate using the original text
+            if (translations[currentLanguage][originalText]) {
+                header.textContent = translations[currentLanguage][originalText];
             }
         });
     });
@@ -2052,9 +2068,17 @@ function updateTableHeaders() {
 function updateButtons() {
     const buttons = document.querySelectorAll('.btn');
     buttons.forEach(button => {
-        const text = button.textContent;
-        if (translations[currentLanguage][text]) {
-            button.textContent = translations[currentLanguage][text];
+        // Get the original English text from data attribute, or use current text if not set
+        let originalText = button.getAttribute('data-original-text');
+        if (!originalText) {
+            // Store the original text for future translations
+            originalText = button.textContent;
+            button.setAttribute('data-original-text', originalText);
+        }
+        
+        // Translate using the original text
+        if (translations[currentLanguage][originalText]) {
+            button.textContent = translations[currentLanguage][originalText];
         }
     });
 }
@@ -2062,9 +2086,17 @@ function updateButtons() {
 function updateFormLabels() {
     const labels = document.querySelectorAll('label');
     labels.forEach(label => {
-        const text = label.textContent;
-        if (translations[currentLanguage][text]) {
-            label.textContent = translations[currentLanguage][text];
+        // Get the original English text from data attribute, or use current text if not set
+        let originalText = label.getAttribute('data-original-text');
+        if (!originalText) {
+            // Store the original text for future translations
+            originalText = label.textContent;
+            label.setAttribute('data-original-text', originalText);
+        }
+        
+        // Translate using the original text
+        if (translations[currentLanguage][originalText]) {
+            label.textContent = translations[currentLanguage][originalText];
         }
     });
 }
