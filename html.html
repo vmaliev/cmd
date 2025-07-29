@@ -1113,6 +1113,9 @@
                 });
                 document.querySelectorAll('.view-ticket').forEach(attachViewTicketListener);
                 renderRecentTickets(tickets);
+                
+                // Update table headers after rendering to ensure translations are applied
+                updateTableHeaders();
             }
             function renderRecentTickets(tickets) {
                 const recentTicketsBody = document.getElementById('recent-tickets-body');
@@ -1177,6 +1180,9 @@
                         }
                     });
                 });
+                
+                // Update table headers after rendering to ensure translations are applied
+                updateTableHeaders();
             }
             async function updateDashboardStats() {
                 const tickets = await fetchTickets();
@@ -1225,6 +1231,9 @@
                     `;
                     dashboardAssetTable.appendChild(row);
                 });
+                
+                // Update table headers after rendering dashboard assets
+                updateTableHeaders();
             }
             // On page load
             renderTickets();
@@ -1668,6 +1677,7 @@ const translations = {
         'Number/Serial': 'Number/Serial',
         'IMEI': 'IMEI',
         'Current user': 'Current user',
+        'Email': 'Email',
         'Department': 'Department',
         'Previous user': 'Previous user',
         'Comment': 'Comment',
@@ -1826,6 +1836,7 @@ const translations = {
         'Number/Serial': 'Broj/Serijski',
         'IMEI': 'IMEI',
         'Current user': 'Trenutni korisnik',
+        'Email': 'Email',
         'Department': 'Odeljenje',
         'Previous user': 'Prethodni korisnik',
         'Comment': 'Komentar',
