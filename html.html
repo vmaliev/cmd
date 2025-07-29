@@ -1395,37 +1395,31 @@
                     // Set the asset ID for editing
                     document.getElementById('edit-asset-id').value = assetId;
                     
-                    // Populate form fields with current data
-                    document.getElementById('asset-tag').value = row.cells[0].textContent;
-                    document.getElementById('asset-type').value = row.cells[1].textContent.toLowerCase();
-                    document.getElementById('brand').value = row.cells[2].textContent;
-                    document.getElementById('model').value = row.cells[3].textContent;
-                    document.getElementById('amount').value = row.cells[4].textContent;
-                    document.getElementById('date').value = row.cells[5].textContent;
-                    document.getElementById('hostname').value = row.cells[6].textContent;
-                    document.getElementById('serial').value = row.cells[7].textContent;
-                    document.getElementById('imei').value = row.cells[8].textContent;
-                    document.getElementById('current-user').value = row.cells[9].textContent;
-                    document.getElementById('department').value = row.cells[10].textContent;
-                    document.getElementById('previous-user').value = row.cells[11].textContent;
-                    document.getElementById('comment').value = row.cells[12].textContent;
-                    
-                    // Handle status field (it has a span with class)
-                    const statusSpan = row.cells[13].querySelector('.status');
-                    const statusValue = statusSpan ? statusSpan.textContent.toLowerCase() : 'active';
-                    document.getElementById('status-asset').value = statusValue;
-                    
-                    document.getElementById('warranty-end-date').value = row.cells[14].textContent;
-                    
                     // Get complete asset data from backend to ensure all fields are properly populated
                     fetch(`/api/assets`)
                         .then(response => response.json())
                         .then(assets => {
                             const asset = assets.find(a => a.assetNo === assetId);
                             if (asset) {
+                                // Populate all form fields from backend data
                                 document.getElementById('asset-no').value = asset.assetNo || '';
+                                document.getElementById('asset-tag').value = asset.assetTag || '';
+                                document.getElementById('asset-type').value = asset.type || '';
+                                document.getElementById('brand').value = asset.brand || '';
+                                document.getElementById('model').value = asset.model || '';
+                                document.getElementById('amount').value = asset.amount || '';
+                                document.getElementById('date').value = asset.date || '';
+                                document.getElementById('hostname').value = asset.hostname || '';
+                                document.getElementById('serial').value = asset.serial || '';
+                                document.getElementById('imei').value = asset.imei || '';
                                 document.getElementById('id-no').value = asset.idNo || '';
+                                document.getElementById('current-user').value = asset.currentUser || '';
                                 document.getElementById('email').value = asset.email || '';
+                                document.getElementById('department').value = asset.department || '';
+                                document.getElementById('previous-user').value = asset.previousUser || '';
+                                document.getElementById('comment').value = asset.comment || '';
+                                document.getElementById('status-asset').value = asset.status || 'active';
+                                document.getElementById('warranty-end-date').value = asset.warrantyEndDate || '';
                             }
                         })
                         .catch(error => {
