@@ -1,0 +1,2129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Support Ticketing & Asset Management</title>
+    <link rel="stylesheet" href="html.css">
+</head>
+<body>
+    <div class="container">
+        <header style="display: flex; align-items: center; justify-content: space-between; gap: 20px;">
+            <div class="logo">IT Support System</div>
+            <nav style="flex: 1; display: flex; justify-content: center;">
+                <ul style="display: flex; gap: 20px;">
+                    <li><a href="#" class="tab active" id="dashboard-tab">Dashboard</a></li>
+                    <li><a href="#" class="tab" id="tickets-tab">Tickets</a></li>
+                    <li><a href="#" class="tab" id="assets-tab">Assets</a></li>
+                    <li><a href="#" class="tab" id="reports-tab">Reports</a></li>
+                </ul>
+            </nav>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <span id="admin-username" style="color: #3a4da5; font-weight: 600; font-size: 0.9rem;"></span>
+                <button id="language-toggle" class="btn">🇷🇸 Serbian</button>
+                <button id="theme-toggle" class="btn">🌙 Dark Mode</button>
+                <button id="logout-btn" class="btn" style="background: #dc3545; color: white;">🚪 Logout</button>
+            </div>
+        </header>
+        <div class="tab-container">
+            <!-- Dashboard Tab -->
+            <div class="tab-content active" id="dashboard-content">
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3>Open Tickets</h3>
+                        <div class="number">12</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>In Progress</h3>
+                        <div class="number">8</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Closed Today</h3>
+                        <div class="number">5</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Assets</h3>
+                        <div class="number">47</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Recent Tickets</h2>
+                    </div>
+                    <div class="card-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Ticket #</th>
+                                    <th>Subject</th>
+                                    <th>Requester</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-tickets-body">
+                                <tr>
+                                    <td>#TKT-001</td>
+                                    <td>Laptop not connecting to Wi-Fi</td>
+                                    <td>Sarah Johnson</td>
+                                    <td><span class="priority-high">High</span></td>
+                                    <td><span class="status status-in-progress">In Progress</span></td>
+                                    <td>Oct 10, 2023</td>
+                                </tr>
+                                <tr>
+                                    <td>#TKT-002</td>
+                                    <td>Need access to shared drive</td>
+                                    <td>Michael Chen</td>
+                                    <td><span class="priority-medium">Medium</span></td>
+                                    <td><span class="status status-open">Open</span></td>
+                                    <td>Oct 10, 2023</td>
+                                </tr>
+                                <tr>
+                                    <td>#TKT-003</td>
+                                    <td>Printer is out of toner</td>
+                                    <td>Emily Davis</td>
+                                    <td><span class="priority-low">Low</span></td>
+                                    <td><span class="status status-closed">Closed</span></td>
+                                    <td>Oct 9, 2023</td>
+                                </tr>
+                                <tr>
+                                    <td>#TKT-004</td>
+                                    <td>Email configuration issue</td>
+                                    <td>Robert Kim</td>
+                                    <td><span class="priority-high">High</span></td>
+                                    <td><span class="status status-open">Open</span></td>
+                                    <td>Oct 9, 2023</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Asset Overview</h2>
+                    </div>
+                    <div class="card-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Asset TAG</th>
+                                    <th>Type</th>
+                                    <th>Brand</th>
+                                    <th>Model</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Hostname</th>
+                                    <th>Number/Serial</th>
+                                    <th>IMEI</th>
+                                    <th>Current user</th>
+                                    <th>Department</th>
+                                    <th>Previous user</th>
+                                    <th>Comment</th>
+                                    <th>Status</th>
+                                    <th>Warranty End Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboard-assets-body">
+                                <!-- Asset rows will be rendered dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- Tickets Tab -->
+            <div class="tab-content" id="tickets-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Support Tickets</h2>
+                    </div>
+                    <div class="card-body">
+                        <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <button class="btn" id="new-ticket-btn">Create New Ticket</button>
+                            </div>
+                            <div>
+                                <select id="filter-status">
+                                    <option value="">All Status</option>
+                                    <option value="open">Open</option>
+                                    <option value="in-progress">In Progress</option>
+                                    <option value="closed">Closed</option>
+                                </select>
+                                <select id="filter-priority">
+                                    <option value="">All Priorities</option>
+                                    <option value="low">Low</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                        </div>
+                        <table id="tickets-table">
+                            <thead>
+                                <tr>
+                                    <th data-sort="id">Ticket #</th>
+                                    <th data-sort="subject">Subject</th>
+                                    <th data-sort="requester">Requester</th>
+                                    <th data-sort="assignee">Assignee</th>
+                                    <th data-sort="priority">Priority</th>
+                                    <th data-sort="status">Status</th>
+                                    <th data-sort="date">Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tickets-table-body">
+                                <tr data-ticket-id="TKT-001" data-priority="high" data-status="in-progress" data-date="2023-10-10">
+                                    <td>#TKT-001</td>
+                                    <td>Laptop not connecting to Wi-Fi</td>
+                                    <td>Sarah Johnson</td>
+                                    <td>John Smith</td>
+                                    <td><span class="priority-high">High</span></td>
+                                    <td><span class="status status-in-progress">In Progress</span></td>
+                                    <td>Oct 10, 2023</td>
+                                    <td>
+                                        <button class="btn btn-secondary view-ticket">View</button>
+                                    </td>
+                                </tr>
+                                <tr data-ticket-id="TKT-002" data-priority="medium" data-status="open" data-date="2023-10-10">
+                                    <td>#TKT-002</td>
+                                    <td>Need access to shared drive</td>
+                                    <td>Michael Chen</td>
+                                    <td>Unassigned</td>
+                                    <td><span class="priority-medium">Medium</span></td>
+                                    <td><span class="status status-open">Open</span></td>
+                                    <td>Oct 10, 2023</td>
+                                    <td>
+                                        <button class="btn btn-secondary view-ticket">View</button>
+                                    </td>
+                                </tr>
+                                <tr data-ticket-id="TKT-003" data-priority="low" data-status="closed" data-date="2023-10-09">
+                                    <td>#TKT-003</td>
+                                    <td>Printer is out of toner</td>
+                                    <td>Emily Davis</td>
+                                    <td>Jane Wilson</td>
+                                    <td><span class="priority-low">Low</span></td>
+                                    <td><span class="status status-closed">Closed</span></td>
+                                    <td>Oct 9, 2023</td>
+                                    <td>
+                                        <button class="btn btn-secondary view-ticket">View</button>
+                                    </td>
+                                </tr>
+                                <tr data-ticket-id="TKT-004" data-priority="high" data-status="open" data-date="2023-10-09">
+                                    <td>#TKT-004</td>
+                                    <td>Email configuration issue</td>
+                                    <td>Robert Kim</td>
+                                    <td>Unassigned</td>
+                                    <td><span class="priority-high">High</span></td>
+                                    <td><span class="status status-open">Open</span></td>
+                                    <td>Oct 9, 2023</td>
+                                    <td>
+                                        <button class="btn btn-secondary view-ticket">View</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- New Ticket Modal -->
+                <div id="ticket-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>Create New Ticket</h2>
+                            <span class="close-modal" id="close-ticket-modal">&times;</span>
+                        </div>
+                        <form id="ticket-form">
+                            <div class="form-row">
+                                <div>
+                                    <label for="requester">Requester Name *</label>
+                                    <input type="text" id="requester" required>
+                                </div>
+                                <div>
+                                    <label for="email">Email *</label>
+                                    <input type="email" id="email" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div>
+                                    <label for="subject">Subject *</label>
+                                    <input type="text" id="subject" required>
+                                </div>
+                                <div>
+                                    <label for="priority">Priority *</label>
+                                    <select id="priority" required>
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <label for="description">Description *</label>
+                            <textarea id="description" rows="5" required></textarea>
+                            <label for="category">Category</label>
+                            <select id="category">
+                                <option value="hardware">Hardware</option>
+                                <option value="software">Software</option>
+                                <option value="network">Network</option>
+                                <option value="access">Access/Permissions</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                                <button type="button" class="btn btn-secondary" id="cancel-ticket">Cancel</button>
+                                <button type="submit" class="btn">Submit Ticket</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- View Ticket Modal -->
+                <div id="view-ticket-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2>Ticket Details</h2>
+                            <span class="close-modal" id="close-view-modal">&times;</span>
+                        </div>
+                        <div id="ticket-details-content">
+                            <div class="ticket-details">
+                                <div class="detail-row">
+                                    <div class="detail-label">Ticket ID:</div>
+                                    <div id="ticket-id">#TKT-001</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Status:</div>
+                                    <div id="ticket-status"><span class="status status-in-progress">In Progress</span></div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Priority:</div>
+                                    <div id="ticket-priority"><span class="priority-high">High</span></div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Requester:</div>
+                                    <div id="ticket-requester">Sarah Johnson</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Requester Email:</div>
+                                    <div id="ticket-email">sarah.johnson@company.com</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Assignee:</div>
+                                    <div id="ticket-assignee">John Smith</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Category:</div>
+                                    <div id="ticket-category">Hardware</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Created Date:</div>
+                                    <div id="ticket-created">Oct 10, 2023</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Last Updated:</div>
+                                    <div id="ticket-updated">Oct 10, 2023</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Subject:</div>
+                                    <div id="ticket-subject">Laptop not connecting to Wi-Fi</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Description:</div>
+                                    <div id="ticket-description">My laptop cannot connect to the company Wi-Fi network. I've tried restarting the computer and the router, but the issue persists. The Wi-Fi icon shows no available networks.</div>
+                                </div>
+                            </div>
+                            <div class="timeline">
+                                <h3>Activity Timeline</h3>
+                                <div id="ticket-timeline">
+                                    <!-- Timeline items will be dynamically populated here -->
+                                </div>
+                                <div id="add-note-section">
+                                    <h3>Add Note</h3>
+                                    <form id="note-form">
+                                        <textarea id="note-content" rows="4" placeholder="Add your note or update here..."></textarea>
+                                        <div class="ticket-actions">
+                                            <div>
+                                                <label for="update-status">Update Status:</label>
+                                                <select id="update-status">
+                                                    <option value="open">Open</option>
+                                                    <option value="in-progress" selected>In Progress</option>
+                                                    <option value="closed">Closed</option>
+                                                </select>
+                                            </div>
+                                            <div class="action-buttons">
+                                                <button type="button" class="btn btn-secondary" id="cancel-note">Cancel</button>
+                                                <button type="submit" class="btn">Update</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="ticket-actions">
+                                <div class="action-buttons">
+                                    <button class="btn" id="update-ticket">Update Ticket</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Assets Tab -->
+            <div class="tab-content" id="assets-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Asset Management</h2>
+                    </div>
+                    <div class="card-body">
+                        <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <button class="btn" id="new-asset-btn">Add New Asset</button>
+                                <button class="btn" id="export-assets-btn" style="margin-left: 8px;">Export to Excel</button>
+                                <button class="btn" id="import-assets-btn" style="margin-left: 8px;">Import from Excel</button>
+                                <input type="file" id="import-assets-input" accept=".xlsx,.xls" style="display:none">
+                            </div>
+                            <div>
+                                <select id="filter-type">
+                                    <option value="">All Types</option>
+                                    <option value="laptop">Laptop</option>
+                                    <option value="desktop">Desktop</option>
+                                    <option value="printer">Printer</option>
+                                    <option value="phone">Phone</option>
+                                    <option value="monitor">Monitor</option>
+                                </select>
+                                <select id="filter-status-asset">
+                                    <option value="">All Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="maintenance">Maintenance</option>
+                                    <option value="retired">Retired</option>
+                                </select>
+                            </div>
+                        </div>
+                        <table id="assets-table">
+                            <thead>
+                                <tr>
+                                    <th>Asset TAG</th>
+                                    <th>Type</th>
+                                    <th>Brand</th>
+                                    <th>Model</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Hostname</th>
+                                    <th>Number/Serial</th>
+                                    <th>IMEI</th>
+                                    <th>Current user</th>
+                                    <th>Email</th>
+                                    <th>Department</th>
+                                    <th>Previous user</th>
+                                    <th>Comment</th>
+                                    <th>Status</th>
+                                    <th>Warranty End Date</th>
+                                    <th class="actions-col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assets-table-body">
+                                <!-- Asset rows will be rendered dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- New/Edit Asset Modal -->
+                <div id="asset-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 id="modal-title">Add New Asset</h2>
+                            <span class="close-modal" id="close-asset-modal">&times;</span>
+                        </div>
+                        <form id="asset-form">
+                            <input type="hidden" id="edit-mode" value="false">
+                            <input type="hidden" id="edit-asset-id">
+                            <div class="form-row">
+                                <div>
+                                    <label for="asset-no">Asset No. *</label>
+                                    <input type="text" id="asset-no" required>
+                                </div>
+                                <div>
+                                    <label for="asset-tag">Asset TAG</label>
+                                    <input type="text" id="asset-tag">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div>
+                                    <label for="asset-type">Type *</label>
+                                    <select id="asset-type" required>
+                                        <option value="laptop">Laptop</option>
+                                        <option value="desktop">Desktop</option>
+                                        <option value="printer">Printer</option>
+                                        <option value="phone">Phone</option>
+                                        <option value="monitor">Monitor</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="brand">Brand</label>
+                                    <input type="text" id="brand">
+                                </div>
+                                <div>
+                                    <label for="model">Model</label>
+                                    <input type="text" id="model">
+                                </div>
+                                <div>
+                                    <label for="amount">Amount</label>
+                                    <input type="number" id="amount" min="1" value="1">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div>
+                                    <label for="date">Date</label>
+                                    <input type="date" id="date">
+                                </div>
+                                <div>
+                                    <label for="hostname">Hostname</label>
+                                    <input type="text" id="hostname">
+                                </div>
+                                <div>
+                                    <label for="serial">Number/Serial</label>
+                                    <input type="text" id="serial">
+                                </div>
+                                <div>
+                                    <label for="imei">IMEI</label>
+                                    <input type="text" id="imei">
+                                </div>
+                                <div>
+                                    <label for="id-no">ID No.</label>
+                                    <input type="text" id="id-no">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div>
+                                    <label for="current-user">Current user</label>
+                                    <input type="text" id="current-user">
+                                </div>
+                                <div>
+                                    <label for="asset-email">Email</label>
+                                    <input type="email" id="asset-email">
+                                </div>
+                                <div>
+                                    <label for="department">Department</label>
+                                    <input type="text" id="department">
+                                </div>
+                                <div>
+                                    <label for="previous-user">Previous user</label>
+                                    <input type="text" id="previous-user">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div style="flex: 1;">
+                                    <label for="comment">Comment</label>
+                                    <textarea id="comment" rows="2"></textarea>
+                                </div>
+                                <div>
+                                    <label for="status-asset">Status</label>
+                                    <select id="status-asset">
+                                        <option value="active">Active</option>
+                                        <option value="maintenance">Maintenance</option>
+                                        <option value="retired">Retired</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div>
+                                    <label for="warranty-end-date">Warranty End Date</label>
+                                    <input type="date" id="warranty-end-date">
+                                </div>
+                            </div>
+                            <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                                <button type="button" class="btn btn-secondary" id="cancel-asset">Cancel</button>
+                                <button type="submit" class="btn" id="save-asset">Save Asset</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Reports Tab -->
+            <div class="tab-content" id="reports-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Reports & Analytics</h2>
+                    </div>
+                    <div class="card-body">
+                        <div style="margin-bottom: 20px;">
+                            <button class="btn" id="generate-report">Generate Report</button>
+                        </div>
+                        <div class="form-row" style="margin-bottom: 20px;">
+                            <div>
+                                <label for="report-type">Report Type</label>
+                                <select id="report-type">
+                                    <option value="ticket-volume">Ticket Volume</option>
+                                    <option value="response-time">Average Response Time</option>
+                                    <option value="resolution-time">Average Resolution Time</option>
+                                    <option value="asset-inventory">Asset Inventory</option>
+                                    <option value="warranty-status">Warranty Status</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="report-period">Time Period</label>
+                                <select id="report-period">
+                                    <option value="7">Last 7 days</option>
+                                    <option value="30">Last 30 days</option>
+                                    <option value="90">Last 90 days</option>
+                                    <option value="180">Last 6 months</option>
+                                    <option value="365">Last year</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card" style="margin-top: 20px;">
+                            <div class="card-header">
+                                <h3 id="report-title">Ticket Volume Report</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="ticket-chart" width="400" height="150"></canvas>
+                                <div style="margin-top: 20px;">
+                                    <table id="report-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Period</th>
+                                                <th>New Tickets</th>
+                                                <th>Closed Tickets</th>
+                                                <th>Avg. Resolution Time</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Oct 1-7, 2023</td>
+                                                <td>15</td>
+                                                <td>12</td>
+                                                <td>2.4 days</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Sept 24-30, 2023</td>
+                                                <td>18</td>
+                                                <td>16</td>
+                                                <td>1.8 days</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Sept 17-23, 2023</td>
+                                                <td>12</td>
+                                                <td>14</td>
+                                                <td>2.1 days</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Sept 10-16, 2023</td>
+                                                <td>20</td>
+                                                <td>18</td>
+                                                <td>1.5 days</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card" style="margin-top: 20px;">
+                            <div class="card-header">
+                                <h3>Asset Summary</h3>
+                            </div>
+                            <div class="card-body">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Asset Type</th>
+                                            <th>Total</th>
+                                            <th>Active</th>
+                                            <th>Under Maintenance</th>
+                                            <th>Retired</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Laptops</td>
+                                            <td>15</td>
+                                            <td>14</td>
+                                            <td>1</td>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Desktops</td>
+                                            <td>12</td>
+                                            <td>12</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Printers</td>
+                                            <td>3</td>
+                                            <td>2</td>
+                                            <td>1</td>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Phones</td>
+                                            <td>8</td>
+                                            <td>8</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Monitors</td>
+                                            <td>9</td>
+                                            <td>9</td>
+                                            <td>0</td>
+                                            <td>0</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Total</strong></td>
+                                            <td><strong>47</strong></td>
+                                            <td><strong>45</strong></td>
+                                            <td><strong>2</strong></td>
+                                            <td><strong>0</strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Admin authentication check
+        async function checkAdminAuth() {
+            try {
+                const response = await fetch('/api/admin/check-auth');
+                const data = await response.json();
+                
+                if (!data.authenticated) {
+                    window.location.href = '/login';
+                    return;
+                }
+                
+                // Display username
+                if (data.username) {
+                    document.getElementById('admin-username').textContent = `Welcome, ${data.username}`;
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                window.location.href = '/login';
+            }
+        }
+
+        // Tab functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication status
+            checkAdminAuth();
+            
+            // Logout functionality
+            document.getElementById('logout-btn').addEventListener('click', async function() {
+                try {
+                    const response = await fetch('/api/admin/logout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    if (response.ok) {
+                        window.location.href = '/login';
+                    }
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    window.location.href = '/login';
+                }
+            });
+            
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    if (this.id === 'dashboard-tab') {
+                        document.getElementById('dashboard-content').classList.add('active');
+                    } else if (this.id === 'tickets-tab') {
+                        document.getElementById('tickets-content').classList.add('active');
+                    } else if (this.id === 'assets-tab') {
+                        document.getElementById('assets-content').classList.add('active');
+                    } else if (this.id === 'reports-tab') {
+                        document.getElementById('reports-content').classList.add('active');
+                    }
+                });
+            });
+            // Sorting functionality for assets
+            const assetHeaders = document.querySelectorAll('#assets-table th[data-sort]');
+            assetHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const column = header.dataset.sort;
+                    if (currentAssetSortColumn === column) {
+                        currentAssetSortDirection = currentAssetSortDirection === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentAssetSortColumn = column;
+                        currentAssetSortDirection = 'asc';
+                    }
+                    assetHeaders.forEach(h => {
+                        h.classList.remove('sort-asc', 'sort-desc');
+                    });
+                    header.classList.add(currentAssetSortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+                    sortAssets(column, currentAssetSortDirection);
+                });
+            });
+            function sortAssets(column, direction) {
+                const tableBody = document.getElementById('assets-table-body');
+                const rows = Array.from(tableBody.querySelectorAll('tr'));
+                rows.sort((a, b) => {
+                    let aVal, bVal;
+                    switch (column) {
+                        case 'id':
+                            aVal = a.getAttribute('data-asset-id');
+                            bVal = b.getAttribute('data-asset-id');
+                            break;
+                        case 'name':
+                            aVal = a.cells[1].textContent.toLowerCase();
+                            bVal = b.cells[1].textContent.toLowerCase();
+                            break;
+                        case 'type':
+                            aVal = a.getAttribute('data-type');
+                            bVal = b.getAttribute('data-type');
+                            break;
+                        case 'model':
+                            aVal = a.cells[3].textContent.toLowerCase();
+                            bVal = b.cells[3].textContent.toLowerCase();
+                            break;
+                        case 'assigned':
+                            aVal = a.cells[4].textContent.toLowerCase();
+                            bVal = b.cells[4].textContent.toLowerCase();
+                            break;
+                        case 'status':
+                            aVal = a.getAttribute('data-status');
+                            bVal = b.getAttribute('data-status');
+                            const statusOrder = { 'active': 1, 'maintenance': 2, 'retired': 3 };
+                            return direction === 'asc' ? 
+                                statusOrder[bVal] - statusOrder[aVal] : 
+                                statusOrder[aVal] - statusOrder[bVal];
+                        case 'purchase':
+                            aVal = a.getAttribute('data-purchase');
+                            bVal = b.getAttribute('data-purchase');
+                            break;
+                        case 'warranty':
+                            aVal = a.getAttribute('data-warranty');
+                            bVal = b.getAttribute('data-warranty');
+                            if (aVal === 'expired' && bVal === 'expired') return 0;
+                            if (aVal === 'expired') return 1;
+                            if (bVal === 'expired') return -1;
+                            break;
+                        default:
+                            aVal = a.cells[0].textContent.toLowerCase();
+                            bVal = b.cells[0].textContent.toLowerCase();
+                    }
+                    if (typeof aVal === 'string' && typeof bVal === 'string') {
+                        if (direction === 'asc') {
+                            return aVal.localeCompare(bVal);
+                        } else {
+                            return bVal.localeCompare(aVal);
+                        }
+                    }
+                    if (column === 'purchase' || column === 'warranty') {
+                        if (aVal === 'expired' && bVal === 'expired') return 0;
+                        if (aVal === 'expired') return 1;
+                        if (bVal === 'expired') return -1;
+                        if (direction === 'asc') {
+                            return new Date(bVal) - new Date(aVal);
+                        } else {
+                            return new Date(aVal) - new Date(bVal);
+                        }
+                    }
+                    return 0;
+                });
+                rows.forEach(row => tableBody.appendChild(row));
+            }
+            // Filter functionality for tickets
+            const filterStatus = document.getElementById('filter-status');
+            const filterPriority = document.getElementById('filter-priority');
+            filterStatus.addEventListener('change', filterTickets);
+            filterPriority.addEventListener('change', filterTickets);
+            function filterTickets() {
+                const statusFilter = filterStatus.value;
+                const priorityFilter = filterPriority.value;
+                const rows = document.querySelectorAll('#tickets-table-body tr');
+                rows.forEach(row => {
+                    const status = row.getAttribute('data-status');
+                    const priority = row.getAttribute('data-priority');
+                    const statusMatch = !statusFilter || status === statusFilter;
+                    const priorityMatch = !priorityFilter || priority === priorityFilter;
+                    if (statusMatch && priorityMatch) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+            // Filter functionality for assets
+            const filterType = document.getElementById('filter-type');
+            const filterStatusAsset = document.getElementById('filter-status-asset');
+            filterType.addEventListener('change', filterAssets);
+            filterStatusAsset.addEventListener('change', filterAssets);
+            function filterAssets() {
+                const typeFilter = filterType.value;
+                const statusFilter = filterStatusAsset.value;
+                const rows = document.querySelectorAll('#assets-table-body tr');
+                rows.forEach(row => {
+                    const type = row.getAttribute('data-type');
+                    const status = row.getAttribute('data-status');
+                    const typeMatch = !typeFilter || type === typeFilter;
+                    const statusMatch = !statusFilter || status === statusFilter;
+                    if (typeMatch && statusMatch) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+            // Reports functionality
+            const generateReportBtn = document.getElementById('generate-report');
+            const reportTypeSelect = document.getElementById('report-type');
+            const reportPeriodSelect = document.getElementById('report-period');
+            const reportTitle = document.getElementById('report-title');
+            const reportTable = document.getElementById('report-table');
+            const sampleData = {
+                'ticket-volume': {
+                    title: 'Ticket Volume Report',
+                    data: [
+                        ['Oct 1-7, 2023', 15, 12, '2.4 days'],
+                        ['Sept 24-30, 2023', 18, 16, '1.8 days'],
+                        ['Sept 17-23, 2023', 12, 14, '2.1 days'],
+                        ['Sept 10-16, 2023', 20, 18, '1.5 days']
+                    ]
+                },
+                'response-time': {
+                    title: 'Average Response Time Report',
+                    data: [
+                        ['Oct 1-7, 2023', '1.2 hours', '0.8 hours', '2.1 hours'],
+                        ['Sept 24-30, 2023', '1.5 hours', '1.1 hours', '2.8 hours'],
+                        ['Sept 17-23, 2023', '0.9 hours', '0.7 hours', '1.9 hours'],
+                        ['Sept 10-16, 2023', '1.8 hours', '1.3 hours', '3.2 hours']
+                    ],
+                    headers: ['Period', 'Avg. Response Time', 'Min. Response Time', 'Max. Response Time']
+                },
+                'resolution-time': {
+                    title: 'Average Resolution Time Report',
+                    data: [
+                        ['Oct 1-7, 2023', '1.8 days', '1.2 days', '2.4 days'],
+                        ['Sept 24-30, 2023', '1.5 days', '1.0 days', '2.1 days'],
+                        ['Sept 17-23, 2023', '2.1 days', '1.5 days', '3.0 days'],
+                        ['Sept 10-16, 2023', '1.2 days', '0.8 days', '1.8 days']
+                    ],
+                    headers: ['Period', 'Avg. Resolution Time', 'Min. Resolution Time', 'Max. Resolution Time']
+                },
+                'asset-inventory': {
+                    title: 'Asset Inventory Report',
+                    data: [
+                        ['Laptops', '15', '14', '1', '0'],
+                        ['Desktops', '12', '12', '0', '0'],
+                        ['Printers', '3', '2', '1', '0'],
+                        ['Phones', '8', '8', '0', '0'],
+                        ['Monitors', '9', '9', '0', '0']
+                    ],
+                    headers: ['Asset Type', 'Total', 'Active', 'Under Maintenance', 'Retired']
+                },
+                'warranty-status': {
+                    title: 'Warranty Status Report',
+                    data: [
+                        ['Dell Latitude 5420', 'AS-1001', 'Mar 15, 2025', 'Active'],
+                        ['HP EliteDesk 800', 'AS-1002', 'Jan 10, 2024', 'Active'],
+                        ['MacBook Pro 14"', 'AS-1003', 'Nov 3, 2025', 'Active'],
+                        ['Brother MFC-L8900CDW', 'AS-2001', 'Expired', 'Expired']
+                    ],
+                    headers: ['Asset Name', 'Asset ID', 'Warranty Expires', 'Status']
+                }
+            };
+            generateReportBtn.addEventListener('click', function() {
+                const reportType = reportTypeSelect.value;
+                const reportPeriod = reportPeriodSelect.value;
+                const reportData = sampleData[reportType];
+                reportTitle.textContent = reportData.title;
+                if (reportData.headers) {
+                    const headerRow = reportTable.querySelector('thead tr');
+                    headerRow.innerHTML = '';
+                    reportData.headers.forEach(header => {
+                        const th = document.createElement('th');
+                        th.textContent = header;
+                        headerRow.appendChild(th);
+                    });
+                } else {
+                    const defaultHeaders = ['Period', 'New Tickets', 'Closed Tickets', 'Avg. Resolution Time'];
+                    const headerRow = reportTable.querySelector('thead tr');
+                    if (headerRow.children.length !== defaultHeaders.length) {
+                        headerRow.innerHTML = '';
+                        defaultHeaders.forEach(header => {
+                            const th = document.createElement('th');
+                            th.textContent = header;
+                            headerRow.appendChild(th);
+                        });
+                    }
+                }
+                const tbody = reportTable.querySelector('tbody');
+                tbody.innerHTML = '';
+                reportData.data.forEach(rowData => {
+                    const row = document.createElement('tr');
+                    rowData.forEach(cellData => {
+                        const cell = document.createElement('td');
+                        cell.textContent = cellData;
+                        row.appendChild(cell);
+                    });
+                    tbody.appendChild(row);
+                });
+                alert(`Report generated successfully!\n\nType: ${reportData.title}\nPeriod: ${reportPeriodSelect.options[reportPeriodSelect.selectedIndex].text}`);
+            });
+            // Ticket modal logic
+            const newTicketBtn = document.getElementById('new-ticket-btn');
+            const ticketModal = document.getElementById('ticket-modal');
+            const closeTicketModal = document.getElementById('close-ticket-modal');
+            const cancelTicketBtn = document.getElementById('cancel-ticket');
+            const ticketForm = document.getElementById('ticket-form');
+            const viewTicketModal = document.getElementById('view-ticket-modal');
+            const closeViewModal = document.getElementById('close-view-modal');
+            // View ticket buttons
+            function attachViewTicketListener(button) {
+                button.addEventListener('click', async function() {
+                    const row = this.closest('tr');
+                    const ticketId = row.getAttribute('data-ticket-id');
+                    
+                    // Fetch ticket details from backend
+                    try {
+                        const response = await fetch(`/api/tickets`);
+                        const tickets = await response.json();
+                        const ticket = tickets.find(t => t.id === ticketId);
+                        
+                        if (ticket) {
+                            // Populate ticket details
+                            document.getElementById('ticket-id').textContent = '#' + ticket.id;
+                            document.getElementById('ticket-status').innerHTML = `<span class="status status-${ticket.status}">${ticket.status.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>`;
+                            document.getElementById('ticket-priority').innerHTML = `<span class="priority-${ticket.priority}">${ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1)}</span>`;
+                            document.getElementById('ticket-requester').textContent = ticket.requester;
+                            document.getElementById('ticket-assignee').textContent = ticket.assignee || 'Unassigned';
+                            document.getElementById('ticket-created').textContent = ticket.createdDate ? new Date(ticket.createdDate).toLocaleDateString() : ticket.date;
+                            document.getElementById('ticket-updated').textContent = ticket.lastUpdated ? new Date(ticket.lastUpdated).toLocaleDateString() : ticket.date;
+                            document.getElementById('ticket-email').textContent = ticket.email;
+                            document.getElementById('ticket-category').textContent = ticket.category ? ticket.category.charAt(0).toUpperCase() + ticket.category.slice(1) : 'Other';
+                            document.getElementById('ticket-subject').textContent = ticket.subject;
+                            document.getElementById('ticket-description').textContent = ticket.description;
+                            
+                            // Render timeline
+                            renderTicketTimeline(ticket);
+                            
+                            // Store current ticket ID for note form
+                            document.getElementById('note-form').setAttribute('data-ticket-id', ticket.id);
+                        }
+                    } catch (error) {
+                        console.error('Error fetching ticket details:', error);
+                    }
+                    
+                    viewTicketModal.style.display = 'flex';
+                });
+            }
+            
+            // Render ticket timeline
+            function renderTicketTimeline(ticket) {
+                const timelineContainer = document.getElementById('ticket-timeline');
+                timelineContainer.innerHTML = '';
+                
+                if (ticket.timeline && ticket.timeline.length > 0) {
+                    ticket.timeline.forEach(entry => {
+                        const timelineItem = document.createElement('div');
+                        timelineItem.className = `timeline-item ${entry.type || 'note'}`;
+                        
+                        const authorClass = entry.authorType === 'system' ? 'timeline-author-system' : 'timeline-author';
+                        const authorText = entry.authorType === 'system' ? entry.author : `${entry.author} (${entry.authorType === 'requester' ? 'Requester' : 'Agent'})`;
+                        
+                        timelineItem.innerHTML = `
+                            <div class="timeline-header">
+                                <span class="${authorClass}">${authorText}</span>
+                                <span class="timeline-date">${new Date(entry.date).toLocaleString()}</span>
+                            </div>
+                            <div class="timeline-content">
+                                <p>${entry.content}</p>
+                            </div>
+                        `;
+                        
+                        timelineContainer.appendChild(timelineItem);
+                    });
+                } else {
+                    timelineContainer.innerHTML = '<p>No timeline entries yet.</p>';
+                }
+            }
+            document.querySelectorAll('.view-ticket').forEach(attachViewTicketListener);
+            newTicketBtn.addEventListener('click', function() {
+                ticketForm.reset();
+                ticketModal.style.display = 'flex';
+            });
+            closeTicketModal.addEventListener('click', function() {
+                ticketModal.style.display = 'none';
+            });
+            cancelTicketBtn.addEventListener('click', function() {
+                ticketModal.style.display = 'none';
+            });
+            ticketModal.addEventListener('click', function(e) {
+                if (e.target === ticketModal || e.target.classList.contains('close-modal')) {
+                    ticketModal.style.display = 'none';
+                }
+            });
+            closeViewModal.addEventListener('click', function() {
+                viewTicketModal.style.display = 'none';
+            });
+            viewTicketModal.addEventListener('click', function(e) {
+                if (e.target === viewTicketModal || e.target.classList.contains('close-modal')) {
+                    viewTicketModal.style.display = 'none';
+                }
+            });
+
+            // --- Backend Persistence ---
+            async function fetchTickets() {
+                try {
+                    const res = await fetch('/api/tickets');
+                    if (!res.ok) throw new Error('Failed to fetch tickets');
+                    return await res.json();
+                } catch (e) {
+                    alert('Error loading tickets: ' + e.message);
+                    return [];
+                }
+            }
+            async function fetchAssets() {
+                try {
+                    const res = await fetch('/api/assets');
+                    if (!res.ok) throw new Error('Failed to fetch assets');
+                    return await res.json();
+                } catch (e) {
+                    alert('Error loading assets: ' + e.message);
+                    return [];
+                }
+            }
+            async function renderTickets() {
+                const tickets = await fetchTickets();
+                const tbody = document.getElementById('tickets-table-body');
+                tbody.innerHTML = '';
+                tickets.forEach(ticket => {
+                    const row = document.createElement('tr');
+                    row.setAttribute('data-ticket-id', ticket.id);
+                    row.setAttribute('data-priority', ticket.priority);
+                    row.setAttribute('data-status', ticket.status);
+                    row.setAttribute('data-date', ticket.date);
+                    row.innerHTML = `
+                        <td>#${ticket.id}</td>
+                        <td>${ticket.subject}</td>
+                        <td>${ticket.requester}</td>
+                        <td>${ticket.assignee || 'Unassigned'}</td>
+                        <td><span class="priority-${ticket.priority}">${ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1)}</span></td>
+                        <td><span class="status status-${ticket.status}">${ticket.status.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}</span></td>
+                        <td>${ticket.date}</td>
+                        <td><button class="btn btn-secondary view-ticket">View</button></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                document.querySelectorAll('.view-ticket').forEach(attachViewTicketListener);
+                renderRecentTickets(tickets);
+                
+                // Update table headers after rendering to ensure translations are applied
+                updateTableHeaders();
+            }
+            function renderRecentTickets(tickets) {
+                const recentTicketsBody = document.getElementById('recent-tickets-body');
+                recentTicketsBody.innerHTML = '';
+                tickets.slice(0, 4).forEach(ticket => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>#${ticket.id}</td>
+                        <td>${ticket.subject}</td>
+                        <td>${ticket.requester}</td>
+                        <td><span class="priority-${ticket.priority}">${ticket.priority.charAt(0).toUpperCase() + ticket.priority.slice(1)}</span></td>
+                        <td><span class="status status-${ticket.status}">${ticket.status.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}</span></td>
+                        <td>${ticket.date}</td>
+                    `;
+                    recentTicketsBody.appendChild(row);
+                });
+            }
+            async function renderAssets() {
+                const assets = await fetchAssets();
+                const tbody = document.getElementById('assets-table-body');
+                tbody.innerHTML = '';
+                assets.forEach(asset => {
+                    const row = document.createElement('tr');
+                    row.setAttribute('data-asset-id', asset.assetNo); // Use assetNo as the unique identifier
+                    row.setAttribute('data-type', asset.type);
+                    row.setAttribute('data-status', asset.status);
+                    row.setAttribute('data-purchase', asset.purchaseDate);
+                    row.setAttribute('data-warranty', asset.warrantyEndDate);
+                    row.innerHTML = `
+                        <td>${asset.assetTag || ''}</td>
+                        <td>${asset.type || ''}</td>
+                        <td>${asset.brand || ''}</td>
+                        <td>${asset.model || ''}</td>
+                        <td>${asset.amount || ''}</td>
+                        <td>${asset.date || ''}</td>
+                        <td>${asset.hostname || ''}</td>
+                        <td>${asset.serial || ''}</td>
+                        <td>${asset.imei || ''}</td>
+                        <td>${asset.currentUser || ''}</td>
+                        <td>${asset.email || ''}</td>
+                        <td>${asset.department || ''}</td>
+                        <td>${asset.previousUser || ''}</td>
+                        <td>${asset.comment || ''}</td>
+                        <td><span class="status status-${asset.status}">${asset.status ? asset.status.charAt(0).toUpperCase() + asset.status.slice(1) : ''}</span></td>
+                        <td>${asset.warrantyEndDate || ''}</td>
+                        <td class="actions-col">
+                            <button class="btn btn-secondary edit-asset">Edit</button>
+                            <button class="btn btn-secondary delete-asset">Delete</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                document.querySelectorAll('.edit-asset').forEach(attachEditAssetListener);
+                document.querySelectorAll('.delete-asset').forEach(button => {
+                    button.addEventListener('click', async function() {
+                        const row = this.closest('tr');
+                        const assetId = row.getAttribute('data-asset-id');
+                        if (confirm('Are you sure you want to delete this asset?')) {
+                            await fetch(`/api/assets/${assetId}`, { method: 'DELETE' });
+                            await renderAssets();
+                            await updateDashboardStats();
+                        }
+                    });
+                });
+                
+                // Update table headers after rendering to ensure translations are applied
+                updateTableHeaders();
+            }
+            async function updateDashboardStats() {
+                const tickets = await fetchTickets();
+                const today = new Date();
+                const todayStr = today.toISOString().split('T')[0];
+                let openTickets = 0, inProgressTickets = 0, closedToday = 0;
+                tickets.forEach(t => {
+                    if (t.status === 'open') openTickets++;
+                    if (t.status === 'in-progress') inProgressTickets++;
+                    if (t.status === 'closed') {
+                        if (t.date === todayStr || t.date === today.toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'})) {
+                            closedToday++;
+                        }
+                    }
+                });
+                document.querySelector('.stat-card:nth-child(1) .number').textContent = openTickets;
+                document.querySelector('.stat-card:nth-child(2) .number').textContent = inProgressTickets;
+                document.querySelector('.stat-card:nth-child(3) .number').textContent = closedToday;
+                const assets = await fetchAssets();
+                document.querySelector('.stat-card:nth-child(4) .number').textContent = assets.length;
+            }
+            async function renderDashboardAssets() {
+                const assets = await fetchAssets();
+                const dashboardAssetTable = document.getElementById('dashboard-assets-body');
+                if (!dashboardAssetTable) return;
+                dashboardAssetTable.innerHTML = '';
+                assets.forEach(asset => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${asset.assetTag || ''}</td>
+                        <td>${asset.type || ''}</td>
+                        <td>${asset.brand || ''}</td>
+                        <td>${asset.model || ''}</td>
+                        <td>${asset.amount || ''}</td>
+                        <td>${asset.date || ''}</td>
+                        <td>${asset.hostname || ''}</td>
+                        <td>${asset.serial || ''}</td>
+                        <td>${asset.imei || ''}</td>
+                        <td>${asset.currentUser || ''}</td>
+                        <td>${asset.email || ''}</td>
+                        <td>${asset.department || ''}</td>
+                        <td>${asset.previousUser || ''}</td>
+                        <td>${asset.comment || ''}</td>
+                        <td><span class="status status-${asset.status}">${asset.status ? asset.status.charAt(0).toUpperCase() + asset.status.slice(1) : ''}</span></td>
+                        <td>${asset.warrantyEndDate || ''}</td>
+                    `;
+                    dashboardAssetTable.appendChild(row);
+                });
+                
+                // Update table headers after rendering dashboard assets
+                updateTableHeaders();
+            }
+            // On page load
+            renderTickets();
+            renderAssets();
+            updateDashboardStats();
+            renderDashboardAssets(); // Call on page load
+            // --- Ticket Form Submission ---
+            ticketForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const requester = document.getElementById('requester').value;
+                const email = document.getElementById('email').value;
+                const subject = document.getElementById('subject').value;
+                const priority = document.getElementById('priority').value;
+                const description = document.getElementById('description').value;
+                const category = document.getElementById('category').value;
+                const now = new Date();
+                const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+                const formattedDate = now.toLocaleDateString('en-US', dateOptions);
+                const isoDate = now.toISOString().split('T')[0];
+                // Generate ticket ID (let backend handle uniqueness, but for now mimic old logic)
+                const tickets = await fetchTickets();
+                let ticketCounter = 4;
+                if (tickets.length > 0) {
+                    const lastId = tickets[0].id;
+                    const lastNum = parseInt(lastId.split('-')[1], 10);
+                    ticketCounter = Math.max(ticketCounter, lastNum);
+                }
+                ticketCounter++;
+                const ticketId = `TKT-${String(ticketCounter).padStart(3, '0')}`;
+                const ticket = {
+                    id: ticketId,
+                    subject,
+                    requester,
+                    assignee: 'Unassigned',
+                    priority,
+                    status: 'open',
+                    date: isoDate,
+                    email,
+                    description,
+                    category
+                };
+                try {
+                    const res = await fetch('/api/tickets', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(ticket)
+                    });
+                    if (!res.ok) throw new Error('Failed to create ticket');
+                    ticketModal.style.display = 'none';
+                    ticketForm.reset();
+                    await renderTickets();
+                    await updateDashboardStats();
+                    alert(`Ticket #${ticketId} has been created successfully!`);
+                } catch (e) {
+                    alert('Error creating ticket: ' + e.message);
+                }
+            });
+            
+            // --- Note Form Submission ---
+            const noteForm = document.getElementById('note-form');
+            const cancelNoteBtn = document.getElementById('cancel-note');
+            
+            noteForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const ticketId = this.getAttribute('data-ticket-id');
+                const noteContent = document.getElementById('note-content').value;
+                const updateStatus = document.getElementById('update-status').value;
+                
+                if (!noteContent.trim()) {
+                    alert('Please enter a note or update.');
+                    return;
+                }
+                
+                try {
+                    // Add timeline entry
+                    const timelineEntry = {
+                        author: 'Agent',
+                        authorType: 'agent',
+                        content: noteContent,
+                        type: 'note'
+                    };
+                    
+                    const res = await fetch(`/api/tickets/${ticketId}/timeline`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(timelineEntry)
+                    });
+                    
+                    if (!res.ok) throw new Error('Failed to add timeline entry');
+                    
+                    // Update ticket status if changed
+                    const tickets = await fetchTickets();
+                    const ticket = tickets.find(t => t.id === ticketId);
+                    if (ticket && ticket.status !== updateStatus) {
+                        const updatedTicket = { ...ticket, status: updateStatus };
+                        await fetch(`/api/tickets/${ticketId}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(updatedTicket)
+                        });
+                        
+                        // Add status change to timeline
+                        const statusEntry = {
+                            author: 'System',
+                            authorType: 'system',
+                            content: `Status changed from ${ticket.status.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())} to ${updateStatus.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase())}.`,
+                            type: 'status-change'
+                        };
+                        
+                        await fetch(`/api/tickets/${ticketId}/timeline`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(statusEntry)
+                        });
+                    }
+                    
+                    // Reset form and refresh
+                    noteForm.reset();
+                    document.getElementById('update-status').value = 'in-progress';
+                    
+                    // Refresh ticket view
+                    await renderTickets();
+                    
+                    // Re-fetch and display updated ticket
+                    const updatedTickets = await fetchTickets();
+                    const updatedTicket = updatedTickets.find(t => t.id === ticketId);
+                    if (updatedTicket) {
+                        renderTicketTimeline(updatedTicket);
+                    }
+                    
+                    alert('Note added successfully!');
+                } catch (error) {
+                    console.error('Error adding note:', error);
+                    alert('Error adding note: ' + error.message);
+                }
+            });
+            
+            cancelNoteBtn.addEventListener('click', function() {
+                noteForm.reset();
+                document.getElementById('update-status').value = 'in-progress';
+            });
+            
+            // --- Asset Form Submission ---
+            const newAssetBtn = document.getElementById('new-asset-btn');
+            const assetModal = document.getElementById('asset-modal');
+            const assetForm = document.getElementById('asset-form');
+            const modalTitle = document.getElementById('modal-title');
+            const editMode = document.getElementById('edit-mode');
+            function attachEditAssetListener(button) {
+                button.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    editMode.value = 'true';
+                    modalTitle.textContent = 'Edit Asset';
+                    assetForm.reset();
+                    
+                    // Get asset data from the row's data attributes instead of cells
+                    const assetId = row.getAttribute('data-asset-id');
+                    
+                    // Set the asset ID for editing
+                    document.getElementById('edit-asset-id').value = assetId;
+                    
+                    // Get complete asset data from backend to ensure all fields are properly populated
+                    fetch(`/api/assets`)
+                        .then(response => response.json())
+                        .then(assets => {
+                            const asset = assets.find(a => a.assetNo === assetId);
+                            if (asset) {
+                                // Populate all form fields from backend data
+                                document.getElementById('asset-no').value = asset.assetNo || '';
+                                document.getElementById('asset-tag').value = asset.assetTag || '';
+                                document.getElementById('asset-type').value = asset.type || '';
+                                document.getElementById('brand').value = asset.brand || '';
+                                document.getElementById('model').value = asset.model || '';
+                                document.getElementById('amount').value = asset.amount || '';
+                                document.getElementById('date').value = asset.date || '';
+                                document.getElementById('hostname').value = asset.hostname || '';
+                                document.getElementById('serial').value = asset.serial || '';
+                                document.getElementById('imei').value = asset.imei || '';
+                                document.getElementById('id-no').value = asset.idNo || '';
+                                document.getElementById('current-user').value = asset.currentUser || '';
+                                document.getElementById('asset-email').value = asset.email || '';
+                                document.getElementById('department').value = asset.department || '';
+                                
+                                // Debug logging
+                                console.log('Populating edit form - Asset email:', asset.email);
+                                console.log('Email field value after setting:', document.getElementById('asset-email').value);
+                                document.getElementById('previous-user').value = asset.previousUser || '';
+                                document.getElementById('comment').value = asset.comment || '';
+                                document.getElementById('status-asset').value = asset.status || 'active';
+                                document.getElementById('warranty-end-date').value = asset.warrantyEndDate || '';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching asset details:', error);
+                        });
+                    
+                    assetModal.style.display = 'flex';
+                });
+            }
+            newAssetBtn.addEventListener('click', function() {
+                editMode.value = 'false';
+                modalTitle.textContent = 'Add New Asset';
+                assetForm.reset();
+                assetModal.style.display = 'flex';
+            });
+            assetForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                const asset = {
+                    assetNo: document.getElementById('asset-no').value,
+                    assetTag: document.getElementById('asset-tag').value,
+                    type: document.getElementById('asset-type').value,
+                    brand: document.getElementById('brand').value,
+                    model: document.getElementById('model').value,
+                    amount: document.getElementById('amount').value,
+                    date: document.getElementById('date').value,
+                    hostname: document.getElementById('hostname').value,
+                    serial: document.getElementById('serial').value,
+                    imei: document.getElementById('imei').value,
+                    idNo: document.getElementById('id-no').value,
+                    currentUser: document.getElementById('current-user').value,
+                    email: document.getElementById('asset-email').value,
+                    department: document.getElementById('department').value,
+                    previousUser: document.getElementById('previous-user').value,
+                    comment: document.getElementById('comment').value,
+                    status: document.getElementById('status-asset').value,
+                    warrantyEndDate: document.getElementById('warranty-end-date').value
+                };
+                
+                // Debug logging
+                console.log('Asset form submission - Email value:', document.getElementById('asset-email').value);
+                console.log('Asset object being sent:', asset);
+                try {
+                    let res;
+                    if (editMode.value === 'true') {
+                        // Edit mode: update existing asset
+                        const editAssetId = document.getElementById('edit-asset-id').value;
+                        res = await fetch(`/api/assets/${encodeURIComponent(editAssetId)}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(asset)
+                        });
+                    } else {
+                        // Add mode: create new asset
+                        res = await fetch('/api/assets', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(asset)
+                        });
+                    }
+                    if (!res.ok) throw new Error('Failed to save asset');
+                    assetModal.style.display = 'none';
+                    assetForm.reset();
+                    await renderAssets();
+                    await updateDashboardStats();
+                    await renderDashboardAssets();
+                    alert(`Asset ${asset.assetNo} has been ${editMode.value === 'true' ? 'updated' : 'added'} successfully!`);
+                } catch (e) {
+                    alert('Error saving asset: ' + e.message);
+                }
+            });
+            // --- Ticket/Asset Update Logic ---
+            document.getElementById('update-ticket').addEventListener('click', async function() {
+                try {
+                    const ticketId = document.getElementById('ticket-id').textContent.replace('#', '');
+                    const currentStatus = document.getElementById('ticket-status').querySelector('.status').classList.contains('status-open') ? 'open' :
+                        document.getElementById('ticket-status').querySelector('.status').classList.contains('status-in-progress') ? 'in-progress' : 'closed';
+                    const newStatus = document.getElementById('update-status').value;
+                    if (newStatus === currentStatus) {
+                        alert(`Ticket #${ticketId} is already ${newStatus}. Please select a different status.`);
+                        return;
+                    }
+                    // Fetch the ticket from backend
+                    const tickets = await fetchTickets();
+                    const ticket = tickets.find(t => t.id === ticketId);
+                    if (!ticket) {
+                        alert('Ticket not found');
+                        return;
+                    }
+                    ticket.status = newStatus;
+                    // Optionally update date/updated fields here
+                    await fetch(`/api/tickets/${ticketId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(ticket)
+                    });
+                    viewTicketModal.style.display = 'none';
+                    await renderTickets();
+                    await updateDashboardStats();
+                    alert(`Ticket #${ticketId} status updated to ${newStatus}`);
+                } catch (e) {
+                    alert('Error updating ticket: ' + e.message);
+                }
+            });
+            // Remove all localStorage code and calls
+            const closeAssetModal = document.getElementById('close-asset-modal');
+            const cancelAssetBtn = document.getElementById('cancel-asset');
+            closeAssetModal.addEventListener('click', function() {
+                assetModal.style.display = 'none';
+                assetForm.reset();
+            });
+            cancelAssetBtn.addEventListener('click', function() {
+                assetModal.style.display = 'none';
+                assetForm.reset();
+            });
+        });
+    </script>
+    <script>
+// Export assets table to real .xlsx using SheetJS, excluding the Actions column
+function exportTableToXLSX(tableId, filename = 'assets.xlsx') {
+    const table = document.getElementById(tableId);
+    // Clone the table to manipulate columns without affecting the DOM
+    const clone = table.cloneNode(true);
+    // Remove the last cell from each row (Actions column)
+    for (let row of clone.rows) {
+        if (row.cells.length > 0) {
+            row.deleteCell(row.cells.length - 1);
+        }
+    }
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.table_to_sheet(clone);
+    XLSX.utils.book_append_sheet(wb, ws, 'Assets');
+    XLSX.writeFile(wb, filename);
+}
+
+document.getElementById('export-assets-btn').addEventListener('click', function() {
+    exportTableToXLSX('assets-table');
+});
+
+// Import assets from Excel using SheetJS and send to backend, handling duplicates and errors
+async function importAssetsFromXLSX(file) {
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const json = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+        // Fetch existing assets for duplicate check
+        let existingAssets = [];
+        try {
+            existingAssets = await fetch('/api/assets').then(r => r.json());
+        } catch (err) {
+            alert('Failed to fetch existing assets for duplicate check. Import aborted.');
+            return;
+        }
+        // Use Asset TAG and Serial as unique keys
+        const existingKeys = new Set(existingAssets.map(a => (a.assetTag || '') + '|' + (a.serial || '')));
+        let imported = 0, skipped = 0, failed = 0;
+        let skippedRows = [], failedRows = [];
+        for (const [i, asset] of json.entries()) {
+            const key = (asset['Asset TAG'] || '') + '|' + (asset['Number/Serial'] || '');
+            if (existingKeys.has(key)) {
+                skipped++;
+                skippedRows.push(i + 2); // +2 for Excel row number (header + 1-based)
+                continue;
+            }
+            // Map Excel columns to backend asset structure
+            const assetObj = {
+                assetTag: asset['Asset TAG'] || '',
+                type: asset['Type'] || '',
+                brand: asset['Brand'] || '',
+                model: asset['Model'] || '',
+                amount: asset['Amount'] || '',
+                date: asset['Date'] || '',
+                hostname: asset['Hostname'] || '',
+                serial: asset['Number/Serial'] || '',
+                imei: asset['IMEI'] || '',
+                currentUser: asset['Current user'] || '',
+                department: asset['Department'] || '',
+                previousUser: asset['Previous user'] || '',
+                comment: asset['Comment'] || '',
+                status: (asset['Status'] || '').toLowerCase(),
+                warrantyEndDate: asset['Warranty End Date'] || ''
+            };
+            try {
+                const res = await fetch('/api/assets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(assetObj)
+                });
+                if (!res.ok) throw new Error('Server error');
+                imported++;
+            } catch (err) {
+                failed++;
+                failedRows.push(i + 2);
+            }
+        }
+        await renderAssets();
+        await updateDashboardStats();
+        let msg = `Import complete.\nImported: ${imported}\nSkipped (duplicates): ${skipped}`;
+        if (skippedRows.length) msg += `\nSkipped rows: ${skippedRows.join(', ')}`;
+        if (failed) msg += `\nFailed: ${failed}\nFailed rows: ${failedRows.join(', ')}`;
+        alert(msg);
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+document.getElementById('import-assets-btn').addEventListener('click', function() {
+    document.getElementById('import-assets-input').click();
+});
+document.getElementById('import-assets-input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        importAssetsFromXLSX(file);
+    }
+});
+
+// Language switching functionality
+const translations = {
+    en: {
+        // Header
+        'IT Support System': 'IT Support System',
+        'Dashboard': 'Dashboard',
+        'Tickets': 'Tickets',
+        'Assets': 'Assets',
+        'Reports': 'Reports',
+        'Dark Mode': 'Dark Mode',
+        'Serbian': 'Serbian',
+        
+        // Dashboard
+        'Open Tickets': 'Open Tickets',
+        'In Progress': 'In Progress',
+        'Closed Today': 'Closed Today',
+        'Total Assets': 'Total Assets',
+        'Recent Tickets': 'Recent Tickets',
+        'Asset Overview': 'Asset Overview',
+        
+        // Table headers
+        'Ticket #': 'Ticket #',
+        'Subject': 'Subject',
+        'Requester': 'Requester',
+        'Priority': 'Priority',
+        'Status': 'Status',
+        'Date': 'Date',
+        'Actions': 'Actions',
+        'Assignee': 'Assignee',
+        'Asset TAG': 'Asset TAG',
+        'Type': 'Type',
+        'Brand': 'Brand',
+        'Model': 'Model',
+        'Amount': 'Amount',
+        'Hostname': 'Hostname',
+        'Number/Serial': 'Number/Serial',
+        'IMEI': 'IMEI',
+        'Current user': 'Current user',
+        'Email': 'Email',
+        'Department': 'Department',
+        'Previous user': 'Previous user',
+        'Comment': 'Comment',
+        'Warranty End Date': 'Warranty End Date',
+        
+        // Status and Priority
+        'High': 'High',
+        'Medium': 'Medium',
+        'Low': 'Low',
+        'Open': 'Open',
+        'Closed': 'Closed',
+        'Active': 'Active',
+        'Maintenance': 'Maintenance',
+        'Retired': 'Retired',
+        
+        // Buttons
+        'Create New Ticket': 'Create New Ticket',
+        'Add New Asset': 'Add New Asset',
+        'Export to Excel': 'Export to Excel',
+        'Import from Excel': 'Import from Excel',
+        'Generate Report': 'Generate Report',
+        'View': 'View',
+        'Edit': 'Edit',
+        'Delete': 'Delete',
+        'Save Asset': 'Save Asset',
+        'Cancel': 'Cancel',
+        'Submit Ticket': 'Submit Ticket',
+        'Update': 'Update',
+        'Update Ticket': 'Update Ticket',
+        
+        // Form labels
+        'Requester Name *': 'Requester Name *',
+        'Email *': 'Email *',
+        'Subject *': 'Subject *',
+        'Priority *': 'Priority *',
+        'Description *': 'Description *',
+        'Category': 'Category',
+        'Asset No. *': 'Asset No. *',
+        'Asset TAG': 'Asset TAG',
+        'Type *': 'Type *',
+        'Brand': 'Brand',
+        'Model': 'Model',
+        'Amount': 'Amount',
+        'Date': 'Date',
+        'Hostname': 'Hostname',
+        'Number/Serial': 'Number/Serial',
+        'IMEI': 'IMEI',
+        'ID No.': 'ID No.',
+        'Current user': 'Current user',
+        'Department': 'Department',
+        'Previous user': 'Previous user',
+        'Comment': 'Comment',
+        'Status': 'Status',
+        'Warranty End Date': 'Warranty End Date',
+        
+        // Categories
+        'Hardware': 'Hardware',
+        'Software': 'Software',
+        'Network': 'Network',
+        'Access/Permissions': 'Access/Permissions',
+        'Other': 'Other',
+        
+        // Asset types
+        'Laptop': 'Laptop',
+        'Desktop': 'Desktop',
+        'Printer': 'Printer',
+        'Phone': 'Phone',
+        'Monitor': 'Monitor',
+        
+        // Modal titles
+        'Create New Ticket': 'Create New Ticket',
+        'Ticket Details': 'Ticket Details',
+        'Add New Asset': 'Add New Asset',
+        'Edit Asset': 'Edit Asset',
+        'Reports & Analytics': 'Reports & Analytics',
+        
+        // Filter options
+        'All Status': 'All Status',
+        'All Priorities': 'All Priorities',
+        'All Types': 'All Types',
+        
+        // Messages
+        'Unassigned': 'Unassigned',
+        'Add Note': 'Add Note',
+        'Add your note or update here...': 'Add your note or update here...',
+        'Update Status:': 'Update Status:',
+        'Activity Timeline': 'Activity Timeline',
+        'No timeline entries yet.': 'No timeline entries yet.',
+        
+        // Report types
+        'Ticket Volume': 'Ticket Volume',
+        'Average Response Time': 'Average Response Time',
+        'Average Resolution Time': 'Average Resolution Time',
+        'Asset Inventory': 'Asset Inventory',
+        'Warranty Status': 'Warranty Status',
+        
+        // Time periods
+        'Last 7 days': 'Last 7 days',
+        'Last 30 days': 'Last 30 days',
+        'Last 90 days': 'Last 90 days',
+        'Last 6 months': 'Last 6 months',
+        'Last year': 'Last year',
+        
+        // Report headers
+        'Period': 'Period',
+        'New Tickets': 'New Tickets',
+        'Closed Tickets': 'Closed Tickets',
+        'Avg. Resolution Time': 'Avg. Resolution Time',
+        'Asset Type': 'Asset Type',
+        'Total': 'Total',
+        'Under Maintenance': 'Under Maintenance',
+        'Asset Name': 'Asset Name',
+        'Asset ID': 'Asset ID',
+        'Warranty Expires': 'Warranty Expires',
+        'Avg. Response Time': 'Avg. Response Time',
+        'Min. Response Time': 'Min. Response Time',
+        'Max. Response Time': 'Max. Response Time',
+        'Avg. Resolution Time': 'Avg. Resolution Time',
+        'Min. Resolution Time': 'Min. Resolution Time',
+        'Max. Resolution Time': 'Max. Resolution Time',
+        'Asset Summary': 'Asset Summary'
+    },
+    sr: {
+        // Header
+        'IT Support System': 'IT Sistem Podrške',
+        'Dashboard': 'Kontrolna Tabla',
+        'Tickets': 'Tiketi',
+        'Assets': 'Sredstva',
+        'Reports': 'Izveštaji',
+        'Dark Mode': 'Tamni Režim',
+        'Serbian': 'Srpski',
+        
+        // Dashboard
+        'Open Tickets': 'Otvoreni Tiketi',
+        'In Progress': 'U Toku',
+        'Closed Today': 'Zatvoreni Danas',
+        'Total Assets': 'Ukupno Sredstava',
+        'Recent Tickets': 'Skorašnji Tiketi',
+        'Asset Overview': 'Pregled Sredstava',
+        
+        // Table headers
+        'Ticket #': 'Tiket #',
+        'Subject': 'Predmet',
+        'Requester': 'Podnosioc',
+        'Priority': 'Prioritet',
+        'Status': 'Status',
+        'Date': 'Datum',
+        'Actions': 'Akcije',
+        'Assignee': 'Dodeljen',
+        'Asset TAG': 'Oznaka Sredstva',
+        'Type': 'Tip',
+        'Brand': 'Brend',
+        'Model': 'Model',
+        'Amount': 'Količina',
+        'Hostname': 'Hostname',
+        'Number/Serial': 'Broj/Serijski',
+        'IMEI': 'IMEI',
+        'Current user': 'Trenutni korisnik',
+        'Email': 'Email',
+        'Department': 'Odeljenje',
+        'Previous user': 'Prethodni korisnik',
+        'Comment': 'Komentar',
+        'Warranty End Date': 'Datum Isteka Garancije',
+        
+        // Status and Priority
+        'High': 'Visok',
+        'Medium': 'Srednji',
+        'Low': 'Nizak',
+        'Open': 'Otvoren',
+        'Closed': 'Zatvoren',
+        'Active': 'Aktivan',
+        'Maintenance': 'Održavanje',
+        'Retired': 'Povučen',
+        
+        // Buttons
+        'Create New Ticket': 'Kreiraj Novi Tiket',
+        'Add New Asset': 'Dodaj Novo Sredstvo',
+        'Export to Excel': 'Izvezi u Excel',
+        'Import from Excel': 'Uvezi iz Excel-a',
+        'Generate Report': 'Generiši Izveštaj',
+        'View': 'Pregled',
+        'Edit': 'Izmeni',
+        'Delete': 'Obriši',
+        'Save Asset': 'Sačuvaj Sredstvo',
+        'Cancel': 'Otkaži',
+        'Submit Ticket': 'Pošalji Tiket',
+        'Update': 'Ažuriraj',
+        'Update Ticket': 'Ažuriraj Tiket',
+        
+        // Form labels
+        'Requester Name *': 'Ime Podnosioca *',
+        'Email *': 'Email *',
+        'Subject *': 'Predmet *',
+        'Priority *': 'Prioritet *',
+        'Description *': 'Opis *',
+        'Category': 'Kategorija',
+        'Asset No. *': 'Broj Sredstva *',
+        'Asset TAG': 'Oznaka Sredstva',
+        'Type *': 'Tip *',
+        'Brand': 'Brend',
+        'Model': 'Model',
+        'Amount': 'Količina',
+        'Date': 'Datum',
+        'Hostname': 'Hostname',
+        'Number/Serial': 'Broj/Serijski',
+        'IMEI': 'IMEI',
+        'ID No.': 'ID Broj',
+        'Current user': 'Trenutni korisnik',
+        'Department': 'Odeljenje',
+        'Previous user': 'Prethodni korisnik',
+        'Comment': 'Komentar',
+        'Status': 'Status',
+        'Warranty End Date': 'Datum Isteka Garancije',
+        
+        // Categories
+        'Hardware': 'Hardver',
+        'Software': 'Softver',
+        'Network': 'Mreža',
+        'Access/Permissions': 'Pristup/Dozvole',
+        'Other': 'Ostalo',
+        
+        // Asset types
+        'Laptop': 'Laptop',
+        'Desktop': 'Desktop',
+        'Printer': 'Štampač',
+        'Phone': 'Telefon',
+        'Monitor': 'Monitor',
+        
+        // Modal titles
+        'Create New Ticket': 'Kreiraj Novi Tiket',
+        'Ticket Details': 'Detalji Tiketa',
+        'Add New Asset': 'Dodaj Novo Sredstvo',
+        'Edit Asset': 'Izmeni Sredstvo',
+        'Reports & Analytics': 'Izveštaji i Analitika',
+        
+        // Filter options
+        'All Status': 'Svi Statusi',
+        'All Priorities': 'Svi Prioriteti',
+        'All Types': 'Svi Tipovi',
+        
+        // Messages
+        'Unassigned': 'Nedodeljen',
+        'Add Note': 'Dodaj Napomenu',
+        'Add your note or update here...': 'Dodajte svoju napomenu ili ažuriranje ovde...',
+        'Update Status:': 'Ažuriraj Status:',
+        'Activity Timeline': 'Vremenska Linija Aktivnosti',
+        'No timeline entries yet.': 'Još uvek nema unosa u vremenskoj liniji.',
+        
+        // Report types
+        'Ticket Volume': 'Obim Tiketa',
+        'Average Response Time': 'Prosečno Vreme Odgovora',
+        'Average Resolution Time': 'Prosečno Vreme Rešavanja',
+        'Asset Inventory': 'Inventar Sredstava',
+        'Warranty Status': 'Status Garancije',
+        
+        // Time periods
+        'Last 7 days': 'Poslednjih 7 dana',
+        'Last 30 days': 'Poslednjih 30 dana',
+        'Last 90 days': 'Poslednjih 90 dana',
+        'Last 6 months': 'Poslednjih 6 meseci',
+        'Last year': 'Prošle godine',
+        
+        // Report headers
+        'Period': 'Period',
+        'New Tickets': 'Novi Tiketi',
+        'Closed Tickets': 'Zatvoreni Tiketi',
+        'Avg. Resolution Time': 'Prosečno Vreme Rešavanja',
+        'Asset Type': 'Tip Sredstva',
+        'Total': 'Ukupno',
+        'Under Maintenance': 'Pod Održavanjem',
+        'Asset Name': 'Naziv Sredstva',
+        'Asset ID': 'ID Sredstva',
+        'Warranty Expires': 'Garancija Ističe',
+        'Avg. Response Time': 'Prosečno Vreme Odgovora',
+        'Min. Response Time': 'Min. Vreme Odgovora',
+        'Max. Response Time': 'Max. Vreme Odgovora',
+        'Avg. Resolution Time': 'Prosečno Vreme Rešavanja',
+        'Min. Resolution Time': 'Min. Vreme Rešavanja',
+        'Max. Resolution Time': 'Max. Vreme Rešavanja',
+        'Asset Summary': 'Pregled Sredstava'
+    }
+};
+
+let currentLanguage = 'en';
+
+function switchLanguage() {
+    currentLanguage = currentLanguage === 'en' ? 'sr' : 'en';
+    const languageToggle = document.getElementById('language-toggle');
+    languageToggle.textContent = currentLanguage === 'en' ? '🇷🇸 Serbian' : '🇺🇸 English';
+    
+    // Update all translatable elements
+    updatePageLanguage();
+    
+    // Save language preference
+    localStorage.setItem('language', currentLanguage);
+}
+
+function updatePageLanguage() {
+    const elements = document.querySelectorAll('[data-translate]');
+    elements.forEach(element => {
+        const key = element.getAttribute('data-translate');
+        if (translations[currentLanguage][key]) {
+            element.textContent = translations[currentLanguage][key];
+        }
+    });
+    
+    // Update elements without data-translate attribute
+    updateStaticElements();
+}
+
+function updateStaticElements() {
+    // Update header elements
+    const logo = document.querySelector('.logo');
+    if (logo) logo.textContent = translations[currentLanguage]['IT Support System'];
+    
+    // Update navigation tabs
+    const dashboardTab = document.getElementById('dashboard-tab');
+    const ticketsTab = document.getElementById('tickets-tab');
+    const assetsTab = document.getElementById('assets-tab');
+    const reportsTab = document.getElementById('reports-tab');
+    
+    if (dashboardTab) dashboardTab.textContent = translations[currentLanguage]['Dashboard'];
+    if (ticketsTab) ticketsTab.textContent = translations[currentLanguage]['Tickets'];
+    if (assetsTab) assetsTab.textContent = translations[currentLanguage]['Assets'];
+    if (reportsTab) reportsTab.textContent = translations[currentLanguage]['Reports'];
+    
+    // Update theme toggle button
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) themeToggle.textContent = translations[currentLanguage]['Dark Mode'];
+    
+    // Update dashboard stats
+    const statCards = document.querySelectorAll('.stat-card h3');
+    if (statCards.length >= 4) {
+        statCards[0].textContent = translations[currentLanguage]['Open Tickets'];
+        statCards[1].textContent = translations[currentLanguage]['In Progress'];
+        statCards[2].textContent = translations[currentLanguage]['Closed Today'];
+        statCards[3].textContent = translations[currentLanguage]['Total Assets'];
+    }
+    
+    // Update card headers
+    const cardHeaders = document.querySelectorAll('.card-header h2');
+    cardHeaders.forEach(header => {
+        // Get the original English text from data attribute, or use current text if not set
+        let originalText = header.getAttribute('data-original-text');
+        if (!originalText) {
+            // Store the original text for future translations
+            originalText = header.textContent;
+            header.setAttribute('data-original-text', originalText);
+        }
+        
+        // Translate using the original text
+        if (translations[currentLanguage][originalText]) {
+            header.textContent = translations[currentLanguage][originalText];
+        }
+    });
+    
+    // Update table headers
+    updateTableHeaders();
+    
+    // Update buttons
+    updateButtons();
+    
+    // Update form labels
+    updateFormLabels();
+}
+
+function updateTableHeaders() {
+    const tables = document.querySelectorAll('table');
+    tables.forEach(table => {
+        const headers = table.querySelectorAll('th');
+        headers.forEach(header => {
+            // Get the original English text from data attribute, or use current text if not set
+            let originalText = header.getAttribute('data-original-text');
+            if (!originalText) {
+                // Store the original text for future translations
+                originalText = header.textContent;
+                header.setAttribute('data-original-text', originalText);
+            }
+            
+            // Translate using the original text
+            if (translations[currentLanguage][originalText]) {
+                header.textContent = translations[currentLanguage][originalText];
+            }
+        });
+    });
+}
+
+function updateButtons() {
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(button => {
+        // Get the original English text from data attribute, or use current text if not set
+        let originalText = button.getAttribute('data-original-text');
+        if (!originalText) {
+            // Store the original text for future translations
+            originalText = button.textContent;
+            button.setAttribute('data-original-text', originalText);
+        }
+        
+        // Translate using the original text
+        if (translations[currentLanguage][originalText]) {
+            button.textContent = translations[currentLanguage][originalText];
+        }
+    });
+}
+
+function updateFormLabels() {
+    const labels = document.querySelectorAll('label');
+    labels.forEach(label => {
+        // Get the original English text from data attribute, or use current text if not set
+        let originalText = label.getAttribute('data-original-text');
+        if (!originalText) {
+            // Store the original text for future translations
+            originalText = label.textContent;
+            label.setAttribute('data-original-text', originalText);
+        }
+        
+        // Translate using the original text
+        if (translations[currentLanguage][originalText]) {
+            label.textContent = translations[currentLanguage][originalText];
+        }
+    });
+}
+
+// Initialize language on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Load saved language preference
+    const savedLanguage = localStorage.getItem('language');
+    if (savedLanguage) {
+        currentLanguage = savedLanguage;
+        const languageToggle = document.getElementById('language-toggle');
+        languageToggle.textContent = currentLanguage === 'en' ? '🇷🇸 Serbian' : '🇺🇸 English';
+    }
+    
+    // Add event listener for language toggle
+    const languageToggle = document.getElementById('language-toggle');
+    if (languageToggle) {
+        languageToggle.addEventListener('click', switchLanguage);
+    }
+    
+    // Initial language update
+    updatePageLanguage();
+});
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="theme.js"></script>
+</body>
+</html> 

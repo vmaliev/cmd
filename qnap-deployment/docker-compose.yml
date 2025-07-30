@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  it-support-app:
+    build: .
+    container_name: it-support-system
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+      - "443:443"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      # Add your SMTP settings here
+      - SMTP_HOST=in-v3.mailjet.com
+      - SMTP_PORT=587
+      - SMTP_USER=your_mailjet_api_key
+      - SMTP_PASS=your_mailjet_secret_key
+      - SMTP_FROM=your_verified_email@domain.com
+    volumes:
+      # Persistent data storage
+      - ./data:/app/data
+      # SSL certificates (create this directory on your NAS)
+      - ./ssl:/app/ssl:ro
+      # Logs
+      - ./logs:/app/logs
+      # Environment file (optional)
+      - ./.env:/app/.env:ro
+    networks:
+      - it-support-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - "com.qnap.container.description=IT Support System"
+      - "com.qnap.container.author=Your Name"
+      - "com.qnap.container.version=1.0"
+
+networks:
+  it-support-network:
+    driver: bridge 

@@ -1,0 +1,65 @@
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Development files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*.log
+logs/
+.DS_Store
+.nyc_output
+coverage/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# SSL certificates (will be mounted as volumes)
+ssl/
+*.pem
+*.key
+*.crt
+
+# Large files
+my-it-support-app.tar
+*.tar
+*.tar.gz
+*.zip
+
+# Test files
+test
+tests/
+__tests__/
+*.test.js
+*.spec.js
+
+# Documentation
+README.md
+*.md
+docs/
+
+# Docker files (except Dockerfile)
+docker-compose*.yml
+.dockerignore 
