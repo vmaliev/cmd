@@ -1,0 +1,181 @@
+{
+  "project": {
+    "name": "Crypto Trading Bot",
+    "description": "Automated crypto trading bot with Bybit integration and TradingView webhook support",
+    "version": "1.0.0"
+  },
+  "tags": {
+    "master": {
+      "description": "Main development tasks",
+      "created": "2024-12-19T10:00:00Z",
+      "tasks": [
+        {
+          "id": 1,
+          "title": "Set up Bybit API Integration",
+          "description": "Create the core Bybit API client with authentication and basic trading operations",
+          "status": "pending",
+          "priority": "high",
+          "dependencies": [],
+          "details": "Implement Bybit API client with proper authentication, rate limiting, and error handling. Support for market orders, account balance retrieval, and position management.",
+          "testStrategy": "Test API connection, retrieve account balance, and place a test market order",
+          "subtasks": []
+        },
+        {
+          "id": 2,
+          "title": "Implement Webhook Server",
+          "description": "Create secure webhook endpoint for receiving TradingView alerts",
+          "status": "pending",
+          "priority": "high",
+          "dependencies": [1],
+          "details": "Build Express.js server with webhook endpoint, signature validation, and proper error handling. Support for TradingView webhook format and security validation.",
+          "testStrategy": "Send test webhook payload and verify proper processing and validation",
+          "subtasks": []
+        },
+        {
+          "id": 3,
+          "title": "Create Basic Order Execution Engine",
+          "description": "Implement core trading logic for executing orders based on webhook signals",
+          "status": "pending",
+          "priority": "high",
+          "dependencies": [1, 2],
+          "details": "Build order execution engine that processes webhook signals, validates parameters, and places orders through Bybit API. Include basic error handling and logging.",
+          "testStrategy": "Process test signals and verify order placement with proper error handling",
+          "subtasks": []
+        },
+        {
+          "id": 4,
+          "title": "Develop Web Interface Foundation",
+          "description": "Create basic web dashboard for configuration and monitoring",
+          "status": "pending",
+          "priority": "medium",
+          "dependencies": [1],
+          "details": "Build React-based web interface with basic configuration forms, account status display, and trade history. Include user authentication and responsive design.",
+          "testStrategy": "Test interface functionality, form submissions, and real-time updates",
+          "subtasks": []
+        },
+        {
+          "id": 5,
+          "title": "Implement Position Sizing Algorithm",
+          "description": "Add intelligent position sizing based on account balance and risk parameters",
+          "status": "pending",
+          "priority": "medium",
+          "dependencies": [3],
+          "details": "Create position sizing logic that calculates appropriate order sizes based on account balance, risk percentage, and market volatility. Include configuration options for risk management.",
+          "testStrategy": "Test position sizing calculations with various account balances and risk settings",
+          "subtasks": []
+        },
+        {
+          "id": 6,
+          "title": "Add Risk Management System",
+          "description": "Implement comprehensive risk controls and safety measures",
+          "status": "pending",
+          "priority": "high",
+          "dependencies": [3, 5],
+          "details": "Build risk management system with stop-loss automation, maximum drawdown protection, and portfolio exposure limits. Include real-time monitoring and alerting.",
+          "testStrategy": "Test risk controls with simulated market conditions and verify proper activation",
+          "subtasks": []
+        },
+        {
+          "id": 7,
+          "title": "Create Database Schema and Models",
+          "description": "Design and implement database structure for storing trades and configuration",
+          "status": "pending",
+          "priority": "medium",
+          "dependencies": [1],
+          "details": "Design PostgreSQL schema for trades, strategies, account data, and configuration. Implement data models and connection management with proper error handling.",
+          "testStrategy": "Test database operations, data persistence, and query performance",
+          "subtasks": []
+        },
+        {
+          "id": 8,
+          "title": "Implement Trade History Tracking",
+          "description": "Add comprehensive logging and tracking of all trading activities",
+          "status": "pending",
+          "priority": "medium",
+          "dependencies": [3, 7],
+          "details": "Create system for logging all trades, order status changes, and performance metrics. Include P&L tracking, win/loss ratios, and trade analysis capabilities.",
+          "testStrategy": "Verify accurate trade logging and performance calculation accuracy",
+          "subtasks": []
+        },
+        {
+          "id": 9,
+          "title": "Add Advanced Order Types",
+          "description": "Support for limit orders, stop-loss, and take-profit orders",
+          "status": "pending",
+          "priority": "medium",
+          "dependencies": [3],
+          "details": "Extend order execution engine to support limit orders, stop-loss orders, and take-profit orders. Include order modification and cancellation capabilities.",
+          "testStrategy": "Test all order types with proper execution and modification handling",
+          "subtasks": []
+        },
+        {
+          "id": 10,
+          "title": "Implement Notification System",
+          "description": "Add email alerts and system status notifications",
+          "status": "pending",
+          "priority": "low",
+          "dependencies": [3],
+          "details": "Create notification system for trade executions, errors, and system status. Support email notifications and webhook status monitoring.",
+          "testStrategy": "Test notification delivery for various events and error conditions",
+          "subtasks": []
+        },
+        {
+          "id": 11,
+          "title": "Enhance Web Interface",
+          "description": "Add real-time updates and advanced monitoring features",
+          "status": "pending",
+          "priority": "medium",
+          "dependencies": [4, 8],
+          "details": "Enhance web interface with real-time trade updates, performance charts, and advanced configuration options. Include mobile responsiveness and improved UX.",
+          "testStrategy": "Test real-time updates, chart functionality, and mobile interface",
+          "subtasks": []
+        },
+        {
+          "id": 12,
+          "title": "Add Performance Analytics",
+          "description": "Implement comprehensive performance tracking and reporting",
+          "status": "pending",
+          "priority": "low",
+          "dependencies": [8, 11],
+          "details": "Create analytics dashboard with performance metrics, trade analysis, and reporting capabilities. Include historical data visualization and strategy performance comparison.",
+          "testStrategy": "Verify analytics accuracy and chart generation functionality",
+          "subtasks": []
+        },
+        {
+          "id": 13,
+          "title": "Implement Security Hardening",
+          "description": "Add comprehensive security measures and input validation",
+          "status": "pending",
+          "priority": "high",
+          "dependencies": [2, 4],
+          "details": "Implement API key encryption, input validation, audit logging, and security best practices. Include rate limiting and protection against common attacks.",
+          "testStrategy": "Perform security testing and vulnerability assessment",
+          "subtasks": []
+        },
+        {
+          "id": 14,
+          "title": "Create Docker Deployment",
+          "description": "Set up containerized deployment with docker-compose",
+          "status": "pending",
+          "priority": "medium",
+          "dependencies": [7],
+          "details": "Create Dockerfile and docker-compose configuration for easy deployment. Include database setup, SSL configuration, and environment variable management.",
+          "testStrategy": "Test complete deployment process and verify all services start correctly",
+          "subtasks": []
+        },
+        {
+          "id": 15,
+          "title": "Write Documentation and Testing",
+          "description": "Create comprehensive documentation and test suite",
+          "status": "pending",
+          "priority": "medium",
+          "dependencies": [14],
+          "details": "Write user documentation, API documentation, deployment guides, and create comprehensive test suite. Include integration tests and end-to-end testing.",
+          "testStrategy": "Verify documentation accuracy and test suite coverage",
+          "subtasks": []
+        }
+      ]
+    }
+  },
+  "currentTag": "master"
+} 

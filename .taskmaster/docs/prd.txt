@@ -1,0 +1,162 @@
+<context>
+# Overview  
+A comprehensive crypto trading bot system that integrates with Bybit exchange to execute automated trading strategies. The system includes webhook support for TradingView alerts, risk management, position sizing, and a web interface for monitoring and control. The project aims to provide a reliable, secure, and user-friendly platform for automated cryptocurrency trading with proper risk controls and real-time monitoring capabilities.
+
+# Core Features  
+## Trading Engine
+- Automated order execution based on TradingView webhook signals
+- Support for multiple trading strategies (options, spot, futures)
+- Real-time position monitoring and management
+- Integration with Bybit API for order placement and account management
+
+## Risk Management System
+- Position sizing based on account balance and risk parameters
+- Stop-loss and take-profit automation
+- Maximum drawdown protection
+- Portfolio exposure limits
+
+## Web Interface
+- Real-time dashboard for monitoring trades and account status
+- Configuration management interface
+- Historical trade analysis and reporting
+- User authentication and security
+
+## Notification System
+- Email alerts for trade executions and errors
+- Webhook status monitoring
+- System health notifications
+
+# User Experience  
+## Primary User: Crypto Trader
+- Needs to set up trading strategies quickly
+- Wants real-time visibility into trading performance
+- Requires confidence in risk management
+- Values ease of configuration and monitoring
+
+## Key User Flows
+1. Initial Setup: Configure API keys, risk parameters, and trading strategies
+2. Strategy Deployment: Upload TradingView strategy and configure webhooks
+3. Monitoring: View dashboard for real-time trade status and performance
+4. Maintenance: Adjust parameters, review logs, and manage positions
+
+## UI/UX Considerations
+- Clean, intuitive dashboard design
+- Mobile-responsive interface
+- Real-time data updates
+- Clear error messaging and status indicators
+</context>
+<PRD>
+# Technical Architecture  
+## System Components
+- **Trading Engine**: Core logic for strategy execution and order management
+- **API Layer**: Bybit API integration with rate limiting and error handling
+- **Webhook Server**: Secure endpoint for receiving TradingView alerts
+- **Database**: Trade history, configuration, and performance metrics
+- **Web Interface**: React-based dashboard for user interaction
+- **Notification System**: Email and webhook status alerts
+
+## Data Models
+- **Trade**: Order details, execution status, P&L tracking
+- **Strategy**: Configuration, parameters, performance metrics
+- **Account**: Balance, positions, risk settings
+- **Signal**: Webhook data, validation, processing status
+
+## APIs and Integrations
+- Bybit REST API for trading operations
+- TradingView webhook integration
+- Email service for notifications
+- Optional: Additional exchange APIs for multi-exchange support
+
+## Infrastructure Requirements
+- Node.js runtime environment
+- PostgreSQL database for data persistence
+- SSL certificates for secure webhook communication
+- Docker containerization for deployment
+- Logging and monitoring systems
+
+# Development Roadmap  
+## Phase 1: Foundation (MVP)
+- Basic Bybit API integration with authentication
+- Simple webhook endpoint for receiving TradingView signals
+- Basic order execution (market orders only)
+- Simple web interface for configuration
+- Basic logging and error handling
+
+## Phase 2: Core Trading Features
+- Advanced order types (limit, stop-loss, take-profit)
+- Position sizing algorithm implementation
+- Risk management rules and validation
+- Trade history tracking and basic reporting
+- Enhanced web interface with real-time updates
+
+## Phase 3: Advanced Features
+- Multiple strategy support
+- Advanced risk management (drawdown protection, portfolio limits)
+- Performance analytics and reporting
+- Email notification system
+- Mobile-responsive web interface
+
+## Phase 4: Production Readiness
+- Comprehensive error handling and recovery
+- Security hardening (API key encryption, input validation)
+- Performance optimization and monitoring
+- Documentation and deployment guides
+- Testing suite and quality assurance
+
+# Logical Dependency Chain
+## Foundation First (Phase 1)
+1. **API Integration**: Bybit client setup and authentication
+2. **Basic Webhook**: Simple endpoint to receive and validate signals
+3. **Order Execution**: Basic market order placement
+4. **Web Interface**: Minimal configuration and status display
+
+## Build Upon Foundation (Phase 2)
+1. **Enhanced Orders**: Add limit orders and stop-loss functionality
+2. **Position Management**: Track and manage open positions
+3. **Risk Controls**: Implement position sizing and basic risk rules
+4. **Data Persistence**: Store trades and configuration
+
+## Advanced Features (Phase 3)
+1. **Multiple Strategies**: Support for different trading approaches
+2. **Advanced Risk Management**: Portfolio-level controls
+3. **Analytics**: Performance tracking and reporting
+4. **Notifications**: Email alerts and system monitoring
+
+## Production Polish (Phase 4)
+1. **Security**: API key encryption, input validation, audit logging
+2. **Reliability**: Error handling, recovery mechanisms, monitoring
+3. **Performance**: Optimization, caching, rate limiting
+4. **Documentation**: User guides, API documentation, deployment
+
+# Risks and Mitigations  
+## Technical Challenges
+- **API Rate Limits**: Implement proper rate limiting and retry logic
+- **Webhook Security**: Validate webhook signatures and implement IP whitelisting
+- **Order Execution Failures**: Robust error handling and order status tracking
+- **Data Consistency**: Proper database transactions and rollback mechanisms
+
+## MVP Scope Management
+- **Start Simple**: Focus on market orders before complex order types
+- **Single Exchange**: Begin with Bybit only, expand later
+- **Basic Risk Management**: Implement essential controls first
+- **Minimal UI**: Functional interface before advanced features
+
+## Resource Constraints
+- **Development Time**: Prioritize core trading functionality over nice-to-have features
+- **Testing**: Focus on critical path testing for trading operations
+- **Documentation**: Maintain essential documentation for deployment and usage
+
+# Appendix  
+## Research Findings
+- Bybit API provides comprehensive trading capabilities
+- TradingView webhook integration is well-documented
+- Node.js ecosystem has excellent libraries for crypto trading
+- Docker deployment simplifies production setup
+
+## Technical Specifications
+- **Backend**: Node.js with TypeScript
+- **Frontend**: React with real-time updates
+- **Database**: PostgreSQL for data persistence
+- **Deployment**: Docker containers with docker-compose
+- **Security**: SSL/TLS encryption, API key management
+- **Monitoring**: Structured logging and health checks 
