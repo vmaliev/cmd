@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard - IT Support System</title>
+    <link rel="stylesheet" href="html.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .analytics-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .analytics-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .analytics-title {
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .analytics-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .time-range-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .time-range-selector label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .time-range-selector select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .metric-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .metric-change {
+            font-size: 0.8em;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .metric-change.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .metric-change.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        .analytics-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 600;
+            color: #7f8c8d;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .export-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .export-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .export-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .export-card h4 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+        }
+
+        .real-time-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #27ae60;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .analytics-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .analytics-controls {
+                justify-content: center;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-wrapper {
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="analytics-container">
+        <!-- Header -->
+        <div class="analytics-header">
+            <h1 class="analytics-title">Analytics Dashboard</h1>
+            <div class="analytics-controls">
+                <div class="time-range-selector">
+                    <label for="timeRange">Time Range:</label>
+                    <select id="timeRange" onchange="changeTimeRange()">
+                        <option value="7d">Last 7 Days</option>
+                        <option value="30d" selected>Last 30 Days</option>
+                        <option value="90d">Last 90 Days</option>
+                        <option value="1y">Last Year</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="refreshData()">
+                    <span>🔄</span> Refresh
+                </button>
+                <button class="btn btn-success" onclick="exportData()">
+                    <span>📊</span> Export
+                </button>
+                <a href="/admin-users.html" class="btn btn-secondary">
+                    <span>👥</span> User Management
+                </a>
+                <a href="/" class="btn btn-secondary">
+                    <span>🏠</span> Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Real-time Status -->
+        <div class="real-time-indicator" id="realTimeIndicator"></div>
+        <span id="lastUpdate">Last updated: Never</span>
+
+        <!-- Key Metrics -->
+        <div class="dashboard-grid">
+            <div class="metric-card">
+                <div class="metric-number" id="totalUsers">-</div>
+                <div class="metric-label">Total Users</div>
+                <div class="metric-change positive" id="userChange">+0%</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number" id="activeUsers">-</div>
+                <div class="metric-label">Active Users</div>
+                <div class="metric-change positive" id="activeChange">+0%</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number" id="totalLogins">-</div>
+                <div class="metric-label">Total Logins</div>
+                <div class="metric-change positive" id="loginChange">+0%</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number" id="retentionRate">-</div>
+                <div class="metric-label">Retention Rate</div>
+                <div class="metric-change positive" id="retentionChange">+0%</div>
+            </div>
+        </div>
+
+        <!-- Analytics Tabs -->
+        <div class="analytics-tabs">
+            <button class="tab-button active" onclick="switchTab('overview')">Overview</button>
+            <button class="tab-button" onclick="switchTab('registrations')">Registrations</button>
+            <button class="tab-button" onclick="switchTab('activity')">Activity</button>
+            <button class="tab-button" onclick="switchTab('engagement')">Engagement</button>
+            <button class="tab-button" onclick="switchTab('performance')">Performance</button>
+            <button class="tab-button" onclick="switchTab('system')">System Health</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overviewTab" class="tab-content active">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">User Growth Trend</h3>
+                    <div class="chart-controls">
+                        <button class="btn btn-secondary btn-sm" onclick="updateChart('daily')">Daily</button>
+                        <button class="btn btn-secondary btn-sm" onclick="updateChart('weekly')">Weekly</button>
+                        <button class="btn btn-secondary btn-sm" onclick="updateChart('monthly')">Monthly</button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="growthChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">User Activity by Role</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="roleActivityChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Registrations Tab -->
+        <div id="registrationsTab" class="tab-content">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Registration Trends</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="registrationChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Registrations by Role</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="roleRegistrationChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Verification Rate</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="verificationChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Tab -->
+        <div id="activityTab" class="tab-content">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Login Activity</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="loginActivityChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Failed Login Attempts</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="failedLoginsChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Session Duration</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="sessionDurationChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Engagement Tab -->
+        <div id="engagementTab" class="tab-content">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Daily Active Users</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="dailyActiveChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">User Retention</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="retentionChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Most Active Users</h3>
+                </div>
+                <div id="topUsersTable">
+                    <div class="loading">Loading top users...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Tab -->
+        <div id="performanceTab" class="tab-content">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Top Performers</h3>
+                </div>
+                <div id="topPerformersTable">
+                    <div class="loading">Loading top performers...</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">User Efficiency</h3>
+                </div>
+                <div id="efficiencyTable">
+                    <div class="loading">Loading efficiency data...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Health Tab -->
+        <div id="systemTab" class="tab-content">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">System Load</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="systemLoadChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Error Rates</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="errorRatesChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Recent Activity</h3>
+                </div>
+                <div id="recentActivityTable">
+                    <div class="loading">Loading recent activity...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Section -->
+        <div class="export-section">
+            <h3>Export Analytics Data</h3>
+            <div class="export-grid">
+                <div class="export-card">
+                    <h4>Registration Data</h4>
+                    <button class="btn btn-primary" onclick="exportRegistrations()">Export CSV</button>
+                </div>
+                <div class="export-card">
+                    <h4>Activity Data</h4>
+                    <button class="btn btn-primary" onclick="exportActivity()">Export CSV</button>
+                </div>
+                <div class="export-card">
+                    <h4>Engagement Data</h4>
+                    <button class="btn btn-primary" onclick="exportEngagement()">Export CSV</button>
+                </div>
+                <div class="export-card">
+                    <h4>Complete Report</h4>
+                    <button class="btn btn-success" onclick="exportComplete()">Export All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTimeRange = '30d';
+        let charts = {};
+        let realTimeInterval;
+
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+            startRealTimeUpdates();
+        });
+
+        function changeTimeRange() {
+            currentTimeRange = document.getElementById('timeRange').value;
+            loadDashboardData();
+        }
+
+        function refreshData() {
+            loadDashboardData();
+        }
+
+        async function loadDashboardData() {
+            try {
+                await Promise.all([
+                    loadDashboardSummary(),
+                    loadOverviewData(),
+                    loadRegistrationData(),
+                    loadActivityData(),
+                    loadEngagementData(),
+                    loadPerformanceData(),
+                    loadSystemHealthData()
+                ]);
+                
+                updateLastUpdate();
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showError('Failed to load dashboard data');
+            }
+        }
+
+        async function loadDashboardSummary() {
+            try {
+                const response = await fetch('/api/analytics/dashboard');
+                if (!response.ok) throw new Error('Failed to load dashboard summary');
+                
+                const data = await response.json();
+                
+                document.getElementById('totalUsers').textContent = data.thisMonth.registrations;
+                document.getElementById('activeUsers').textContent = data.thisMonth.activeUsers;
+                document.getElementById('totalLogins').textContent = data.thisMonth.logins;
+                
+                // Calculate retention rate (simplified)
+                const retentionRate = data.thisMonth.activeUsers > 0 
+                    ? ((data.thisMonth.activeUsers / data.thisMonth.registrations) * 100).toFixed(1)
+                    : 0;
+                document.getElementById('retentionRate').textContent = retentionRate + '%';
+                
+            } catch (error) {
+                console.error('Error loading dashboard summary:', error);
+            }
+        }
+
+        async function loadOverviewData() {
+            try {
+                const [registrationStats, activityStats] = await Promise.all([
+                    fetch(`/api/analytics/registrations?timeRange=${currentTimeRange}`).then(r => r.json()),
+                    fetch(`/api/analytics/activity?timeRange=${currentTimeRange}`).then(r => r.json())
+                ]);
+                
+                createGrowthChart(registrationStats.registrationsByDay);
+                createRoleActivityChart(activityStats.loginsByRole);
+                
+            } catch (error) {
+                console.error('Error loading overview data:', error);
+            }
+        }
+
+        async function loadRegistrationData() {
+            try {
+                const response = await fetch(`/api/analytics/registrations?timeRange=${currentTimeRange}`);
+                if (!response.ok) throw new Error('Failed to load registration data');
+                
+                const data = await response.json();
+                
+                createRegistrationChart(data.registrationsByDay);
+                createRoleRegistrationChart(data.registrationsByRole);
+                createVerificationChart(data.verificationRate);
+                
+            } catch (error) {
+                console.error('Error loading registration data:', error);
+            }
+        }
+
+        async function loadActivityData() {
+            try {
+                const response = await fetch(`/api/analytics/activity?timeRange=${currentTimeRange}`);
+                if (!response.ok) throw new Error('Failed to load activity data');
+                
+                const data = await response.json();
+                
+                createLoginActivityChart(data.loginsByDay);
+                createFailedLoginsChart(data.failedLogins);
+                createSessionDurationChart(data.averageSessionDuration);
+                
+            } catch (error) {
+                console.error('Error loading activity data:', error);
+            }
+        }
+
+        async function loadEngagementData() {
+            try {
+                const response = await fetch(`/api/analytics/engagement?timeRange=${currentTimeRange}`);
+                if (!response.ok) throw new Error('Failed to load engagement data');
+                
+                const data = await response.json();
+                
+                createDailyActiveChart(data.dailyActiveUsers);
+                createRetentionChart(data.userRetention);
+                renderTopUsersTable(data.mostActiveUsers);
+                
+            } catch (error) {
+                console.error('Error loading engagement data:', error);
+            }
+        }
+
+        async function loadPerformanceData() {
+            try {
+                const response = await fetch(`/api/analytics/performance?timeRange=${currentTimeRange}`);
+                if (!response.ok) throw new Error('Failed to load performance data');
+                
+                const data = await response.json();
+                
+                renderTopPerformersTable(data.topPerformers);
+                renderEfficiencyTable(data.userEfficiency);
+                
+            } catch (error) {
+                console.error('Error loading performance data:', error);
+            }
+        }
+
+        async function loadSystemHealthData() {
+            try {
+                const response = await fetch('/api/analytics/system-health');
+                if (!response.ok) throw new Error('Failed to load system health data');
+                
+                const data = await response.json();
+                
+                createSystemLoadChart(data.systemLoad);
+                createErrorRatesChart(data.errorRates);
+                renderRecentActivityTable(data.recentActivity);
+                
+            } catch (error) {
+                console.error('Error loading system health data:', error);
+            }
+        }
+
+        // Chart creation functions
+        function createGrowthChart(data) {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            
+            if (charts.growthChart) {
+                charts.growthChart.destroy();
+            }
+            
+            charts.growthChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(item => item.date),
+                    datasets: [{
+                        label: 'New Users',
+                        data: data.map(item => item.count),
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function createRoleActivityChart(data) {
+            const ctx = document.getElementById('roleActivityChart').getContext('2d');
+            
+            if (charts.roleActivityChart) {
+                charts.roleActivityChart.destroy();
+            }
+            
+            charts.roleActivityChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(item => item.role),
+                    datasets: [{
+                        data: data.map(item => item.count),
+                        backgroundColor: [
+                            '#3498db',
+                            '#e74c3c',
+                            '#f39c12',
+                            '#27ae60',
+                            '#9b59b6'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function createRegistrationChart(data) {
+            const ctx = document.getElementById('registrationChart').getContext('2d');
+            
+            if (charts.registrationChart) {
+                charts.registrationChart.destroy();
+            }
+            
+            charts.registrationChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(item => item.date),
+                    datasets: [{
+                        label: 'Registrations',
+                        data: data.map(item => item.count),
+                        backgroundColor: '#27ae60'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function createRoleRegistrationChart(data) {
+            const ctx = document.getElementById('roleRegistrationChart').getContext('2d');
+            
+            if (charts.roleRegistrationChart) {
+                charts.roleRegistrationChart.destroy();
+            }
+            
+            charts.roleRegistrationChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: data.map(item => item.role),
+                    datasets: [{
+                        data: data.map(item => item.count),
+                        backgroundColor: [
+                            '#3498db',
+                            '#e74c3c',
+                            '#f39c12',
+                            '#27ae60'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function createVerificationChart(data) {
+            const ctx = document.getElementById('verificationChart').getContext('2d');
+            
+            if (charts.verificationChart) {
+                charts.verificationChart.destroy();
+            }
+            
+            charts.verificationChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Verified', 'Unverified'],
+                    datasets: [{
+                        data: [data.verified, data.total - data.verified],
+                        backgroundColor: ['#27ae60', '#e74c3c']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function createLoginActivityChart(data) {
+            const ctx = document.getElementById('loginActivityChart').getContext('2d');
+            
+            if (charts.loginActivityChart) {
+                charts.loginActivityChart.destroy();
+            }
+            
+            charts.loginActivityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(item => item.date),
+                    datasets: [{
+                        label: 'Logins',
+                        data: data.map(item => item.count),
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function createFailedLoginsChart(data) {
+            const ctx = document.getElementById('failedLoginsChart').getContext('2d');
+            
+            if (charts.failedLoginsChart) {
+                charts.failedLoginsChart.destroy();
+            }
+            
+            charts.failedLoginsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Failed Logins'],
+                    datasets: [{
+                        label: 'Count',
+                        data: [data],
+                        backgroundColor: '#e74c3c'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function createSessionDurationChart(data) {
+            const ctx = document.getElementById('sessionDurationChart').getContext('2d');
+            
+            if (charts.sessionDurationChart) {
+                charts.sessionDurationChart.destroy();
+            }
+            
+            charts.sessionDurationChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Average Session Duration'],
+                    datasets: [{
+                        label: 'Minutes',
+                        data: [data],
+                        backgroundColor: '#f39c12'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function createDailyActiveChart(data) {
+            const ctx = document.getElementById('dailyActiveChart').getContext('2d');
+            
+            if (charts.dailyActiveChart) {
+                charts.dailyActiveChart.destroy();
+            }
+            
+            charts.dailyActiveChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(item => item.date),
+                    datasets: [{
+                        label: 'Daily Active Users',
+                        data: data.map(item => item.count),
+                        borderColor: '#27ae60',
+                        backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function createRetentionChart(data) {
+            const ctx = document.getElementById('retentionChart').getContext('2d');
+            
+            if (charts.retentionChart) {
+                charts.retentionChart.destroy();
+            }
+            
+            charts.retentionChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Retained', 'Not Retained'],
+                    datasets: [{
+                        data: [data.activeUsers, data.totalUsers - data.activeUsers],
+                        backgroundColor: ['#27ae60', '#95a5a6']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function createSystemLoadChart(data) {
+            const ctx = document.getElementById('systemLoadChart').getContext('2d');
+            
+            if (charts.systemLoadChart) {
+                charts.systemLoadChart.destroy();
+            }
+            
+            charts.systemLoadChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Recent Logins', 'Active Sessions', 'Failed Attempts'],
+                    datasets: [{
+                        label: 'Count',
+                        data: [data.recentLogins, data.activeSessions, data.failedAttempts],
+                        backgroundColor: ['#3498db', '#27ae60', '#e74c3c']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function createErrorRatesChart(data) {
+            const ctx = document.getElementById('errorRatesChart').getContext('2d');
+            
+            if (charts.errorRatesChart) {
+                charts.errorRatesChart.destroy();
+            }
+            
+            charts.errorRatesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(item => item.action),
+                    datasets: [{
+                        label: 'Error Rate (%)',
+                        data: data.map(item => item.error_rate),
+                        backgroundColor: '#e74c3c'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // Table rendering functions
+        function renderTopUsersTable(users) {
+            const container = document.getElementById('topUsersTable');
+            
+            if (!users || users.length === 0) {
+                container.innerHTML = '<p>No data available</p>';
+                return;
+            }
+            
+            let html = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Activity Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            users.forEach(user => {
+                html += `
+                    <tr>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${user.role}</td>
+                        <td>${user.activity_count}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function renderTopPerformersTable(users) {
+            const container = document.getElementById('topPerformersTable');
+            
+            if (!users || users.length === 0) {
+                container.innerHTML = '<p>No data available</p>';
+                return;
+            }
+            
+            let html = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Total Actions</th>
+                            <th>Active Days</th>
+                            <th>Avg Actions/Day</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            users.forEach(user => {
+                html += `
+                    <tr>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${user.role}</td>
+                        <td>${user.total_actions}</td>
+                        <td>${user.active_days}</td>
+                        <td>${user.avg_actions_per_day || 0}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function renderEfficiencyTable(users) {
+            const container = document.getElementById('efficiencyTable');
+            
+            if (!users || users.length === 0) {
+                container.innerHTML = '<p>No data available</p>';
+                return;
+            }
+            
+            let html = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Total Actions</th>
+                            <th>Active Days</th>
+                            <th>Efficiency Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            users.forEach(user => {
+                html += `
+                    <tr>
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${user.role}</td>
+                        <td>${user.total_actions}</td>
+                        <td>${user.active_days}</td>
+                        <td>${user.efficiency_score}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function renderRecentActivityTable(activities) {
+            const container = document.getElementById('recentActivityTable');
+            
+            if (!activities || activities.length === 0) {
+                container.innerHTML = '<p>No data available</p>';
+                return;
+            }
+            
+            let html = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Count</th>
+                            <th>Successful</th>
+                            <th>Failed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            activities.forEach(activity => {
+                html += `
+                    <tr>
+                        <td>${activity.action}</td>
+                        <td>${activity.count}</td>
+                        <td>${activity.successful}</td>
+                        <td>${activity.failed}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected tab
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Real-time updates
+        function startRealTimeUpdates() {
+            realTimeInterval = setInterval(async () => {
+                try {
+                    const response = await fetch('/api/analytics/realtime');
+                    if (response.ok) {
+                        const data = await response.json();
+                        updateRealTimeMetrics(data);
+                    }
+                } catch (error) {
+                    console.error('Real-time update error:', error);
+                }
+            }, 30000); // Update every 30 seconds
+        }
+
+        function updateRealTimeMetrics(data) {
+            // Update real-time indicators
+            document.getElementById('realTimeIndicator').style.background = '#27ae60';
+            updateLastUpdate();
+        }
+
+        function updateLastUpdate() {
+            document.getElementById('lastUpdate').textContent = 
+                `Last updated: ${new Date().toLocaleTimeString()}`;
+        }
+
+        // Export functions
+        function exportData() {
+            window.open(`/api/analytics/export?timeRange=${currentTimeRange}&format=csv`, '_blank');
+        }
+
+        function exportRegistrations() {
+            window.open(`/api/analytics/export/registrations?timeRange=${currentTimeRange}&format=csv`, '_blank');
+        }
+
+        function exportActivity() {
+            window.open(`/api/analytics/export/activity?timeRange=${currentTimeRange}&format=csv`, '_blank');
+        }
+
+        function exportEngagement() {
+            // This would need a specific endpoint for engagement data
+            showError('Engagement export not yet implemented');
+        }
+
+        function exportComplete() {
+            window.open(`/api/analytics/export?timeRange=${currentTimeRange}&format=csv`, '_blank');
+        }
+
+        // Utility functions
+        function showError(message) {
+            const div = document.createElement('div');
+            div.className = 'error-message';
+            div.textContent = message;
+            document.querySelector('.analytics-container').insertBefore(div, document.querySelector('.dashboard-grid'));
+            
+            setTimeout(() => div.remove(), 5000);
+        }
+
+        function showSuccess(message) {
+            const div = document.createElement('div');
+            div.className = 'success-message';
+            div.textContent = message;
+            document.querySelector('.analytics-container').insertBefore(div, document.querySelector('.dashboard-grid'));
+            
+            setTimeout(() => div.remove(), 5000);
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (realTimeInterval) {
+                clearInterval(realTimeInterval);
+            }
+        });
+    </script>
+</body>
+</html> 

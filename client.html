@@ -738,7 +738,10 @@
                 const res = await fetch('/api/check-auth', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
+                    body: JSON.stringify({ 
+                        email: email,
+                        deviceId: getDeviceId()
+                    })
                 });
                 const data = await res.json();
                 if (data.authenticated) {
@@ -982,6 +985,14 @@
             }
         }
 
+        // Enter key handler for email input
+        document.getElementById('auth-email').addEventListener('keypress', async function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('enter-btn').click();
+            }
+        });
+
         // Enter button handler
         document.getElementById('enter-btn').addEventListener('click', async function() {
             const email = document.getElementById('auth-email').value.trim();
@@ -1075,6 +1086,14 @@
             await requestOTP(email);
             this.disabled = false;
             this.textContent = 'Request OTP';
+        });
+
+        // Enter key handler for OTP input
+        document.getElementById('otp-code').addEventListener('keypress', async function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('verify-otp-btn').click();
+            }
         });
 
         document.getElementById('verify-otp-btn').addEventListener('click', async function() {

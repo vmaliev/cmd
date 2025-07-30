@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Key Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+        input { padding: 10px; margin: 10px 0; width: 300px; }
+        button { padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        .result { margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>Enter Key Functionality Test</h1>
+    
+    <div class="test-section">
+        <h2>Email Input Test (Client Interface)</h2>
+        <p>Type an email and press Enter to test the functionality:</p>
+        <input type="email" id="test-email" placeholder="Enter your email address">
+        <button id="test-enter-btn">Enter</button>
+        <div id="email-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>OTP Input Test (Client Interface)</h2>
+        <p>Type an OTP code and press Enter to test the functionality:</p>
+        <input type="text" id="test-otp" placeholder="6-digit code" maxlength="6">
+        <button id="test-verify-btn">Verify OTP</button>
+        <div id="otp-result" class="result"></div>
+    </div>
+
+    <script>
+        // Test email input Enter key functionality
+        document.getElementById('test-email').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('test-enter-btn').click();
+            }
+        });
+
+        document.getElementById('test-enter-btn').addEventListener('click', function() {
+            const email = document.getElementById('test-email').value;
+            document.getElementById('email-result').textContent = `Enter key functionality working! Email: ${email}`;
+        });
+
+        // Test OTP input Enter key functionality
+        document.getElementById('test-otp').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('test-verify-btn').click();
+            }
+        });
+
+        document.getElementById('test-verify-btn').addEventListener('click', function() {
+            const otp = document.getElementById('test-otp').value;
+            document.getElementById('otp-result').textContent = `Enter key functionality working! OTP: ${otp}`;
+        });
+    </script>
+</body>
+</html> 

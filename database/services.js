@@ -7,9 +7,95 @@ class DatabaseServices {
 
     // ==================== USER SERVICES ====================
 
-    // Get all users
-    getUsers() {
-        return this.db.prepare('SELECT * FROM users ORDER BY created_at DESC').all();
+    // Get all users with pagination and filtering
+    getUsers(options = {}) {
+        const {
+            page = 1,
+            limit = 20,
+            search = '',
+            role = '',
+            status = '',
+            sortBy = 'created_at',
+            sortOrder = 'desc'
+        } = options;
+
+        // Build query conditions
+        let conditions = [];
+        let params = [];
+
+        if (search) {
+            conditions.push('(name LIKE ? OR email LIKE ?)');
+            params.push(`%${search}%`, `%${search}%`);
+        }
+
+        if (role) {
+            conditions.push('role = ?');
+            params.push(role);
+        }
+
+        if (status) {
+            if (status === 'active') {
+                conditions.push('is_active = 1');
+            } else if (status === 'inactive') {
+                conditions.push('is_active = 0');
+            }
+        }
+
+        const whereClause = conditions.length > 0 ? 'WHERE ' + conditions.join(' AND ') : '';
+        const offset = (page - 1) * limit;
+
+        // Get total count
+        const countQuery = `SELECT COUNT(*) as total FROM users ${whereClause}`;
+        const totalResult = this.db.prepare(countQuery).get(...params);
+        const total = totalResult.total;
+
+        // Get users with pagination
+        const usersQuery = `
+            SELECT 
+                id, email, name, role, department, is_active,
+                last_login, created_at, updated_at
+            FROM users 
+            ${whereClause}
+            ORDER BY ${sortBy} ${sortOrder.toUpperCase()}
+            LIMIT ? OFFSET ?
+        `;
+        
+        const users = this.db.prepare(usersQuery).all(...params, limit, offset);
+
+        // Calculate pagination info
+        const totalPages = Math.ceil(total / limit);
+        const hasNext = page < totalPages;
+        const hasPrev = page > 1;
+
+        return {
+            users,
+            pagination: {
+                page: parseInt(page),
+                limit: parseInt(limit),
+                total,
+                totalPages,
+                hasNext,
+                hasPrev
+            },
+            filters: {
+                search,
+                role,
+                status,
+                sortBy,
+                sortOrder
+            }
+        };
+    }
+
+    // Get all users (for export)
+    getAllUsers() {
+        return this.db.prepare(`
+            SELECT 
+                id, email, name, role, department, is_active,
+                last_login, created_at, updated_at
+            FROM users 
+            ORDER BY created_at DESC
+        `).all();
     }
 
     // Get user by ID
@@ -22,29 +108,383 @@ class DatabaseServices {
         return this.db.prepare('SELECT * FROM users WHERE email = ?').get(email);
     }
 
-    // Create new user
-    createUser(userData) {
+    // Get user by email verification token
+    getUserByVerificationToken(token) {
+        return this.db.prepare('SELECT * FROM users WHERE email_verification_token = ?').get(token);
+    }
+
+    // Create new user with password
+    async createUser(userData) {
+        const { name, email, role, password, department } = userData;
+        
+        // Hash password if provided
+        let passwordHash = null;
+        if (password) {
+            const bcrypt = require('bcrypt');
+            passwordHash = await bcrypt.hash(password, 10);
+        }
+
         const stmt = this.db.prepare(`
-            INSERT INTO users (email, name, role, department) 
-            VALUES (?, ?, ?, ?)
+            INSERT INTO users (email, name, role, department, is_active) 
+            VALUES (?, ?, ?, ?, ?)
         `);
-        const result = stmt.run(userData.email, userData.name, userData.role || 'user', userData.department);
-        return { id: result.lastInsertRowid, ...userData };
+        const result = stmt.run(
+            email, 
+            name, 
+            role || 'user', 
+            department || null,
+            1 // is_active
+        );
+        
+        return this.getUserById(result.lastInsertRowid);
     }
 
     // Update user
     updateUser(id, userData) {
+        const updates = [];
+        const params = [];
+
+        if (userData.name !== undefined) {
+            updates.push('name = ?');
+            params.push(userData.name);
+        }
+        if (userData.email !== undefined) {
+            updates.push('email = ?');
+            params.push(userData.email);
+        }
+        if (userData.role !== undefined) {
+            updates.push('role = ?');
+            params.push(userData.role);
+        }
+        if (userData.department !== undefined) {
+            updates.push('department = ?');
+            params.push(userData.department);
+        }
+        if (userData.is_active !== undefined) {
+            updates.push('is_active = ?');
+            params.push(userData.is_active ? 1 : 0);
+        }
+
+        if (updates.length === 0) {
+            return { changes: 0 };
+        }
+
+        updates.push('updated_at = CURRENT_TIMESTAMP');
+        params.push(id);
+
         const stmt = this.db.prepare(`
             UPDATE users 
-            SET name = ?, role = ?, department = ?, updated_at = CURRENT_TIMESTAMP 
+            SET ${updates.join(', ')}
             WHERE id = ?
         `);
-        return stmt.run(userData.name, userData.role, userData.department, id);
+        
+        const result = stmt.run(...params);
+        return this.getUserById(id);
+    }
+
+    // Update user password
+    updateUserPassword(id, passwordHash) {
+        const stmt = this.db.prepare(`
+            UPDATE users 
+            SET password_hash = ?, updated_at = CURRENT_TIMESTAMP 
+            WHERE id = ?
+        `);
+        return stmt.run(passwordHash, id);
+    }
+
+    // Update user verification status
+    updateUserVerification(id, isVerified, verificationToken = null) {
+        const stmt = this.db.prepare(`
+            UPDATE users 
+            SET is_verified = ?, email_verification_token = ?, updated_at = CURRENT_TIMESTAMP 
+            WHERE id = ?
+        `);
+        return stmt.run(isVerified ? 1 : 0, verificationToken, id);
+    }
+
+    // Set password reset token
+    setPasswordResetToken(email, resetToken, expiresAt) {
+        const stmt = this.db.prepare(`
+            UPDATE users 
+            SET password_reset_token = ?, password_reset_expires = ?, updated_at = CURRENT_TIMESTAMP 
+            WHERE email = ?
+        `);
+        return stmt.run(resetToken, expiresAt, email);
+    }
+
+    // Get user by password reset token
+    getUserByResetToken(resetToken) {
+        return this.db.prepare(`
+            SELECT * FROM users 
+            WHERE password_reset_token = ? AND password_reset_expires > datetime('now')
+        `).get(resetToken);
+    }
+
+    // Clear password reset token
+    clearPasswordResetToken(email) {
+        const stmt = this.db.prepare(`
+            UPDATE users 
+            SET password_reset_token = NULL, password_reset_expires = NULL, updated_at = CURRENT_TIMESTAMP 
+            WHERE email = ?
+        `);
+        return stmt.run(email);
+    }
+
+    // Update failed login attempts
+    updateFailedLoginAttempts(email, attempts, lockedUntil = null) {
+        const stmt = this.db.prepare(`
+            UPDATE users 
+            SET failed_login_attempts = ?, account_locked_until = ?, updated_at = CURRENT_TIMESTAMP 
+            WHERE email = ?
+        `);
+        return stmt.run(attempts, lockedUntil, email);
+    }
+
+    // Update last login
+    updateLastLogin(id) {
+        const stmt = this.db.prepare(`
+            UPDATE users 
+            SET last_login = CURRENT_TIMESTAMP, failed_login_attempts = 0, account_locked_until = NULL, updated_at = CURRENT_TIMESTAMP 
+            WHERE id = ?
+        `);
+        return stmt.run(id);
     }
 
     // Delete user
     deleteUser(id) {
         return this.db.prepare('DELETE FROM users WHERE id = ?').run(id);
+    }
+
+    // Bulk update users
+    async bulkUpdateUsers(userIds, updates) {
+        let updated = 0;
+        let failed = 0;
+
+        for (const userId of userIds) {
+            try {
+                const user = this.getUserById(userId);
+                if (!user) {
+                    failed++;
+                    continue;
+                }
+
+                // Prepare update data
+                const updateData = {};
+                if (updates.name) updateData.name = updates.name;
+                if (updates.email) updateData.email = updates.email;
+                if (updates.role) updateData.role = updates.role;
+                if (updates.department !== undefined) updateData.department = updates.department;
+                if (updates.isActive !== undefined) updateData.is_active = updates.isActive ? 1 : 0;
+
+                if (Object.keys(updateData).length > 0) {
+                    this.updateUser(userId, updateData);
+                    updated++;
+                }
+            } catch (error) {
+                failed++;
+            }
+        }
+
+        return { updated, failed };
+    }
+
+    // Bulk delete users
+    async bulkDeleteUsers(userIds) {
+        let deleted = 0;
+        let failed = 0;
+
+        for (const userId of userIds) {
+            try {
+                const user = this.getUserById(userId);
+                if (!user) {
+                    failed++;
+                    continue;
+                }
+
+                this.deleteUser(userId);
+                deleted++;
+            } catch (error) {
+                failed++;
+            }
+        }
+
+        return { deleted, failed };
+    }
+
+    // Get user statistics
+    getUserStats() {
+        const stats = {
+            total: this.db.prepare('SELECT COUNT(*) as count FROM users').get().count,
+            active: this.db.prepare('SELECT COUNT(*) as count FROM users WHERE is_active = 1').get().count,
+            inactive: this.db.prepare('SELECT COUNT(*) as count FROM users WHERE is_active = 0').get().count,
+            verified: this.db.prepare('SELECT COUNT(*) as count FROM users').get().count, // All users are considered verified in this schema
+            unverified: 0, // No unverified users in this schema
+            byRole: this.db.prepare(`
+                SELECT role, COUNT(*) as count 
+                FROM users 
+                GROUP BY role
+            `).all(),
+            recentRegistrations: this.db.prepare(`
+                SELECT COUNT(*) as count 
+                FROM users 
+                WHERE created_at >= datetime('now', '-7 days')
+            `).get().count,
+            recentLogins: this.db.prepare(`
+                SELECT COUNT(*) as count 
+                FROM users 
+                WHERE last_login >= datetime('now', '-7 days')
+            `).get().count
+        };
+
+        return stats;
+    }
+
+    // ==================== JWT TOKEN SERVICES ====================
+
+    // Store JWT refresh token
+    storeRefreshToken(userId, refreshToken, deviceId, deviceInfo = null, expiresAt) {
+        const stmt = this.db.prepare(`
+            INSERT INTO jwt_refresh_tokens (user_id, refresh_token, device_id, device_info, expires_at) 
+            VALUES (?, ?, ?, ?, ?)
+        `);
+        return stmt.run(userId, refreshToken, deviceId, deviceInfo, expiresAt);
+    }
+
+    // Get refresh token
+    getRefreshToken(refreshToken) {
+        return this.db.prepare(`
+            SELECT * FROM jwt_refresh_tokens 
+            WHERE refresh_token = ? AND is_revoked = 0 AND expires_at > datetime('now')
+        `).get(refreshToken);
+    }
+
+    // Revoke refresh token
+    revokeRefreshToken(refreshToken) {
+        const stmt = this.db.prepare(`
+            UPDATE jwt_refresh_tokens 
+            SET is_revoked = 1 
+            WHERE refresh_token = ?
+        `);
+        return stmt.run(refreshToken);
+    }
+
+    // Revoke all refresh tokens for user
+    revokeAllUserTokens(userId) {
+        const stmt = this.db.prepare(`
+            UPDATE jwt_refresh_tokens 
+            SET is_revoked = 1 
+            WHERE user_id = ?
+        `);
+        return stmt.run(userId);
+    }
+
+    // Revoke all refresh tokens for user on specific device
+    revokeUserDeviceTokens(userId, deviceId) {
+        const stmt = this.db.prepare(`
+            UPDATE jwt_refresh_tokens 
+            SET is_revoked = 1 
+            WHERE user_id = ? AND device_id = ?
+        `);
+        return stmt.run(userId, deviceId);
+    }
+
+    // Get user's active refresh tokens
+    getUserRefreshTokens(userId) {
+        return this.db.prepare(`
+            SELECT * FROM jwt_refresh_tokens 
+            WHERE user_id = ? AND is_revoked = 0 AND expires_at > datetime('now')
+            ORDER BY created_at DESC
+        `).all(userId);
+    }
+
+    // ==================== AUTH AUDIT LOG SERVICES ====================
+
+    // Log authentication event
+    logAuthEvent(auditData) {
+        const stmt = this.db.prepare(`
+            INSERT INTO auth_audit_log (user_id, email, action, ip_address, user_agent, device_id, success, details) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `);
+        return stmt.run(
+            auditData.userId || null,
+            auditData.email,
+            auditData.action,
+            auditData.ipAddress || null,
+            auditData.userAgent || null,
+            auditData.deviceId || null,
+            auditData.success ? 1 : 0,
+            auditData.details ? JSON.stringify(auditData.details) : null
+        );
+    }
+
+    // Get auth audit log for user
+    getAuthAuditLog(userId, limit = 50) {
+        return this.db.prepare(`
+            SELECT * FROM auth_audit_log 
+            WHERE user_id = ? 
+            ORDER BY created_at DESC 
+            LIMIT ?
+        `).all(userId, limit);
+    }
+
+    // ==================== PERMISSION SERVICES ====================
+
+    // Get user permissions
+    getUserPermissions(userId) {
+        return this.db.prepare(`
+            SELECT resource, action, granted FROM user_permissions 
+            WHERE user_id = ?
+        `).all(userId);
+    }
+
+    // Get role permissions
+    getRolePermissions(role) {
+        return this.db.prepare(`
+            SELECT resource, action, granted FROM role_permissions 
+            WHERE role = ?
+        `).all(role);
+    }
+
+    // Check if user has permission
+    hasPermission(userId, resource, action) {
+        // First check user-specific permissions
+        const userPermission = this.db.prepare(`
+            SELECT granted FROM user_permissions 
+            WHERE user_id = ? AND resource = ? AND action = ?
+        `).get(userId, resource, action);
+
+        if (userPermission !== undefined) {
+            return userPermission.granted === 1;
+        }
+
+        // Then check role permissions
+        const user = this.getUserById(userId);
+        if (!user) return false;
+
+        const rolePermission = this.db.prepare(`
+            SELECT granted FROM role_permissions 
+            WHERE role = ? AND resource = ? AND action = ?
+        `).get(user.role, resource, action);
+
+        return rolePermission ? rolePermission.granted === 1 : false;
+    }
+
+    // Grant permission to user
+    grantUserPermission(userId, resource, action) {
+        const stmt = this.db.prepare(`
+            INSERT OR REPLACE INTO user_permissions (user_id, resource, action, granted) 
+            VALUES (?, ?, ?, 1)
+        `);
+        return stmt.run(userId, resource, action);
+    }
+
+    // Revoke permission from user
+    revokeUserPermission(userId, resource, action) {
+        const stmt = this.db.prepare(`
+            INSERT OR REPLACE INTO user_permissions (user_id, resource, action, granted) 
+            VALUES (?, ?, ?, 0)
+        `);
+        return stmt.run(userId, resource, action);
     }
 
     // ==================== TICKET SERVICES ====================
@@ -474,6 +914,15 @@ class DatabaseServices {
         return this.db.prepare('DELETE FROM admin_sessions WHERE session_token = ?').run(sessionToken);
     }
 
+    // Update admin session (extend expiration)
+    updateAdminSession(sessionToken) {
+        return this.db.prepare(`
+            UPDATE admin_sessions 
+            SET expires_at = datetime('now', '+1 day')
+            WHERE session_token = ?
+        `).run(sessionToken);
+    }
+
     // ==================== OTP SERVICES ====================
 
     // Store OTP
@@ -521,11 +970,16 @@ class DatabaseServices {
         return stats;
     }
 
-    // Clean up expired sessions and OTPs
+    // Clean up expired sessions, OTPs, and JWT tokens
     cleanupExpired() {
-        this.db.prepare('DELETE FROM user_sessions WHERE expires_at <= datetime("now")').run();
-        this.db.prepare('DELETE FROM admin_sessions WHERE expires_at <= datetime("now")').run();
-        this.db.prepare('DELETE FROM otp_store WHERE expires_at <= datetime("now")').run();
+        try {
+            this.db.prepare('DELETE FROM user_sessions WHERE expires_at <= datetime(\'now\')').run();
+            this.db.prepare('DELETE FROM admin_sessions WHERE expires_at <= datetime(\'now\')').run();
+            this.db.prepare('DELETE FROM otp_store WHERE expires_at <= datetime(\'now\')').run();
+            this.db.prepare('DELETE FROM jwt_refresh_tokens WHERE expires_at <= datetime(\'now\')').run();
+        } catch (error) {
+            console.error('Cleanup error:', error);
+        }
     }
 }
 
