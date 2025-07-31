@@ -568,6 +568,12 @@
                         <span class="info-label">Description</span>
                         <span class="info-value" id="display-description"></span>
                     </div>
+                    <div class="info-item">
+                        <span class="info-label">Attachments</span>
+                        <div id="display-attachments">
+                            <div class="no-attachments">No attachments</div>
+                        </div>
+                    </div>
                     
                     <h4 style="margin: 1.5rem 0 1rem 0; color: #3a4da5;">Activity Timeline</h4>
                     <div class="timeline-simple" id="timeline-display">
@@ -626,6 +632,18 @@
                             <option value="access">Access/Permissions</option>
                             <option value="other">Other</option>
                         </select>
+                    </div>
+                    
+                    <!-- File Attachments Section -->
+                    <div class="form-group">
+                        <label for="client-attachments">Attachments (Optional)</label>
+                        <div class="file-upload-container">
+                            <input type="file" id="client-attachments" multiple accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx" style="display: none;">
+                            <button type="button" class="btn btn-secondary" id="client-browse-files">📎 Browse Files</button>
+                            <span id="client-file-info" class="file-info">No files selected</span>
+                        </div>
+                        <div id="client-selected-files" class="selected-files"></div>
+                        <small class="form-help">Supported formats: Images (JPG, PNG, GIF), Documents (PDF, DOC, DOCX, TXT, CSV, XLS, XLSX). Max size: 10MB per file.</small>
                     </div>
                     
                     <button type="submit" class="submit-btn">Submit Ticket</button>
@@ -1245,9 +1263,33 @@
                     throw new Error('Failed to create ticket');
                 }
                 
+                const createdTicket = await createResponse.json();
+                
+                // Upload attachments if any files are selected
+                if (selectedFiles.length > 0) {
+                    for (const file of selectedFiles) {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        
+                        const attachmentRes = await fetch(`/api/tickets/${createdTicket.id}/attachments`, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        if (!attachmentRes.ok) {
+                            console.warn(`Failed to upload attachment ${file.name}:`, await attachmentRes.text());
+                        }
+                    }
+                }
+                
                 // Reset form
                 this.reset();
                 document.getElementById('requester-email').value = authenticatedEmail;
+                
+                // Clear file attachments
+                selectedFiles = [];
+                document.getElementById('client-selected-files').innerHTML = '';
+                document.getElementById('client-file-info').textContent = 'No files selected';
                 
                 // Auto-populate name field again after form reset
                 autoPopulateNameField();
@@ -1280,6 +1322,9 @@
             document.getElementById('display-category').textContent = ticket.category ? 
                 ticket.category.charAt(0).toUpperCase() + ticket.category.slice(1) : 'Other';
             document.getElementById('display-description').textContent = ticket.description;
+            
+            // Load and display attachments
+            loadClientTicketAttachments(ticket.id);
             
             // Populate timeline
             const timelineContainer = document.getElementById('timeline-display');
@@ -1346,6 +1391,117 @@
             setTimeout(() => {
                 errorDiv.remove();
             }, 5000);
+        }
+
+        // --- File Upload Handling for Client ---
+        const clientBrowseFilesBtn = document.getElementById('client-browse-files');
+        const clientFileInput = document.getElementById('client-attachments');
+        const clientSelectedFilesContainer = document.getElementById('client-selected-files');
+        const clientFileInfo = document.getElementById('client-file-info');
+        let selectedFiles = [];
+
+        clientBrowseFilesBtn.addEventListener('click', function() {
+            clientFileInput.click();
+        });
+
+        clientFileInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            selectedFiles = files;
+            
+            // Update file info
+            if (files.length === 0) {
+                clientFileInfo.textContent = 'No files selected';
+                clientSelectedFilesContainer.innerHTML = '';
+                return;
+            }
+            
+            clientFileInfo.textContent = `${files.length} file(s) selected`;
+            clientSelectedFilesContainer.innerHTML = '';
+            
+            files.forEach((file, index) => {
+                const fileElement = document.createElement('div');
+                fileElement.className = 'selected-file';
+                fileElement.innerHTML = `
+                    <span class="file-name">${file.name}</span>
+                    <span class="file-size">${formatFileSize(file.size)}</span>
+                    <button type="button" class="remove-file" data-index="${index}">×</button>
+                `;
+                clientSelectedFilesContainer.appendChild(fileElement);
+            });
+        });
+
+        // Remove file when X button is clicked
+        clientSelectedFilesContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-file')) {
+                const index = parseInt(e.target.getAttribute('data-index'));
+                selectedFiles.splice(index, 1);
+                
+                // Update file input
+                const dt = new DataTransfer();
+                selectedFiles.forEach(file => dt.items.add(file));
+                clientFileInput.files = dt.files;
+                
+                // Update display
+                if (selectedFiles.length === 0) {
+                    clientFileInfo.textContent = 'No files selected';
+                    clientSelectedFilesContainer.innerHTML = '';
+                } else {
+                    clientFileInfo.textContent = `${selectedFiles.length} file(s) selected`;
+                    clientSelectedFilesContainer.innerHTML = '';
+                    selectedFiles.forEach((file, index) => {
+                        const fileElement = document.createElement('div');
+                        fileElement.className = 'selected-file';
+                        fileElement.innerHTML = `
+                            <span class="file-name">${file.name}</span>
+                            <span class="file-size">${formatFileSize(file.size)}</span>
+                            <button type="button" class="remove-file" data-index="${index}">×</button>
+                        `;
+                        clientSelectedFilesContainer.appendChild(fileElement);
+                    });
+                }
+            }
+        });
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Load and display ticket attachments for client
+        async function loadClientTicketAttachments(ticketId) {
+            const attachmentsContainer = document.getElementById('display-attachments');
+            
+            try {
+                const response = await fetch(`/api/tickets/${ticketId}/attachments`);
+                if (!response.ok) {
+                    throw new Error('Failed to load attachments');
+                }
+                
+                const attachments = await response.json();
+                
+                if (attachments.length === 0) {
+                    attachmentsContainer.innerHTML = '<div class="no-attachments">No attachments</div>';
+                    return;
+                }
+                
+                attachmentsContainer.innerHTML = '';
+                attachments.forEach(attachment => {
+                    const attachmentElement = document.createElement('div');
+                    attachmentElement.className = 'ticket-attachment';
+                    attachmentElement.innerHTML = `
+                        <span class="attachment-name">${attachment.original_filename}</span>
+                        <span class="attachment-size">${formatFileSize(attachment.file_size)}</span>
+                        <a href="/api/attachments/${attachment.id}/download" class="download-attachment" target="_blank">Download</a>
+                    `;
+                    attachmentsContainer.appendChild(attachmentElement);
+                });
+            } catch (error) {
+                console.error('Error loading attachments:', error);
+                attachmentsContainer.innerHTML = '<div class="no-attachments">Error loading attachments</div>';
+            }
         }
 
         function getResponseTime(priority) {

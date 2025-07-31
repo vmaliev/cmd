@@ -1,27 +1,59 @@
 {
   "tickets": [
     {
+      "id": "TKT-006",
+      "subject": "dfgsdfgdfhfdgh",
+      "requester": "2384y28347y",
+      "assignee": "Unassigned",
+      "priority": "high",
+      "status": "open",
+      "date": "2025-07-31",
+      "email": "vmaliev@gmail.com",
+      "description": "hdfhdfgh",
+      "category": "hardware",
+      "createdDate": "2025-07-31T09:52:35.971Z",
+      "lastUpdated": "2025-07-31T09:52:35.971Z",
+      "timeline": [
+        {
+          "id": "timeline-1753955555971-1",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-31T09:52:35.971Z",
+          "content": "Hello 2384y28347y! Thank you for submitting your ticket. We have received your request and will begin working on it shortly.",
+          "type": "greeting"
+        },
+        {
+          "id": "timeline-1753955555971-2",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-31T09:52:35.971Z",
+          "content": "This ticket has been classified as HIGH priority. Expected response time: 1-2 hours. This will be escalated immediately to our support team.",
+          "type": "priority-info"
+        },
+        {
+          "id": "timeline-1753955555971-3",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-31T09:52:35.971Z",
+          "content": "Ticket created with ID: TKT-006. Status: Open.",
+          "type": "creation"
+        }
+      ]
+    },
+    {
       "id": "TKT-005",
       "subject": "wereqtert",
       "requester": "2384y28347y",
       "assignee": "Unassigned",
       "priority": "high",
-      "status": "closed",
+      "status": "open",
       "date": "2025-07-29",
       "email": "vmaliev@gmail.com",
       "description": "23rqwerwqer",
       "category": "hardware",
       "createdDate": "2025-07-29T06:13:17.096Z",
-      "lastUpdated": "2025-07-31T08:06:01.817Z",
+      "lastUpdated": "2025-07-29T06:13:17.096Z",
       "timeline": [
-        {
-          "id": "timeline-1753949161817",
-          "author": "Agent",
-          "authorType": "agent",
-          "date": "2025-07-31T08:06:01.817Z",
-          "content": "Testing status update functionality",
-          "type": "note"
-        },
         {
           "id": "timeline-1753769597096-1",
           "author": "System",
@@ -106,13 +138,13 @@
       "requester": "Ammar Tivari",
       "assignee": "Unassigned",
       "priority": "medium",
-      "status": "closed",
+      "status": "in-progress",
       "date": "2025-07-25",
       "email": "ammar.tivari@adriatic42.com",
       "description": "I have issue connecting with Plotter",
       "category": "network",
       "createdDate": "2025-07-25T10:00:00.000Z",
-      "lastUpdated": "2025-07-31T08:07:21.802Z",
+      "lastUpdated": "2025-07-28T06:02:39.860Z",
       "timeline": [
         {
           "id": "timeline-1753682540621",
