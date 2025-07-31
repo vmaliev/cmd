@@ -391,7 +391,19 @@ app.get('/api/admin/check-auth', (req, res) => {
     
     if (dbSession || (memSession && Date.now() < memSession.expiresAt)) {
       const session = dbSession || memSession;
-      res.json({ authenticated: true, username: session.username });
+      
+      // Try to get user details from database to show name instead of email
+      try {
+        const user = dbServices.getUserByEmail(session.username);
+        if (user && user.name) {
+          res.json({ authenticated: true, username: user.name });
+        } else {
+          res.json({ authenticated: true, username: session.username });
+        }
+      } catch (error) {
+        // Fallback to session username if database lookup fails
+        res.json({ authenticated: true, username: session.username });
+      }
     } else {
       res.json({ authenticated: false });
     }
