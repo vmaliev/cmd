@@ -597,10 +597,10 @@
         <div class="bulk-actions" id="bulkActions">
             <div class="selected-count" id="selectedCount">0 users selected</div>
             <div style="margin-top: 10px;">
-                <button class="btn btn-warning btn-sm" onclick="bulkUpdateStatus('inactive')">Deactivate</button>
-                <button class="btn btn-success btn-sm" onclick="bulkUpdateStatus('active')">Activate</button>
-                <button class="btn btn-danger btn-sm" onclick="bulkDelete()">Delete</button>
-                <button class="btn btn-secondary btn-sm" onclick="clearSelection()">Clear Selection</button>
+                <button class="btn btn-warning btn-sm bulk-deactivate-btn" data-status="inactive">Deactivate</button>
+                <button class="btn btn-success btn-sm bulk-activate-btn" data-status="active">Activate</button>
+                <button class="btn btn-danger btn-sm bulk-delete-btn">Delete</button>
+                <button class="btn btn-secondary btn-sm clear-selection-btn">Clear Selection</button>
             </div>
         </div>
 
@@ -802,6 +802,112 @@
             document.getElementById('importSubmitBtn').addEventListener('click', importUsers);
         }
 
+        function addTableEventListeners() {
+            // Select all checkbox
+            const selectAllCheckbox = document.getElementById('selectAll');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', toggleSelectAll);
+            }
+
+            // Individual user checkboxes
+            const userCheckboxes = document.querySelectorAll('input[type="checkbox"][data-user-id]');
+            userCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const userId = parseInt(this.getAttribute('data-user-id'));
+                    toggleUserSelection(userId);
+                });
+            });
+
+            // View buttons
+            const viewButtons = document.querySelectorAll('.view-user-btn');
+            viewButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const userId = parseInt(this.getAttribute('data-user-id'));
+                    viewUser(userId);
+                });
+            });
+
+            // Edit buttons
+            const editButtons = document.querySelectorAll('.edit-user-btn');
+            editButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const userId = parseInt(this.getAttribute('data-user-id'));
+                    editUser(userId);
+                });
+            });
+
+            // Delete buttons
+            const deleteButtons = document.querySelectorAll('.delete-user-btn');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const userId = parseInt(this.getAttribute('data-user-id'));
+                    deleteUser(userId);
+                });
+            });
+        }
+
+        function addPaginationEventListeners() {
+            // Previous page button
+            const prevButton = document.querySelector('.prev-page-btn');
+            if (prevButton) {
+                prevButton.addEventListener('click', function() {
+                    const page = parseInt(this.getAttribute('data-page'));
+                    changePage(page);
+                });
+            }
+
+            // Next page button
+            const nextButton = document.querySelector('.next-page-btn');
+            if (nextButton) {
+                nextButton.addEventListener('click', function() {
+                    const page = parseInt(this.getAttribute('data-page'));
+                    changePage(page);
+                });
+            }
+        }
+
+        function addBulkActionEventListeners() {
+            // Bulk deactivate button
+            const deactivateBtn = document.querySelector('.bulk-deactivate-btn');
+            if (deactivateBtn) {
+                deactivateBtn.addEventListener('click', function() {
+                    const status = this.getAttribute('data-status');
+                    bulkUpdateStatus(status);
+                });
+            }
+
+            // Bulk activate button
+            const activateBtn = document.querySelector('.bulk-activate-btn');
+            if (activateBtn) {
+                activateBtn.addEventListener('click', function() {
+                    const status = this.getAttribute('data-status');
+                    bulkUpdateStatus(status);
+                });
+            }
+
+            // Bulk delete button
+            const deleteBtn = document.querySelector('.bulk-delete-btn');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', bulkDelete);
+            }
+
+            // Clear selection button
+            const clearBtn = document.querySelector('.clear-selection-btn');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', clearSelection);
+            }
+        }
+
+        function addTabEventListeners() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+        }
+
         async function loadUsers() {
             try {
                 const response = await fetch('/api/users?' + new URLSearchParams({
@@ -854,7 +960,7 @@
                 <table class="users-table">
                     <thead>
                         <tr>
-                            <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                            <th><input type="checkbox" id="selectAll"></th>
                             <th id="sortName">Name</th>
                             <th id="sortEmail">Email</th>
                             <th id="sortRole">Role</th>
@@ -873,7 +979,7 @@
                         <td>
                             <input type="checkbox" value="${user.id}" 
                                    ${isSelected ? 'checked' : ''} 
-                                   onchange="toggleUserSelection(${user.id})">
+                                   data-user-id="${user.id}">
                         </td>
                         <td>${user.name}</td>
                         <td>${user.email}</td>
@@ -886,9 +992,9 @@
                         <td>${user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}</td>
                         <td>
                             <div class="user-actions">
-                                <button class="btn btn-primary btn-sm" onclick="viewUser(${user.id})">View</button>
-                                <button class="btn btn-warning btn-sm" onclick="editUser(${user.id})">Edit</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">Delete</button>
+                                <button class="btn btn-primary btn-sm view-user-btn" data-user-id="${user.id}">View</button>
+                                <button class="btn btn-warning btn-sm edit-user-btn" data-user-id="${user.id}">Edit</button>
+                                <button class="btn btn-danger btn-sm delete-user-btn" data-user-id="${user.id}">Delete</button>
                             </div>
                         </td>
                     </tr>
@@ -900,6 +1006,9 @@
             count.textContent = `${currentUsers.length} users`;
             
             updateBulkActions();
+            
+            // Add event listeners after rendering
+            addTableEventListeners();
         }
 
         function updatePagination() {
@@ -908,18 +1017,21 @@
             pagination.className = 'pagination';
             
             pagination.innerHTML = `
-                <button onclick="changePage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''}>
+                <button class="prev-page-btn" data-page="${currentPage - 1}" ${currentPage <= 1 ? 'disabled' : ''}>
                     Previous
                 </button>
                 <span class="pagination-info">
                     Page ${currentPage} of ${totalPages}
                 </span>
-                <button onclick="changePage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''}>
+                <button class="next-page-btn" data-page="${currentPage + 1}" ${currentPage >= totalPages ? 'disabled' : ''}>
                     Next
                 </button>
             `;
             
             container.appendChild(pagination);
+            
+            // Add pagination event listeners
+            addPaginationEventListeners();
         }
 
         function changePage(page) {
@@ -974,6 +1086,8 @@
             if (selectedUsers.size > 0) {
                 bulkActions.classList.add('show');
                 selectedCount.textContent = `${selectedUsers.size} users selected`;
+                // Add bulk action event listeners
+                addBulkActionEventListeners();
             } else {
                 bulkActions.classList.remove('show');
             }
@@ -1044,8 +1158,8 @@
                 </div>
                 
                 <div class="user-tabs">
-                    <button class="tab-button active" onclick="switchTab('activity')">Recent Activity</button>
-                    <button class="tab-button" onclick="switchTab('permissions')">Permissions</button>
+                    <button class="tab-button active" data-tab="activity">Recent Activity</button>
+                    <button class="tab-button" data-tab="permissions">Permissions</button>
                 </div>
                 
                 <div id="activityTab" class="tab-content active">
@@ -1056,6 +1170,9 @@
                     ${renderPermissionsTab(userData.permissions)}
                 </div>
             `;
+            
+            // Add tab event listeners
+            addTabEventListeners();
         }
 
         function renderActivityTab(activity) {
