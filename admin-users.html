@@ -661,7 +661,7 @@
                     <input type="text" id="userDepartment">
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('createUserModal')">Cancel</button>
+                    <button type="button" class="btn btn-secondary cancel-create-user-btn">Cancel</button>
                     <button type="submit" class="btn btn-primary">Create User</button>
                 </div>
             </form>
@@ -706,7 +706,7 @@
                     </select>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('editUserModal')">Cancel</button>
+                    <button type="button" class="btn btn-secondary cancel-edit-user-btn">Cancel</button>
                     <button type="submit" class="btn btn-primary">Update User</button>
                 </div>
             </form>
@@ -745,7 +745,7 @@
                 <div id="importPreviewContent" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: #f9f9f9;"></div>
             </div>
             <div class="form-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('importUserModal')">Cancel</button>
+                <button type="button" class="btn btn-secondary cancel-import-user-btn">Cancel</button>
                 <button type="button" class="btn btn-primary" id="importSubmitBtn" disabled>Import Users</button>
             </div>
         </div>
@@ -800,6 +800,23 @@
             
             // Import button
             document.getElementById('importSubmitBtn').addEventListener('click', importUsers);
+            
+            // Modal cancel buttons
+            document.querySelector('.cancel-create-user-btn').addEventListener('click', function() {
+                closeModal('createUserModal');
+                document.getElementById('createUserForm').reset();
+            });
+            
+            document.querySelector('.cancel-edit-user-btn').addEventListener('click', function() {
+                closeModal('editUserModal');
+            });
+            
+            document.querySelector('.cancel-import-user-btn').addEventListener('click', function() {
+                closeModal('importUserModal');
+                document.getElementById('importFile').value = '';
+                document.getElementById('importPreview').style.display = 'none';
+                document.getElementById('importSubmitBtn').disabled = true;
+            });
         }
 
         function addTableEventListeners() {
