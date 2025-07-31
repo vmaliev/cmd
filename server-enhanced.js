@@ -20,6 +20,8 @@ const analyticsRoutes = require('./routes/analytics');
 const userRoutes = require('./routes/users');
 const profileRoutes = require('./routes/profiles');
 const roleRoutes = require('./routes/roles');
+const attachmentRoutes = require('./routes/attachments');
+const templateRoutes = require('./routes/templates');
 
 const app = express();
 
@@ -866,6 +868,12 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/profiles', profileRoutes);
 app.use('/api/roles', roleRoutes);
+
+// Mount attachment routes
+app.use('/api', attachmentRoutes);
+
+// Mount template routes
+app.use('/api', templateRoutes);
 
 // ==================== PAGE ROUTES ====================
 

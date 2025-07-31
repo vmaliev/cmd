@@ -163,7 +163,7 @@
         "id": 6,
         "title": "Ticket Management System Enhancement",
         "description": "Enhance existing ticket management system with advanced features and improved workflow",
-        "status": "pending",
+        "status": "in-progress",
         "priority": "high",
         "dependencies": [
           2,
@@ -173,7 +173,62 @@
         ],
         "details": "Enhance the existing ticket management system with advanced features including file attachments, ticket templates, SLA management, escalation rules, and improved workflow automation. Add bulk operations, advanced filtering, and enhanced reporting capabilities.",
         "testStrategy": "Test enhanced ticket management features, file attachments, SLA compliance, and workflow automation.",
-        "subtasks": []
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "File Attachments System",
+            "description": "Implement file attachment functionality for tickets including upload, storage, and download capabilities",
+            "details": "- Add file upload support to ticket creation and updates\n- Implement secure file storage with proper validation\n- Add file download and preview functionality\n- Support multiple file types (images, documents, etc.)\n- Add file size limits and type restrictions",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 2,
+            "title": "Ticket Templates System",
+            "description": "Create predefined ticket templates for common issues to speed up ticket creation",
+            "details": "- Create template categories (hardware, software, network, etc.)\n- Implement template selection and customization\n- Add template management interface for admins\n- Support template variables and placeholders\n- Allow template import/export functionality",
+            "status": "done",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 3,
+            "title": "SLA Management and Escalation Rules",
+            "description": "Implement Service Level Agreement tracking and automatic escalation rules",
+            "details": "- Define SLA timeframes for different priorities\n- Implement automatic escalation based on time thresholds\n- Add SLA violation tracking and notifications\n- Create escalation workflow and notifications\n- Add SLA reporting and compliance metrics",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 4,
+            "title": "Bulk Operations System",
+            "description": "Implement bulk operations for ticket management including mass updates and actions",
+            "details": "- Add bulk status updates for multiple tickets\n- Implement bulk assignment to technicians\n- Add bulk priority changes\n- Create bulk export functionality\n- Add bulk delete with confirmation\n- Implement bulk template application",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 5,
+            "title": "Advanced Filtering and Search",
+            "description": "Enhance ticket filtering and search capabilities with advanced options",
+            "details": "- Add advanced search with multiple criteria\n- Implement date range filtering\n- Add priority and status filtering\n- Create assignee and requester filtering\n- Add category and department filtering\n- Implement saved search filters\n- Add search result export functionality",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 6
+          },
+          {
+            "id": 6,
+            "title": "Enhanced Reporting and Analytics",
+            "description": "Implement comprehensive ticket reporting and analytics dashboard",
+            "details": "- Create ticket volume and trend reports\n- Add SLA compliance reporting\n- Implement technician performance metrics\n- Add category and priority distribution reports\n- Create resolution time analytics\n- Add customer satisfaction tracking\n- Implement real-time dashboard updates",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 6
+          }
+        ]
       },
       {
         "id": 7,
@@ -320,7 +375,7 @@
       "lastModified": "2024-07-30T13:00:00.000Z",
       "version": "1.0.0",
       "description": "IT Management System Development Tasks",
-      "updated": "2025-07-30T19:23:47.915Z"
+      "updated": "2025-07-31T09:07:15.236Z"
     }
   }
 }
