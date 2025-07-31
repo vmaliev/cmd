@@ -307,30 +307,65 @@ app.post('/api/admin/login',
     body('password').notEmpty(),
     handleValidationErrors
   ],
-  (req, res) => {
+  async (req, res) => {
     const { username, password } = req.body;
     
-    if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
-      const sessionId = require('crypto').randomBytes(32).toString('hex');
+    try {
+      // First try to authenticate against the user database
+      const user = dbServices.getUserByEmail(username);
+      if (user && user.password_hash) {
+        const bcrypt = require('bcrypt');
+        const isValidPassword = await bcrypt.compare(password, user.password_hash);
+        
+        if (isValidPassword && (user.role === 'admin' || user.role === 'technician')) {
+          const sessionId = require('crypto').randomBytes(32).toString('hex');
+          
+          // Store in both database and memory for backward compatibility
+          dbServices.createAdminSession(username, sessionId);
+          adminSessions[sessionId] = {
+            username: username,
+            createdAt: Date.now(),
+            expiresAt: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+          };
+          
+          res.cookie('adminSession', sessionId, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            maxAge: 24 * 60 * 60 * 1000 // 24 hours
+          });
+          
+          res.json({ success: true });
+          return;
+        }
+      }
       
-      // Store in both database and memory for backward compatibility
-      dbServices.createAdminSession(username, sessionId);
-      adminSessions[sessionId] = {
-        username: username,
-        createdAt: Date.now(),
-        expiresAt: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
-      };
-      
-      res.cookie('adminSession', sessionId, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
-      });
-      
-      res.json({ success: true });
-    } else {
-      res.status(401).json({ error: 'Invalid credentials' });
+      // Fallback to hardcoded admin credentials
+      if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+        const sessionId = require('crypto').randomBytes(32).toString('hex');
+        
+        // Store in both database and memory for backward compatibility
+        dbServices.createAdminSession(username, sessionId);
+        adminSessions[sessionId] = {
+          username: username,
+          createdAt: Date.now(),
+          expiresAt: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+        };
+        
+        res.cookie('adminSession', sessionId, {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'strict',
+          maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        });
+        
+        res.json({ success: true });
+      } else {
+        res.status(401).json({ error: 'Invalid credentials' });
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({ error: 'Authentication error' });
     }
   }
 );

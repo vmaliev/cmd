@@ -124,19 +124,39 @@ class DatabaseServices {
             passwordHash = await bcrypt.hash(password, 10);
         }
 
-        const stmt = this.db.prepare(`
-            INSERT INTO users (email, name, role, department, is_active) 
-            VALUES (?, ?, ?, ?, ?)
-        `);
-        const result = stmt.run(
-            email, 
-            name, 
-            role || 'user', 
-            department || null,
-            1 // is_active
-        );
-        
-        return this.getUserById(result.lastInsertRowid);
+        // Try to insert with password_hash first (enhanced schema)
+        try {
+            const stmt = this.db.prepare(`
+                INSERT INTO users (email, name, role, department, password_hash, is_active) 
+                VALUES (?, ?, ?, ?, ?, ?)
+            `);
+            const result = stmt.run(
+                email, 
+                name, 
+                role || 'user', 
+                department || null,
+                passwordHash,
+                1 // is_active
+            );
+            
+            return this.getUserById(result.lastInsertRowid);
+        } catch (error) {
+            // If password_hash column doesn't exist, fall back to basic schema
+            console.log('Enhanced schema not available, using basic schema for user creation');
+            const stmt = this.db.prepare(`
+                INSERT INTO users (email, name, role, department, is_active) 
+                VALUES (?, ?, ?, ?, ?)
+            `);
+            const result = stmt.run(
+                email, 
+                name, 
+                role || 'user', 
+                department || null,
+                1 // is_active
+            );
+            
+            return this.getUserById(result.lastInsertRowid);
+        }
     }
 
     // Update user

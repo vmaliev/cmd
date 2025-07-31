@@ -36,15 +36,18 @@ class DatabaseManager {
     // Initialize database schema
     initSchema() {
         try {
-            const schemaPath = path.join(__dirname, 'schema.sql');
+            // Try to use enhanced schema first
+            let schemaPath = path.join(__dirname, 'schema-enhanced.sql');
+            if (!fs.existsSync(schemaPath)) {
+                // Fallback to basic schema
+                schemaPath = path.join(__dirname, 'schema.sql');
+            }
+            
             const schema = fs.readFileSync(schemaPath, 'utf8');
             
-            // Split schema into individual statements
-            const statements = schema.split(';').filter(stmt => stmt.trim());
-            
-            // Execute each statement
+            // Execute schema
             this.db.exec(schema);
-            console.log('Database schema initialized successfully');
+            console.log(`Database schema initialized successfully using: ${path.basename(schemaPath)}`);
         } catch (error) {
             console.error('Schema initialization error:', error);
             throw error;
