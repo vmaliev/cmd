@@ -1511,7 +1511,7 @@
                             const formData = new FormData();
                             formData.append('file', file);
                             
-                            const attachmentRes = await fetch(`/api/tickets/${createdTicket.id}/attachments`, {
+                            const attachmentRes = await fetch(`/api/ticket-attachments/${createdTicket.id}`, {
                                 method: 'POST',
                                 body: formData
                             });

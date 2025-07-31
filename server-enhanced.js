@@ -15,6 +15,9 @@ const fileUpload = require('express-fileupload');
 const dbServices = require('./database/services');
 const dbManager = require('./database/db');
 
+// Initialize database schema
+dbManager.initSchema();
+
 // Import routes
 const analyticsRoutes = require('./routes/analytics');
 const userRoutes = require('./routes/users');

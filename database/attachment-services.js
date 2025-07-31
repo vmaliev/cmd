@@ -5,6 +5,9 @@ const crypto = require('crypto');
 class AttachmentServices {
     constructor(db) {
         this.db = db;
+        console.log('AttachmentServices constructor - Database:', db);
+        console.log('AttachmentServices constructor - Database path:', db?.name);
+        
         this.uploadDir = path.join(__dirname, '..', 'uploads');
         this.maxFileSize = 10 * 1024 * 1024; // 10MB
         this.allowedMimeTypes = [
@@ -25,14 +28,30 @@ class AttachmentServices {
     // Get all attachments for a ticket
     getTicketAttachments(ticketId) {
         try {
-            const stmt = this.db.prepare(`
-                SELECT ta.*, u.name as uploaded_by_name
-                FROM ticket_attachments ta
-                LEFT JOIN users u ON ta.uploaded_by = u.id
-                WHERE ta.ticket_id = ? AND ta.is_deleted = 0
-                ORDER BY ta.uploaded_at DESC
-            `);
-            return stmt.all(ticketId);
+            // Handle both integer and string ticket IDs
+            const isInteger = Number.isInteger(ticketId) || (typeof ticketId === 'string' && !isNaN(parseInt(ticketId)));
+            
+            if (isInteger) {
+                // Database ticket
+                const stmt = this.db.prepare(`
+                    SELECT ta.*, u.name as uploaded_by_name
+                    FROM ticket_attachments ta
+                    LEFT JOIN users u ON ta.uploaded_by = u.id
+                    WHERE ta.ticket_id = ? AND ta.is_deleted = 0
+                    ORDER BY ta.uploaded_at DESC
+                `);
+                return stmt.all(ticketId);
+            } else {
+                // JSON ticket - store string ID in a separate field
+                const stmt = this.db.prepare(`
+                    SELECT ta.*, u.name as uploaded_by_name
+                    FROM ticket_attachments ta
+                    LEFT JOIN users u ON ta.uploaded_by = u.id
+                    WHERE ta.json_ticket_id = ? AND ta.is_deleted = 0
+                    ORDER BY ta.uploaded_at DESC
+                `);
+                return stmt.all(ticketId);
+            }
         } catch (error) {
             console.error('Error getting ticket attachments:', error);
             return [];
@@ -58,39 +77,75 @@ class AttachmentServices {
     // Create a new attachment
     createAttachment(ticketId, fileData, uploadedBy) {
         try {
+            console.log('Creating attachment for ticket:', ticketId);
+            console.log('File data:', {
+                name: fileData.name,
+                size: fileData.size,
+                mimetype: fileData.mimetype
+            });
+            
             // Validate file
             if (!this.validateFile(fileData)) {
                 throw new Error('Invalid file');
             }
 
             // Generate unique filename
-            const fileExtension = path.extname(fileData.originalname);
+            const fileExtension = path.extname(fileData.name);
             const uniqueFilename = this.generateUniqueFilename(fileExtension);
             const filePath = path.join(this.uploadDir, uniqueFilename);
+
+            console.log('Saving file to:', filePath);
 
             // Save file to disk
             fs.writeFileSync(filePath, fileData.data);
 
-            // Save to database
-            const stmt = this.db.prepare(`
-                INSERT INTO ticket_attachments 
-                (ticket_id, filename, original_filename, file_path, file_size, mime_type, uploaded_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            `);
+            // Handle both integer and string ticket IDs
+            const isInteger = Number.isInteger(ticketId) || (typeof ticketId === 'string' && !isNaN(parseInt(ticketId)));
             
-            const result = stmt.run(
-                ticketId,
-                uniqueFilename,
-                fileData.originalname,
-                `/uploads/${uniqueFilename}`,
-                fileData.size,
-                fileData.mimetype,
-                uploadedBy
-            );
+            console.log('Ticket ID type:', typeof ticketId, 'Is integer:', isInteger);
+            
+            let stmt, result;
+            if (isInteger) {
+                // Database ticket
+                console.log('Using database ticket ID');
+                stmt = this.db.prepare(`
+                    INSERT INTO ticket_attachments 
+                    (ticket_id, filename, original_filename, file_path, file_size, mime_type, uploaded_by)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                `);
+                result = stmt.run(
+                    ticketId,
+                    uniqueFilename,
+                    fileData.name,
+                    `/uploads/${uniqueFilename}`,
+                    fileData.size,
+                    fileData.mimetype,
+                    uploadedBy || 1 // Default to user ID 1 if not provided
+                );
+            } else {
+                // JSON ticket - store string ID in json_ticket_id field
+                console.log('Using JSON ticket ID');
+                stmt = this.db.prepare(`
+                    INSERT INTO ticket_attachments 
+                    (json_ticket_id, filename, original_filename, file_path, file_size, mime_type, uploaded_by)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                `);
+                result = stmt.run(
+                    ticketId,
+                    uniqueFilename,
+                    fileData.name,
+                    `/uploads/${uniqueFilename}`,
+                    fileData.size,
+                    fileData.mimetype,
+                    uploadedBy || 1 // Default to user ID 1 if not provided
+                );
+            }
 
+            console.log('Insert result:', result);
             return this.getAttachmentById(result.lastInsertRowid);
         } catch (error) {
             console.error('Error creating attachment:', error);
+            console.error('Error details:', error.message);
             throw error;
         }
     }

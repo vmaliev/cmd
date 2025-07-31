@@ -36,6 +36,14 @@ class DatabaseManager {
     // Initialize database schema
     initSchema() {
         try {
+            // Check if database already has tables
+            const tableCount = this.db.prepare("SELECT COUNT(*) as count FROM sqlite_master WHERE type='table'").get().count;
+            
+            if (tableCount > 0) {
+                console.log(`Database already has ${tableCount} tables, skipping schema initialization`);
+                return;
+            }
+            
             // Try to use enhanced schema first
             let schemaPath = path.join(__dirname, 'schema-enhanced.sql');
             if (!fs.existsSync(schemaPath)) {
@@ -50,7 +58,8 @@ class DatabaseManager {
             console.log(`Database schema initialized successfully using: ${path.basename(schemaPath)}`);
         } catch (error) {
             console.error('Schema initialization error:', error);
-            throw error;
+            // Don't throw error, just log it
+            console.log('Continuing without schema initialization');
         }
     }
 
