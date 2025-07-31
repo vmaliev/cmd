@@ -37,14 +37,19 @@ router.get('/attachments/stats',
 
 // Get all attachments for a ticket
 router.get('/tickets/:ticketId/attachments',
-    [
-        param('ticketId').isInt().withMessage('Ticket ID must be a valid integer'),
-        handleValidationErrors
-    ],
     (req, res) => {
         try {
-            const attachments = attachmentServices.getTicketAttachments(req.params.ticketId);
-            res.json(attachments);
+            // Try to parse as integer for database lookup
+            const ticketId = parseInt(req.params.ticketId);
+            if (!isNaN(ticketId)) {
+                const attachments = attachmentServices.getTicketAttachments(ticketId);
+                res.json(attachments);
+                return;
+            }
+            
+            // If not an integer, return empty array for now (tickets in JSON don't have attachments yet)
+            // TODO: Implement attachment support for JSON-based tickets
+            res.json([]);
         } catch (error) {
             console.error('Error getting ticket attachments:', error);
             res.status(500).json({ error: 'Failed to get attachments' });
@@ -107,10 +112,6 @@ router.get('/attachments/:attachmentId/download',
 
 // Upload attachment to a ticket
 router.post('/tickets/:ticketId/attachments',
-    [
-        param('ticketId').isInt().withMessage('Ticket ID must be a valid integer'),
-        handleValidationErrors
-    ],
     (req, res) => {
         try {
             if (!req.files || Object.keys(req.files).length === 0) {
@@ -122,11 +123,17 @@ router.post('/tickets/:ticketId/attachments',
                 return res.status(400).json({ error: 'No file provided' });
             }
 
+            // Try to parse as integer for database lookup
+            const ticketId = parseInt(req.params.ticketId);
+            if (isNaN(ticketId)) {
+                return res.status(400).json({ error: 'Ticket ID must be a valid integer for attachments' });
+            }
+
             // Get user ID from session (you'll need to implement this based on your auth system)
             const uploadedBy = req.user?.id || 1; // Default to admin user for now
 
             const attachment = attachmentServices.createAttachment(
-                req.params.ticketId,
+                ticketId,
                 uploadedFile,
                 uploadedBy
             );
