@@ -22,6 +22,7 @@
                 <span id="admin-username" style="color: #3a4da5; font-weight: 600; font-size: 0.9rem;"></span>
                 <button id="language-toggle" class="btn">🇷🇸 Serbian</button>
                 <button id="theme-toggle" class="btn">🌙 Dark Mode</button>
+                <button id="user-management-btn" class="btn" style="background: #28a745; color: white;">👥 User Management</button>
                 <button id="logout-btn" class="btn" style="background: #dc3545; color: white;">🚪 Logout</button>
             </div>
         </header>
@@ -720,6 +721,11 @@
                     console.error('Logout error:', error);
                     window.location.href = '/login';
                 }
+            });
+            
+            // User Management functionality
+            document.getElementById('user-management-btn').addEventListener('click', function() {
+                window.location.href = '/admin-users';
             });
             
             const tabs = document.querySelectorAll('.tab');
