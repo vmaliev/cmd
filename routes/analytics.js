@@ -1,5 +1,5 @@
 const express = require('express');
-const { query } = require('express-validator');
+const { query, validationResult } = require('express-validator');
 const { authenticateJWT, requireRole } = require('../middleware/auth');
 const { generalRateLimit } = require('../middleware/security');
 const AnalyticsServices = require('../database/analytics-services');
@@ -586,6 +586,152 @@ router.get('/export/activity', requireRole(['admin']), [
   } catch (error) {
     console.error('Export activity analytics error:', error);
     res.status(500).json({ error: 'Failed to export activity analytics' });
+  }
+});
+
+/**
+ * @route GET /api/analytics/export/engagement
+ * @desc Export engagement analytics
+ * @access Admin
+ */
+router.get('/export/engagement', requireRole(['admin']), [
+  query('timeRange').optional().isIn(['7d', '30d', '90d', '1y']),
+  query('format').optional().isIn(['json', 'csv'])
+], async (req, res) => {
+  try {
+    // Validate input
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ 
+        error: 'Validation failed', 
+        details: errors.array() 
+      });
+    }
+
+    const { timeRange = '30d', format = 'json' } = req.query;
+    const data = analyticsServices.getUserEngagementMetrics(timeRange);
+    
+    if (format === 'csv') {
+      const csvData = [
+        ['Engagement Analytics'],
+        ['Metric', 'Value'],
+        ['Daily Active Users', data.dailyActiveUsers],
+        ['Weekly Active Users', data.weeklyActiveUsers],
+        ['Monthly Active Users', data.monthlyActiveUsers],
+        ['User Retention Rate (%)', data.retentionRate],
+        ['Average Session Duration (minutes)', data.averageSessionDuration],
+        ['Top Active Users', data.topActiveUsers.length],
+        [],
+        ['Daily Active Users Trend'],
+        ['Date', 'Count'],
+        ...data.dailyActiveTrend.map(day => [day.date, day.count]),
+        [],
+        ['Top Active Users'],
+        ['Name', 'Email', 'Role', 'Total Actions', 'Active Days', 'Avg Actions/Day'],
+        ...data.topActiveUsers.map(user => [
+          user.name, 
+          user.email, 
+          user.role, 
+          user.total_actions, 
+          user.active_days, 
+          user.avg_actions_per_day || 0
+        ]),
+        [],
+        ['User Retention Data'],
+        ['Period', 'Retained Users', 'Total Users', 'Retention Rate (%)'],
+        ['7 Days', data.retentionData.sevenDay.retained, data.retentionData.sevenDay.total, data.retentionData.sevenDay.rate],
+        ['30 Days', data.retentionData.thirtyDay.retained, data.retentionData.thirtyDay.total, data.retentionData.thirtyDay.rate],
+        ['90 Days', data.retentionData.ninetyDay.retained, data.retentionData.ninetyDay.total, data.retentionData.ninetyDay.rate]
+      ];
+      
+      const csv = csvData.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+      
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="engagement-${timeRange}-${new Date().toISOString().split('T')[0]}.csv"`);
+      res.send(csv);
+    } else {
+      res.json(data);
+    }
+  } catch (error) {
+    console.error('Export engagement analytics error:', error);
+    res.status(500).json({ error: 'Failed to export engagement analytics' });
+  }
+});
+
+/**
+ * @route GET /api/analytics/export/performance
+ * @desc Export performance analytics
+ * @access Admin
+ */
+router.get('/export/performance', requireRole(['admin']), [
+  query('timeRange').optional().isIn(['7d', '30d', '90d', '1y']),
+  query('format').optional().isIn(['json', 'csv'])
+], async (req, res) => {
+  try {
+    // Validate input
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ 
+        error: 'Validation failed', 
+        details: errors.array() 
+      });
+    }
+
+    const { timeRange = '30d', format = 'json' } = req.query;
+    const data = analyticsServices.getUserPerformanceMetrics(timeRange);
+    
+    if (format === 'csv') {
+      const csvData = [
+        ['Performance Analytics'],
+        ['Metric', 'Value'],
+        ['Total Actions Performed', data.totalActions],
+        ['Average Actions Per User', data.averageActionsPerUser],
+        ['Top Performers Count', data.topPerformers.length],
+        ['Most Efficient Users Count', data.mostEfficientUsers.length],
+        [],
+        ['Top Performers'],
+        ['Name', 'Email', 'Role', 'Total Actions', 'Active Days', 'Avg Actions/Day'],
+        ...data.topPerformers.map(user => [
+          user.name, 
+          user.email, 
+          user.role, 
+          user.total_actions, 
+          user.active_days, 
+          user.avg_actions_per_day || 0
+        ]),
+        [],
+        ['Most Efficient Users'],
+        ['Name', 'Email', 'Role', 'Total Actions', 'Active Days', 'Efficiency Score'],
+        ...data.mostEfficientUsers.map(user => [
+          user.name, 
+          user.email, 
+          user.role, 
+          user.total_actions, 
+          user.active_days, 
+          user.efficiency_score
+        ]),
+        [],
+        ['Performance by Role'],
+        ['Role', 'Total Actions', 'Average Actions', 'Active Users'],
+        ...data.performanceByRole.map(role => [
+          role.role, 
+          role.total_actions, 
+          role.average_actions, 
+          role.active_users
+        ])
+      ];
+      
+      const csv = csvData.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+      
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="performance-${timeRange}-${new Date().toISOString().split('T')[0]}.csv"`);
+      res.send(csv);
+    } else {
+      res.json(data);
+    }
+  } catch (error) {
+    console.error('Export performance analytics error:', error);
+    res.status(500).json({ error: 'Failed to export performance analytics' });
   }
 });
 

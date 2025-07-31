@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analytics Dashboard - IT Support System</title>
     <link rel="stylesheet" href="html.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="chart.min.js"></script>
     <style>
         .analytics-container {
             max-width: 1400px;
@@ -367,12 +367,12 @@
 
         <!-- Analytics Tabs -->
         <div class="analytics-tabs">
-            <button class="tab-button active" onclick="switchTab('overview')">Overview</button>
-            <button class="tab-button" onclick="switchTab('registrations')">Registrations</button>
-            <button class="tab-button" onclick="switchTab('activity')">Activity</button>
-            <button class="tab-button" onclick="switchTab('engagement')">Engagement</button>
-            <button class="tab-button" onclick="switchTab('performance')">Performance</button>
-            <button class="tab-button" onclick="switchTab('system')">System Health</button>
+            <button class="tab-button active" data-tab="overview">Overview</button>
+            <button class="tab-button" data-tab="registrations">Registrations</button>
+            <button class="tab-button" data-tab="activity">Activity</button>
+            <button class="tab-button" data-tab="engagement">Engagement</button>
+            <button class="tab-button" data-tab="performance">Performance</button>
+            <button class="tab-button" data-tab="system">System Health</button>
         </div>
 
         <!-- Overview Tab -->
@@ -559,6 +559,10 @@
                     <button class="btn btn-primary" onclick="exportEngagement()">Export CSV</button>
                 </div>
                 <div class="export-card">
+                    <h4>Performance Data</h4>
+                    <button class="btn btn-primary" onclick="exportPerformance()">Export CSV</button>
+                </div>
+                <div class="export-card">
                     <h4>Complete Report</h4>
                     <button class="btn btn-success" onclick="exportComplete()">Export All</button>
                 </div>
@@ -575,6 +579,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadDashboardData();
             startRealTimeUpdates();
+            setupTabListeners();
         });
 
         function changeTimeRange() {
@@ -648,10 +653,17 @@
                 if (!response.ok) throw new Error('Failed to load registration data');
                 
                 const data = await response.json();
+                console.log('Registration data:', data);
                 
-                createRegistrationChart(data.registrationsByDay);
-                createRoleRegistrationChart(data.registrationsByRole);
-                createVerificationChart(data.verificationRate);
+                if (data.registrationsByDay && data.registrationsByDay.length > 0) {
+                    createRegistrationChart(data.registrationsByDay);
+                }
+                if (data.registrationsByRole && data.registrationsByRole.length > 0) {
+                    createRoleRegistrationChart(data.registrationsByRole);
+                }
+                if (data.verificationRate) {
+                    createVerificationChart(data.verificationRate);
+                }
                 
             } catch (error) {
                 console.error('Error loading registration data:', error);
@@ -664,10 +676,17 @@
                 if (!response.ok) throw new Error('Failed to load activity data');
                 
                 const data = await response.json();
+                console.log('Activity data:', data);
                 
-                createLoginActivityChart(data.loginsByDay);
-                createFailedLoginsChart(data.failedLogins);
-                createSessionDurationChart(data.averageSessionDuration);
+                if (data.loginsByDay && data.loginsByDay.length > 0) {
+                    createLoginActivityChart(data.loginsByDay);
+                }
+                if (data.failedLogins !== undefined) {
+                    createFailedLoginsChart(data.failedLogins);
+                }
+                if (data.averageSessionDuration !== undefined) {
+                    createSessionDurationChart(data.averageSessionDuration);
+                }
                 
             } catch (error) {
                 console.error('Error loading activity data:', error);
@@ -680,10 +699,17 @@
                 if (!response.ok) throw new Error('Failed to load engagement data');
                 
                 const data = await response.json();
+                console.log('Engagement data:', data);
                 
-                createDailyActiveChart(data.dailyActiveUsers);
-                createRetentionChart(data.userRetention);
-                renderTopUsersTable(data.mostActiveUsers);
+                if (data.dailyActiveUsers && data.dailyActiveUsers.length > 0) {
+                    createDailyActiveChart(data.dailyActiveUsers);
+                }
+                if (data.userRetention) {
+                    createRetentionChart(data.userRetention);
+                }
+                if (data.mostActiveUsers && data.mostActiveUsers.length > 0) {
+                    renderTopUsersTable(data.mostActiveUsers);
+                }
                 
             } catch (error) {
                 console.error('Error loading engagement data:', error);
@@ -696,9 +722,14 @@
                 if (!response.ok) throw new Error('Failed to load performance data');
                 
                 const data = await response.json();
+                console.log('Performance data:', data);
                 
-                renderTopPerformersTable(data.topPerformers);
-                renderEfficiencyTable(data.userEfficiency);
+                if (data.topPerformers && data.topPerformers.length > 0) {
+                    renderTopPerformersTable(data.topPerformers);
+                }
+                if (data.userEfficiency && data.userEfficiency.length > 0) {
+                    renderEfficiencyTable(data.userEfficiency);
+                }
                 
             } catch (error) {
                 console.error('Error loading performance data:', error);
@@ -1225,7 +1256,23 @@
             
             // Show selected tab
             document.getElementById(tabName + 'Tab').classList.add('active');
-            event.target.classList.add('active');
+        }
+
+        // Setup tab event listeners
+        function setupTabListeners() {
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    if (tabName) {
+                        // Remove active class from all buttons
+                        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                        // Add active class to clicked button
+                        this.classList.add('active');
+                        // Switch to the tab
+                        switchTab(tabName);
+                    }
+                });
+            });
         }
 
         // Real-time updates
@@ -1268,8 +1315,11 @@
         }
 
         function exportEngagement() {
-            // This would need a specific endpoint for engagement data
-            showError('Engagement export not yet implemented');
+            window.open(`/api/analytics/export/engagement?timeRange=${currentTimeRange}&format=csv`, '_blank');
+        }
+
+        function exportPerformance() {
+            window.open(`/api/analytics/export/performance?timeRange=${currentTimeRange}&format=csv`, '_blank');
         }
 
         function exportComplete() {

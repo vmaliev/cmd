@@ -1,6 +1,46 @@
 {
   "tickets": [
     {
+      "id": "TKT-009",
+      "subject": "dfgsdfgsdfg",
+      "requester": "ertrset",
+      "assignee": "Unassigned",
+      "priority": "low",
+      "status": "open",
+      "date": "2025-07-31",
+      "email": "vmaliev@gmail.com",
+      "description": "gdfgdfdgsdfgsdfg",
+      "category": "hardware",
+      "timeline": [
+        {
+          "id": "timeline-1753961861743-1",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-31T11:37:41.743Z",
+          "content": "Hello ertrset! Thank you for submitting your ticket. We have received your request and will begin working on it shortly.",
+          "type": "greeting"
+        },
+        {
+          "id": "timeline-1753961861743-2",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-31T11:37:41.743Z",
+          "content": "This ticket has been classified as LOW priority. Expected response time: 24-48 hours. We will address this as soon as possible.",
+          "type": "priority-info"
+        },
+        {
+          "id": "timeline-1753961861744-3",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-31T11:37:41.743Z",
+          "content": "Ticket created with ID: TKT-009. Status: Open.",
+          "type": "creation"
+        }
+      ],
+      "createdDate": "2025-07-31T11:37:41.743Z",
+      "lastUpdated": "2025-07-31T11:37:41.743Z"
+    },
+    {
       "id": "TKT-008",
       "subject": "dfgdsfaggasdsgh",
       "requester": "2384y28347y",

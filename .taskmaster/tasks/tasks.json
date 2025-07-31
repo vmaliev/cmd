@@ -102,7 +102,7 @@
         "id": 5,
         "title": "User Management System Enhancement",
         "description": "Enhance user management with improved CRUD operations and role-based permissions",
-        "status": "pending",
+        "status": "done",
         "priority": "medium",
         "dependencies": [
           2,
@@ -153,7 +153,7 @@
             "title": "User Analytics and Reporting",
             "description": "Implement user analytics and reporting functionality",
             "details": "- Create user activity analytics dashboard\n- Implement user registration and login statistics\n- Add user engagement metrics\n- Create role-based usage reports\n- Implement user performance tracking\n- Add exportable user reports",
-            "status": "in-progress",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 5
           }

@@ -396,6 +396,16 @@ io.on('connection', (socket) => {
   // No-op, just keep the connection open
 });
 
+// Admin users route
+app.get('/admin-users', requireAdminAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin-users.html'));
+});
+
+// Also serve the .html version
+app.get('/admin-users.html', requireAdminAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin-users.html'));
+});
+
 server.listen(PORT, () => {
   console.log(`HTTPS Server running at https://localhost:${PORT}`);
 });

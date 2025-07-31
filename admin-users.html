@@ -527,6 +527,9 @@
                 <button class="btn btn-secondary" id="refreshBtn">
                     <span>🔄</span> Refresh
                 </button>
+                <a href="/analytics" class="btn btn-primary">
+                    <span>📈</span> User Analytics
+                </a>
                 <a href="/" class="btn btn-secondary">
                     <span>🏠</span> Dashboard
                 </a>
@@ -550,6 +553,37 @@
             <div class="stat-card">
                 <div class="stat-number" id="recentUsers">-</div>
                 <div class="stat-label">New This Week</div>
+            </div>
+        </div>
+
+        <!-- Quick Analytics Summary -->
+        <div class="analytics-summary" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #3498db;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="margin: 0 0 10px 0; color: #2c3e50;">📈 Quick Analytics</h3>
+                    <p style="margin: 0; color: #7f8c8d; font-size: 14px;">Key user engagement metrics and insights</p>
+                </div>
+                <a href="/analytics" class="btn btn-primary" style="text-decoration: none;">
+                    <span>📊</span> View Full Analytics
+                </a>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-top: 15px;">
+                <div style="text-align: center;">
+                    <div style="font-size: 1.5em; font-weight: bold; color: #3498db;" id="dailyActiveUsers">-</div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Daily Active</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 1.5em; font-weight: bold; color: #27ae60;" id="retentionRate">-</div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Retention %</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 1.5em; font-weight: bold; color: #f39c12;" id="avgSessionDuration">-</div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Avg Session (min)</div>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 1.5em; font-weight: bold; color: #e74c3c;" id="topPerformers">-</div>
+                    <div style="font-size: 0.9em; color: #7f8c8d;">Top Performers</div>
+                </div>
             </div>
         </div>
 
@@ -762,6 +796,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadUsers();
             loadStats();
+            loadQuickAnalytics();
             setupEventListeners();
             // Add event listeners for main buttons
             document.getElementById('addUserBtn').addEventListener('click', showCreateUserModal);
@@ -1023,6 +1058,38 @@
                 document.getElementById('recentUsers').textContent = stats.recentRegistrations;
             } catch (error) {
                 console.error('Error loading stats:', error);
+            }
+        }
+
+        async function loadQuickAnalytics() {
+            try {
+                // Load engagement metrics
+                const engagementResponse = await fetch('/api/analytics/engagement?timeRange=30d');
+                if (engagementResponse.ok) {
+                    const engagementData = await engagementResponse.json();
+                    
+                    document.getElementById('dailyActiveUsers').textContent = engagementData.dailyActiveUsers || '-';
+                    document.getElementById('retentionRate').textContent = 
+                        engagementData.retentionRate ? `${engagementData.retentionRate.toFixed(1)}%` : '-';
+                    document.getElementById('avgSessionDuration').textContent = 
+                        engagementData.averageSessionDuration ? `${engagementData.averageSessionDuration.toFixed(1)}` : '-';
+                }
+
+                // Load performance metrics for top performers count
+                const performanceResponse = await fetch('/api/analytics/performance?timeRange=30d');
+                if (performanceResponse.ok) {
+                    const performanceData = await performanceResponse.json();
+                    
+                    document.getElementById('topPerformers').textContent = 
+                        performanceData.topPerformers ? performanceData.topPerformers.length : '-';
+                }
+            } catch (error) {
+                console.error('Error loading quick analytics:', error);
+                // Set default values if analytics fail to load
+                document.getElementById('dailyActiveUsers').textContent = '-';
+                document.getElementById('retentionRate').textContent = '-';
+                document.getElementById('avgSessionDuration').textContent = '-';
+                document.getElementById('topPerformers').textContent = '-';
             }
         }
 
