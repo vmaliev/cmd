@@ -657,29 +657,56 @@ class DatabaseServices {
 
     // Update ticket
     updateTicket(id, ticketData) {
-        const stmt = this.db.prepare(`
-            UPDATE tickets 
-            SET subject = ?, description = ?, assignee_id = ?, 
-                category_id = ?, priority_id = ?, status_id = ?, 
-                updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-        `);
-
-        // Get related IDs
-        const category = this.db.prepare('SELECT id FROM ticket_categories WHERE name = ?').get(ticketData.category);
-        const priority = this.db.prepare('SELECT id FROM ticket_priorities WHERE name = ?').get(ticketData.priority);
-        const status = this.db.prepare('SELECT id FROM ticket_statuses WHERE name = ?').get(ticketData.status);
-        const assignee = ticketData.assignee ? this.getUserByEmail(ticketData.assignee) : null;
-
-        return stmt.run(
-            ticketData.subject,
-            ticketData.description,
-            assignee ? assignee.id : null,
-            category ? category.id : null,
-            priority ? priority.id : null,
-            status ? status.id : null,
-            id
-        );
+        // Build dynamic update query based on provided fields
+        let updateFields = [];
+        let updateValues = [];
+        
+        if (ticketData.subject !== undefined) {
+            updateFields.push('subject = ?');
+            updateValues.push(ticketData.subject);
+        }
+        
+        if (ticketData.description !== undefined) {
+            updateFields.push('description = ?');
+            updateValues.push(ticketData.description);
+        }
+        
+        if (ticketData.assignee !== undefined) {
+            updateFields.push('assignee_id = ?');
+            const assignee = ticketData.assignee ? this.getUserByEmail(ticketData.assignee) : null;
+            updateValues.push(assignee ? assignee.id : null);
+        }
+        
+        if (ticketData.category !== undefined) {
+            updateFields.push('category_id = ?');
+            const category = this.db.prepare('SELECT id FROM ticket_categories WHERE name = ?').get(ticketData.category);
+            updateValues.push(category ? category.id : null);
+        }
+        
+        if (ticketData.priority !== undefined) {
+            updateFields.push('priority_id = ?');
+            const priority = this.db.prepare('SELECT id FROM ticket_priorities WHERE name = ?').get(ticketData.priority);
+            updateValues.push(priority ? priority.id : null);
+        }
+        
+        if (ticketData.status !== undefined) {
+            updateFields.push('status_id = ?');
+            const status = this.db.prepare('SELECT id FROM ticket_statuses WHERE name = ?').get(ticketData.status);
+            updateValues.push(status ? status.id : null);
+        }
+        
+        // Always update the updated_at timestamp
+        updateFields.push('updated_at = CURRENT_TIMESTAMP');
+        
+        if (updateFields.length === 0) {
+            return { changes: 0 };
+        }
+        
+        const updateQuery = `UPDATE tickets SET ${updateFields.join(', ')} WHERE id = ?`;
+        updateValues.push(id);
+        
+        const stmt = this.db.prepare(updateQuery);
+        return stmt.run(...updateValues);
     }
 
     // Create timeline entry

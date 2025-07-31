@@ -589,15 +589,20 @@ app.put('/api/tickets/:id',
   ],
   (req, res) => {
     try {
+      // Try to parse as integer for database lookup
       const ticketId = parseInt(req.params.id);
-      const result = dbServices.updateTicket(ticketId, req.body);
-      if (result.changes > 0) {
-        io.emit('tickets-updated');
-        const updatedTicket = dbServices.getTicketById(ticketId);
-        res.json(updatedTicket);
-      } else {
-        res.status(404).json({ error: 'Ticket not found' });
+      if (!isNaN(ticketId)) {
+        const result = dbServices.updateTicket(ticketId, req.body);
+        if (result.changes > 0) {
+          io.emit('tickets-updated');
+          const updatedTicket = dbServices.getTicketById(ticketId);
+          res.json(updatedTicket);
+          return;
+        }
       }
+      
+      // If database lookup fails or no changes, fall back to JSON
+      throw new Error('Ticket not found in database, falling back to JSON');
     } catch (error) {
       console.error('Database error, falling back to JSON:', error);
       // Fallback to JSON file
@@ -627,15 +632,22 @@ app.post('/api/tickets/:id/timeline',
   ],
   (req, res) => {
     try {
+      // Try to parse as integer for database lookup
       const ticketId = parseInt(req.params.id);
-      const entry = dbServices.createTimelineEntry(ticketId, req.body);
-      io.emit('tickets-updated');
-      res.json(entry);
+      if (!isNaN(ticketId)) {
+        const entry = dbServices.createTimelineEntry(ticketId, req.body);
+        io.emit('tickets-updated');
+        res.json(entry);
+        return;
+      }
+      
+      // If database lookup fails, fall back to JSON
+      throw new Error('Ticket not found in database, falling back to JSON');
     } catch (error) {
       console.error('Database error, falling back to JSON:', error);
       // Fallback to JSON file
       const data = readData();
-      const idx = data.tickets.findIndex(t => t.id === req.params.id);
+      const idx = data.tickets.findIndex(t => t.id === req.params.id || t.ticket_id === req.params.id);
       if (idx !== -1) {
         const timelineEntry = {
           id: `timeline-${Date.now()}`,
