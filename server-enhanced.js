@@ -205,6 +205,10 @@ function requireAdminAuth(req, res, next) {
   const sessionId = req.cookies?.adminSession;
   
   if (!sessionId) {
+    // Redirect to login page for HTML requests, JSON error for API requests
+    if (req.path.endsWith('.html') || req.path.includes('admin-users') || req.path.includes('analytics')) {
+      return res.redirect('/login');
+    }
     return res.status(401).json({ error: 'Authentication required' });
   }
   
@@ -213,6 +217,10 @@ function requireAdminAuth(req, res, next) {
   const memSession = adminSessions[sessionId];
   
   if (!dbSession && (!memSession || Date.now() > memSession.expiresAt)) {
+    // Redirect to login page for HTML requests, JSON error for API requests
+    if (req.path.endsWith('.html') || req.path.includes('admin-users') || req.path.includes('analytics')) {
+      return res.redirect('/login');
+    }
     return res.status(401).json({ error: 'Invalid or expired session' });
   }
   
@@ -248,15 +256,7 @@ function requireClientAuth(req, res, next) {
   next();
 }
 
-// ==================== STATIC FILES ====================
 
-app.use(express.static(__dirname, {
-  setHeaders: (res, filePath) => {
-    if (filePath.endsWith('.html')) {
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    }
-  }
-}));
 
 // ==================== ROUTES ====================
 
@@ -830,6 +830,16 @@ app.get('/admin-users', requireAdminAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'admin-users.html'));
 });
 
+// Also protect the .html version
+app.get('/admin-users.html', requireAdminAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin-users.html'));
+});
+
+// Also protect the analytics dashboard .html version
+app.get('/analytics-dashboard.html', requireAdminAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'analytics-dashboard.html'));
+});
+
 // Serve the client portal page
 app.get('/client', (req, res) => {
   res.sendFile(path.join(__dirname, 'client.html'));
@@ -847,6 +857,17 @@ function getPriorityBasedMessage(priority) {
   };
   return messages[priority] || messages.medium;
 }
+
+// ==================== STATIC FILES ====================
+
+// Serve static files after all routes (so protected routes take precedence)
+app.use(express.static(__dirname, {
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+  }
+}));
 
 // ==================== ERROR HANDLING MIDDLEWARE ====================
 
