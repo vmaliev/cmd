@@ -974,11 +974,26 @@ class DatabaseServices {
     cleanupExpired() {
         try {
             this.db.prepare('DELETE FROM user_sessions WHERE expires_at <= datetime(\'now\')').run();
+        } catch (error) {
+            console.error('Cleanup user_sessions error:', error);
+        }
+        
+        try {
             this.db.prepare('DELETE FROM admin_sessions WHERE expires_at <= datetime(\'now\')').run();
+        } catch (error) {
+            console.error('Cleanup admin_sessions error:', error);
+        }
+        
+        try {
             this.db.prepare('DELETE FROM otp_store WHERE expires_at <= datetime(\'now\')').run();
+        } catch (error) {
+            console.error('Cleanup otp_store error:', error);
+        }
+        
+        try {
             this.db.prepare('DELETE FROM jwt_refresh_tokens WHERE expires_at <= datetime(\'now\')').run();
         } catch (error) {
-            console.error('Cleanup error:', error);
+            console.error('Cleanup jwt_refresh_tokens error:', error);
         }
     }
 }

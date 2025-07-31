@@ -28,7 +28,7 @@ router.get('/', requireRole(['admin', 'manager']), [
   query('search').optional().isString().trim(),
   query('role').optional().isString().trim(),
   query('status').optional().isIn(['active', 'inactive']),
-  query('sortBy').optional().isIn(['created_at', 'name', 'email', 'role', 'last_login']),
+  query('sortBy').optional().isIn(['created_at', 'name', 'email', 'role', 'last_login', 'updated_at']),
   query('sortOrder').optional().isIn(['asc', 'desc'])
 ], async (req, res) => {
   try {
@@ -253,13 +253,13 @@ router.get('/:id', requireRole(['admin', 'manager']), [
     }
 
     // Get user profile
-    const profile = await profileServices.getUserProfile(userId);
+    const profile = profileServices.getUserProfile(userId);
 
     // Get user permissions
-    const permissions = await roleServices.getUserPermissions(userId);
+    const permissions = roleServices.getUserPermissions(userId);
 
     // Get recent activity
-    const recentActivity = await profileServices.getUserActivityLog(userId, 10);
+    const recentActivity = profileServices.getUserActivityLog(userId, 10);
 
     res.json({
       user,
