@@ -51,6 +51,14 @@ dev-debug.log
 *.sw?
 # OS specific
 
+# Database files
+*.db
+*.db-shm
+*.db-wal
+database/*.db
+database/*.db-shm
+database/*.db-wal
+
 # Task files
 # tasks.json
 # tasks/ 
