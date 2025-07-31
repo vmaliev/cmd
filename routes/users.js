@@ -3,8 +3,12 @@ const { body, query, param, validationResult } = require('express-validator');
 const { authenticateJWT, requireRole } = require('../middleware/auth');
 const { generalRateLimit } = require('../middleware/security');
 const dbServices = require('../database/services');
-const profileServices = require('../database/profile-services');
-const roleServices = require('../database/role-services');
+const ProfileServices = require('../database/profile-services');
+const RoleServices = require('../database/role-services');
+
+// Create instances of the services
+const profileServices = new ProfileServices();
+const roleServices = new RoleServices();
 
 const router = express.Router();
 
