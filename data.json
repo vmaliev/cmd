@@ -6,14 +6,22 @@
       "requester": "2384y28347y",
       "assignee": "Unassigned",
       "priority": "high",
-      "status": "open",
+      "status": "closed",
       "date": "2025-07-29",
       "email": "vmaliev@gmail.com",
       "description": "23rqwerwqer",
       "category": "hardware",
       "createdDate": "2025-07-29T06:13:17.096Z",
-      "lastUpdated": "2025-07-29T06:13:17.096Z",
+      "lastUpdated": "2025-07-31T08:06:01.817Z",
       "timeline": [
+        {
+          "id": "timeline-1753949161817",
+          "author": "Agent",
+          "authorType": "agent",
+          "date": "2025-07-31T08:06:01.817Z",
+          "content": "Testing status update functionality",
+          "type": "note"
+        },
         {
           "id": "timeline-1753769597096-1",
           "author": "System",
@@ -98,13 +106,13 @@
       "requester": "Ammar Tivari",
       "assignee": "Unassigned",
       "priority": "medium",
-      "status": "in-progress",
+      "status": "closed",
       "date": "2025-07-25",
       "email": "ammar.tivari@adriatic42.com",
       "description": "I have issue connecting with Plotter",
       "category": "network",
       "createdDate": "2025-07-25T10:00:00.000Z",
-      "lastUpdated": "2025-07-28T06:02:39.860Z",
+      "lastUpdated": "2025-07-31T08:07:21.802Z",
       "timeline": [
         {
           "id": "timeline-1753682540621",

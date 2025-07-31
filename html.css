@@ -7,7 +7,7 @@
         
         body {
             background-color: #f5f7fa;
-            color: white;
+            color: #333;
             line-height: 1.6;
         }
         
@@ -29,7 +29,7 @@
         }
         
         h1, h2, h3 {
-            color: white;
+            color: #3a4da5;
         }
         
         .logo {
@@ -70,12 +70,10 @@
             background-color: #f0f4ff;
             padding: 15px 20px;
             border-bottom: 1px solid #e1e5f2;
-            color: white;
         }
         
         .card-body {
             padding: 20px;
-            color: white;
         }
         
         .btn {
@@ -111,13 +109,12 @@
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #e1e5f2;
-            color: white;
         }
         
         th {
             background-color: #f0f4ff;
             font-weight: 600;
-            color: white;
+            color: #3a4da5;
             cursor: pointer;
             user-select: none;
             position: relative;
@@ -200,7 +197,6 @@
             font-weight: 500;
             margin-bottom: 5px;
             display: block;
-            color: white;
         }
         
         input, select, textarea {
@@ -209,8 +205,6 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 1rem;
-            color: white;
-            background-color: #333;
         }
         
         .tab-container {
@@ -226,12 +220,11 @@
             padding: 10px 20px;
             cursor: pointer;
             border-bottom: 3px solid transparent;
-            color: white;
         }
         
         .tab.active {
             border-bottom: 3px solid #3a4da5;
-            color: white;
+            color: #3a4da5;
             font-weight: 600;
         }
         
@@ -260,7 +253,7 @@
         }
         
         .stat-card h3 {
-            color: white;
+            color: #6c757d;
             font-size: 1rem;
             margin-bottom: 10px;
         }
@@ -268,7 +261,7 @@
         .stat-card .number {
             font-size: 2.5rem;
             font-weight: 700;
-            color: white;
+            color: #3a4da5;
         }
         
         .form-row {
