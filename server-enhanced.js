@@ -25,6 +25,10 @@ const profileRoutes = require('./routes/profiles');
 const roleRoutes = require('./routes/roles');
 const attachmentRoutes = require('./routes/attachments');
 const templateRoutes = require('./routes/templates');
+const slaRoutes = require('./routes/sla');
+const bulkOperationsRoutes = require('./routes/bulk-operations');
+const advancedSearchRoutes = require('./routes/advanced-search');
+const enhancedReportsRoutes = require('./routes/enhanced-reports');
 
 const app = express();
 
@@ -878,6 +882,18 @@ app.use('/api', attachmentRoutes);
 // Mount template routes
 app.use('/api', templateRoutes);
 
+// Mount SLA routes
+app.use('/api/sla', slaRoutes);
+
+// Mount bulk operations routes
+app.use('/api/bulk', bulkOperationsRoutes);
+
+// Mount advanced search routes
+app.use('/api/advanced-search', advancedSearchRoutes);
+
+// Mount enhanced reports routes
+app.use('/api/enhanced-reports', enhancedReportsRoutes);
+
 // ==================== PAGE ROUTES ====================
 
 // Serve login page
@@ -893,6 +909,26 @@ app.get('/', requireAdminAuth, (req, res) => {
 // Serve the analytics dashboard (protected)
 app.get('/analytics', requireAdminAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'analytics-dashboard.html'));
+});
+
+// Serve the SLA management page (protected)
+app.get('/sla', requireAdminAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'sla-management.html'));
+});
+
+// Serve the bulk operations page (protected)
+app.get('/bulk-operations', requireAdminAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'bulk-operations.html'));
+});
+
+// Serve the advanced search page (protected)
+app.get('/advanced-search', requireAdminAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'advanced-search.html'));
+});
+
+// Serve the enhanced reports page (protected)
+app.get('/enhanced-reports', requireAdminAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'enhanced-reports.html'));
 });
 
 // Serve the admin users management page (protected)

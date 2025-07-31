@@ -757,6 +757,808 @@ class DatabaseServices {
         return messages[priority] || messages.medium;
     }
 
+    // ==================== ADVANCED TICKET FILTERING AND SEARCH ====================
+
+    // Advanced ticket search with multiple criteria
+    searchTickets(filters = {}, options = {}) {
+        let query = `
+            SELECT 
+                t.*,
+                u1.name as requester_name,
+                u1.email as requester_email,
+                u2.name as assignee_name,
+                tc.name as category_name,
+                tp.name as priority_name,
+                tp.color as priority_color,
+                ts.name as status_name,
+                ts.color as status_color
+            FROM tickets t
+            LEFT JOIN users u1 ON t.requester_id = u1.id
+            LEFT JOIN users u2 ON t.assignee_id = u2.id
+            LEFT JOIN ticket_categories tc ON t.category_id = tc.id
+            LEFT JOIN ticket_priorities tp ON t.priority_id = tp.id
+            LEFT JOIN ticket_statuses ts ON t.status_id = ts.id
+        `;
+
+        const conditions = [];
+        const params = [];
+
+        // Text search
+        if (filters.search) {
+            conditions.push(`(
+                t.subject LIKE ? OR 
+                t.description LIKE ? OR 
+                t.ticket_id LIKE ? OR
+                u1.name LIKE ? OR 
+                u1.email LIKE ? OR
+                u2.name LIKE ? OR
+                u2.email LIKE ?
+            )`);
+            const searchTerm = `%${filters.search}%`;
+            params.push(searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm);
+        }
+
+        // Status filter
+        if (filters.status) {
+            if (Array.isArray(filters.status)) {
+                const placeholders = filters.status.map(() => '?').join(',');
+                conditions.push(`ts.name IN (${placeholders})`);
+                params.push(...filters.status);
+            } else {
+                conditions.push('ts.name = ?');
+                params.push(filters.status);
+            }
+        }
+
+        // Priority filter
+        if (filters.priority) {
+            if (Array.isArray(filters.priority)) {
+                const placeholders = filters.priority.map(() => '?').join(',');
+                conditions.push(`tp.name IN (${placeholders})`);
+                params.push(...filters.priority);
+            } else {
+                conditions.push('tp.name = ?');
+                params.push(filters.priority);
+            }
+        }
+
+        // Category filter
+        if (filters.category) {
+            if (Array.isArray(filters.category)) {
+                const placeholders = filters.category.map(() => '?').join(',');
+                conditions.push(`tc.name IN (${placeholders})`);
+                params.push(...filters.category);
+            } else {
+                conditions.push('tc.name = ?');
+                params.push(filters.category);
+            }
+        }
+
+        // Assignee filter
+        if (filters.assignee) {
+            if (filters.assignee === 'unassigned') {
+                conditions.push('t.assignee_id IS NULL');
+            } else {
+                conditions.push('u2.email = ?');
+                params.push(filters.assignee);
+            }
+        }
+
+        // Requester filter
+        if (filters.requester) {
+            conditions.push('u1.email = ?');
+            params.push(filters.requester);
+        }
+
+        // Date range filters
+        if (filters.createdAfter) {
+            conditions.push('t.created_at >= ?');
+            params.push(filters.createdAfter);
+        }
+
+        if (filters.createdBefore) {
+            conditions.push('t.created_at <= ?');
+            params.push(filters.createdBefore);
+        }
+
+        if (filters.updatedAfter) {
+            conditions.push('t.updated_at >= ?');
+            params.push(filters.updatedAfter);
+        }
+
+        if (filters.updatedBefore) {
+            conditions.push('t.updated_at <= ?');
+            params.push(filters.updatedBefore);
+        }
+
+        // Resolution time filter
+        if (filters.resolvedAfter) {
+            conditions.push('t.resolved_at >= ?');
+            params.push(filters.resolvedAfter);
+        }
+
+        if (filters.resolvedBefore) {
+            conditions.push('t.resolved_at <= ?');
+            params.push(filters.resolvedBefore);
+        }
+
+        // Department filter (if available)
+        if (filters.department) {
+            conditions.push('u1.department = ?');
+            params.push(filters.department);
+        }
+
+        // Add WHERE clause if conditions exist
+        if (conditions.length > 0) {
+            query += ' WHERE ' + conditions.join(' AND ');
+        }
+
+        // Add ORDER BY
+        const orderBy = options.orderBy || 't.created_at';
+        const orderDirection = options.orderDirection || 'DESC';
+        query += ` ORDER BY ${orderBy} ${orderDirection}`;
+
+        // Add LIMIT and OFFSET for pagination
+        if (options.limit) {
+            query += ' LIMIT ?';
+            params.push(options.limit);
+            
+            if (options.offset) {
+                query += ' OFFSET ?';
+                params.push(options.offset);
+            }
+        }
+
+        return this.db.prepare(query).all(...params);
+    }
+
+    // Get ticket search statistics
+    getTicketSearchStats(filters = {}) {
+        let query = `
+            SELECT 
+                COUNT(*) as total_tickets,
+                COUNT(CASE WHEN ts.name IN ('open', 'in-progress') THEN 1 END) as open_tickets,
+                COUNT(CASE WHEN ts.name = 'resolved' THEN 1 END) as resolved_tickets,
+                COUNT(CASE WHEN ts.name = 'closed' THEN 1 END) as closed_tickets,
+                AVG(CASE WHEN t.resolved_at IS NOT NULL 
+                    THEN (julianday(t.resolved_at) - julianday(t.created_at)) * 24 
+                    END) as avg_resolution_hours
+            FROM tickets t
+            LEFT JOIN users u1 ON t.requester_id = u1.id
+            LEFT JOIN users u2 ON t.assignee_id = u2.id
+            LEFT JOIN ticket_categories tc ON t.category_id = tc.id
+            LEFT JOIN ticket_priorities tp ON t.priority_id = tp.id
+            LEFT JOIN ticket_statuses ts ON t.status_id = ts.id
+        `;
+
+        const conditions = [];
+        const params = [];
+
+        // Apply same filters as searchTickets
+        if (filters.search) {
+            conditions.push(`(
+                t.subject LIKE ? OR 
+                t.description LIKE ? OR 
+                t.ticket_id LIKE ? OR
+                u1.name LIKE ? OR 
+                u1.email LIKE ? OR
+                u2.name LIKE ? OR
+                u2.email LIKE ?
+            )`);
+            const searchTerm = `%${filters.search}%`;
+            params.push(searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm);
+        }
+
+        if (filters.status) {
+            if (Array.isArray(filters.status)) {
+                const placeholders = filters.status.map(() => '?').join(',');
+                conditions.push(`ts.name IN (${placeholders})`);
+                params.push(...filters.status);
+            } else {
+                conditions.push('ts.name = ?');
+                params.push(filters.status);
+            }
+        }
+
+        if (filters.priority) {
+            if (Array.isArray(filters.priority)) {
+                const placeholders = filters.priority.map(() => '?').join(',');
+                conditions.push(`tp.name IN (${placeholders})`);
+                params.push(...filters.priority);
+            } else {
+                conditions.push('tp.name = ?');
+                params.push(filters.priority);
+            }
+        }
+
+        if (filters.category) {
+            if (Array.isArray(filters.category)) {
+                const placeholders = filters.category.map(() => '?').join(',');
+                conditions.push(`tc.name IN (${placeholders})`);
+                params.push(...filters.category);
+            } else {
+                conditions.push('tc.name = ?');
+                params.push(filters.category);
+            }
+        }
+
+        if (filters.assignee) {
+            if (filters.assignee === 'unassigned') {
+                conditions.push('t.assignee_id IS NULL');
+            } else {
+                conditions.push('u2.email = ?');
+                params.push(filters.assignee);
+            }
+        }
+
+        if (filters.requester) {
+            conditions.push('u1.email = ?');
+            params.push(filters.requester);
+        }
+
+        if (filters.createdAfter) {
+            conditions.push('t.created_at >= ?');
+            params.push(filters.createdAfter);
+        }
+
+        if (filters.createdBefore) {
+            conditions.push('t.created_at <= ?');
+            params.push(filters.createdBefore);
+        }
+
+        if (filters.updatedAfter) {
+            conditions.push('t.updated_at >= ?');
+            params.push(filters.updatedAfter);
+        }
+
+        if (filters.updatedBefore) {
+            conditions.push('t.updated_at <= ?');
+            params.push(filters.updatedBefore);
+        }
+
+        if (filters.resolvedAfter) {
+            conditions.push('t.resolved_at >= ?');
+            params.push(filters.resolvedAfter);
+        }
+
+        if (filters.resolvedBefore) {
+            conditions.push('t.resolved_at <= ?');
+            params.push(filters.resolvedBefore);
+        }
+
+        if (filters.department) {
+            conditions.push('u1.department = ?');
+            params.push(filters.department);
+        }
+
+        if (conditions.length > 0) {
+            query += ' WHERE ' + conditions.join(' AND ');
+        }
+
+        return this.db.prepare(query).get(...params);
+    }
+
+    // Get available filter options
+    getTicketFilterOptions() {
+        const options = {
+            statuses: this.db.prepare('SELECT DISTINCT name FROM ticket_statuses ORDER BY name').all(),
+            priorities: this.db.prepare('SELECT DISTINCT name FROM ticket_priorities ORDER BY name').all(),
+            categories: this.db.prepare('SELECT DISTINCT name FROM ticket_categories ORDER BY name').all(),
+            assignees: this.db.prepare(`
+                SELECT DISTINCT u.email, u.name 
+                FROM users u 
+                JOIN tickets t ON u.id = t.assignee_id 
+                WHERE u.role IN ('admin', 'manager', 'technician')
+                ORDER BY u.name
+            `).all(),
+            requesters: this.db.prepare(`
+                SELECT DISTINCT u.email, u.name 
+                FROM users u 
+                JOIN tickets t ON u.id = t.requester_id 
+                ORDER BY u.name
+            `).all(),
+            departments: this.db.prepare(`
+                SELECT DISTINCT department 
+                FROM users 
+                WHERE department IS NOT NULL AND department != ''
+                ORDER BY department
+            `).all()
+        };
+
+        return options;
+    }
+
+    // ==================== ENHANCED REPORTING AND ANALYTICS ====================
+
+    // Get ticket volume and trend reports
+    getTicketVolumeReport(timeRange = '30d', groupBy = 'day') {
+        const dateFormat = groupBy === 'day' ? '%Y-%m-%d' : 
+                          groupBy === 'week' ? '%Y-W%W' : 
+                          groupBy === 'month' ? '%Y-%m' : '%Y-%m-%d';
+        
+        const daysAgo = timeRange === '7d' ? 7 : 
+                       timeRange === '30d' ? 30 : 
+                       timeRange === '90d' ? 90 : 30;
+
+        return this.db.prepare(`
+            SELECT 
+                strftime('${dateFormat}', created_at) as period,
+                COUNT(*) as total_tickets,
+                COUNT(CASE WHEN status_id IN (SELECT id FROM ticket_statuses WHERE name IN ('open', 'in-progress')) THEN 1 END) as open_tickets,
+                COUNT(CASE WHEN status_id IN (SELECT id FROM ticket_statuses WHERE name = 'resolved') THEN 1 END) as resolved_tickets,
+                COUNT(CASE WHEN status_id IN (SELECT id FROM ticket_statuses WHERE name = 'closed') THEN 1 END) as closed_tickets
+            FROM tickets 
+            WHERE created_at >= datetime('now', '-${daysAgo} days')
+            GROUP BY period
+            ORDER BY period
+        `).all();
+    }
+
+    // Get SLA compliance reporting
+    getSLAComplianceReport(timeRange = '30d') {
+        const daysAgo = timeRange === '7d' ? 7 : 
+                       timeRange === '30d' ? 30 : 
+                       timeRange === '90d' ? 90 : 30;
+
+        return this.db.prepare(`
+            SELECT 
+                tp.name as priority,
+                COUNT(*) as total_tickets,
+                COUNT(CASE WHEN t.resolved_at IS NOT NULL THEN 1 END) as resolved_tickets,
+                COUNT(CASE WHEN t.resolved_at IS NOT NULL AND 
+                    (julianday(t.resolved_at) - julianday(t.created_at)) * 24 <= 
+                    CASE tp.name 
+                        WHEN 'critical' THEN 1
+                        WHEN 'high' THEN 2
+                        WHEN 'medium' THEN 8
+                        WHEN 'low' THEN 48
+                        ELSE 8
+                    END THEN 1 END) as sla_compliant,
+                AVG(CASE WHEN t.resolved_at IS NOT NULL 
+                    THEN (julianday(t.resolved_at) - julianday(t.created_at)) * 24 
+                    END) as avg_resolution_hours
+            FROM tickets t
+            JOIN ticket_priorities tp ON t.priority_id = tp.id
+            WHERE t.created_at >= datetime('now', '-${daysAgo} days')
+            GROUP BY tp.name
+            ORDER BY tp.name
+        `).all();
+    }
+
+    // Get technician performance metrics
+    getTechnicianPerformanceReport(timeRange = '30d') {
+        const daysAgo = timeRange === '7d' ? 7 : 
+                       timeRange === '30d' ? 30 : 
+                       timeRange === '90d' ? 90 : 30;
+
+        return this.db.prepare(`
+            SELECT 
+                u.name as technician_name,
+                u.email as technician_email,
+                COUNT(t.id) as total_assigned,
+                COUNT(CASE WHEN t.status_id IN (SELECT id FROM ticket_statuses WHERE name IN ('open', 'in-progress')) THEN 1 END) as open_tickets,
+                COUNT(CASE WHEN t.status_id IN (SELECT id FROM ticket_statuses WHERE name = 'resolved') THEN 1 END) as resolved_tickets,
+                AVG(CASE WHEN t.resolved_at IS NOT NULL 
+                    THEN (julianday(t.resolved_at) - julianday(t.created_at)) * 24 
+                    END) as avg_resolution_hours,
+                COUNT(CASE WHEN t.resolved_at IS NOT NULL AND 
+                    (julianday(t.resolved_at) - julianday(t.created_at)) * 24 <= 8 THEN 1 END) as sla_compliant_tickets
+            FROM users u
+            LEFT JOIN tickets t ON u.id = t.assignee_id
+            WHERE u.role IN ('admin', 'manager', 'technician')
+            AND (t.id IS NULL OR t.created_at >= datetime('now', '-${daysAgo} days'))
+            GROUP BY u.id, u.name, u.email
+            ORDER BY total_assigned DESC
+        `).all();
+    }
+
+    // Get category and priority distribution reports
+    getCategoryPriorityDistribution(timeRange = '30d') {
+        const daysAgo = timeRange === '7d' ? 7 : 
+                       timeRange === '30d' ? 30 : 
+                       timeRange === '90d' ? 90 : 30;
+
+        return this.db.prepare(`
+            SELECT 
+                tc.name as category,
+                tp.name as priority,
+                COUNT(*) as ticket_count,
+                COUNT(CASE WHEN t.status_id IN (SELECT id FROM ticket_statuses WHERE name IN ('open', 'in-progress')) THEN 1 END) as open_count,
+                COUNT(CASE WHEN t.status_id IN (SELECT id FROM ticket_statuses WHERE name = 'resolved') THEN 1 END) as resolved_count,
+                AVG(CASE WHEN t.resolved_at IS NOT NULL 
+                    THEN (julianday(t.resolved_at) - julianday(t.created_at)) * 24 
+                    END) as avg_resolution_hours
+            FROM tickets t
+            JOIN ticket_categories tc ON t.category_id = tc.id
+            JOIN ticket_priorities tp ON t.priority_id = tp.id
+            WHERE t.created_at >= datetime('now', '-${daysAgo} days')
+            GROUP BY tc.name, tp.name
+            ORDER BY tc.name, tp.name
+        `).all();
+    }
+
+    // Get resolution time analytics
+    getResolutionTimeAnalytics(timeRange = '30d') {
+        const daysAgo = timeRange === '7d' ? 7 : 
+                       timeRange === '30d' ? 30 : 
+                       timeRange === '90d' ? 90 : 30;
+
+        return this.db.prepare(`
+            SELECT 
+                tp.name as priority,
+                tc.name as category,
+                COUNT(*) as total_resolved,
+                AVG((julianday(t.resolved_at) - julianday(t.created_at)) * 24) as avg_resolution_hours,
+                MIN((julianday(t.resolved_at) - julianday(t.created_at)) * 24) as min_resolution_hours,
+                MAX((julianday(t.resolved_at) - julianday(t.created_at)) * 24) as max_resolution_hours,
+                COUNT(CASE WHEN (julianday(t.resolved_at) - julianday(t.created_at)) * 24 <= 1 THEN 1 END) as resolved_within_1h,
+                COUNT(CASE WHEN (julianday(t.resolved_at) - julianday(t.created_at)) * 24 <= 4 THEN 1 END) as resolved_within_4h,
+                COUNT(CASE WHEN (julianday(t.resolved_at) - julianday(t.created_at)) * 24 <= 24 THEN 1 END) as resolved_within_24h
+            FROM tickets t
+            JOIN ticket_priorities tp ON t.priority_id = tp.id
+            JOIN ticket_categories tc ON t.category_id = tc.id
+            WHERE t.resolved_at IS NOT NULL
+            AND t.created_at >= datetime('now', '-${daysAgo} days')
+            GROUP BY tp.name, tc.name
+            ORDER BY tp.name, tc.name
+        `).all();
+    }
+
+    // Get customer satisfaction tracking (if satisfaction data exists)
+    getCustomerSatisfactionReport(timeRange = '30d') {
+        const daysAgo = timeRange === '7d' ? 7 : 
+                       timeRange === '30d' ? 30 : 
+                       timeRange === '90d' ? 90 : 30;
+
+        // This would need a satisfaction table - for now return basic metrics
+        return this.db.prepare(`
+            SELECT 
+                COUNT(*) as total_resolved_tickets,
+                COUNT(CASE WHEN t.resolved_at IS NOT NULL THEN 1 END) as tickets_with_resolution,
+                AVG(CASE WHEN t.resolved_at IS NOT NULL 
+                    THEN (julianday(t.resolved_at) - julianday(t.created_at)) * 24 
+                    END) as avg_resolution_time,
+                COUNT(CASE WHEN t.resolved_at IS NOT NULL AND 
+                    (julianday(t.resolved_at) - julianday(t.created_at)) * 24 <= 8 THEN 1 END) as sla_compliant_tickets
+            FROM tickets t
+            WHERE t.created_at >= datetime('now', '-${daysAgo} days')
+        `).get();
+    }
+
+    // Get real-time dashboard metrics
+    getRealTimeDashboardMetrics() {
+        const now = new Date();
+        const today = now.toISOString().split('T')[0];
+        const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+        return this.db.prepare(`
+            SELECT 
+                (SELECT COUNT(*) FROM tickets WHERE DATE(created_at) = '${today}') as tickets_today,
+                (SELECT COUNT(*) FROM tickets WHERE DATE(created_at) = '${yesterday}') as tickets_yesterday,
+                (SELECT COUNT(*) FROM tickets WHERE status_id IN (SELECT id FROM ticket_statuses WHERE name IN ('open', 'in-progress'))) as open_tickets,
+                (SELECT COUNT(*) FROM tickets WHERE status_id IN (SELECT id FROM ticket_statuses WHERE name = 'resolved') AND DATE(resolved_at) = '${today}') as resolved_today,
+                (SELECT COUNT(*) FROM tickets WHERE assignee_id IS NULL) as unassigned_tickets,
+                (SELECT COUNT(*) FROM tickets WHERE priority_id IN (SELECT id FROM ticket_priorities WHERE name IN ('high', 'critical'))) as high_priority_tickets
+        `).get();
+    }
+
+    // Get trend analysis for dashboard
+    getTrendAnalysis(days = 7) {
+        return this.db.prepare(`
+            SELECT 
+                DATE(created_at) as date,
+                COUNT(*) as created,
+                COUNT(CASE WHEN status_id IN (SELECT id FROM ticket_statuses WHERE name = 'resolved') THEN 1 END) as resolved
+            FROM tickets 
+            WHERE created_at >= datetime('now', '-${days} days')
+            GROUP BY DATE(created_at)
+            ORDER BY date
+        `).all();
+    }
+
+    // Get top performing technicians
+    getTopPerformingTechnicians(limit = 5, timeRange = '30d') {
+        const daysAgo = timeRange === '7d' ? 7 : 
+                       timeRange === '30d' ? 30 : 
+                       timeRange === '90d' ? 90 : 30;
+
+        return this.db.prepare(`
+            SELECT 
+                u.name as technician_name,
+                COUNT(t.id) as total_resolved,
+                AVG(CASE WHEN t.resolved_at IS NOT NULL 
+                    THEN (julianday(t.resolved_at) - julianday(t.created_at)) * 24 
+                    END) as avg_resolution_hours,
+                COUNT(CASE WHEN t.resolved_at IS NOT NULL AND 
+                    (julianday(t.resolved_at) - julianday(t.created_at)) * 24 <= 8 THEN 1 END) as sla_compliant_count
+            FROM users u
+            JOIN tickets t ON u.id = t.assignee_id
+            WHERE u.role IN ('admin', 'manager', 'technician')
+            AND t.status_id IN (SELECT id FROM ticket_statuses WHERE name = 'resolved')
+            AND t.created_at >= datetime('now', '-${daysAgo} days')
+            GROUP BY u.id, u.name
+            ORDER BY total_resolved DESC
+            LIMIT ${limit}
+        `).all();
+    }
+
+    // Get system health metrics
+    getSystemHealthMetrics() {
+        return this.db.prepare(`
+            SELECT 
+                (SELECT COUNT(*) FROM tickets) as total_tickets,
+                (SELECT COUNT(*) FROM users) as total_users,
+                (SELECT COUNT(*) FROM assets) as total_assets,
+                (SELECT COUNT(*) FROM tickets WHERE status_id IN (SELECT id FROM ticket_statuses WHERE name IN ('open', 'in-progress'))) as active_tickets,
+                (SELECT COUNT(*) FROM tickets WHERE created_at >= datetime('now', '-24 hours')) as tickets_last_24h,
+                (SELECT COUNT(*) FROM tickets WHERE resolved_at >= datetime('now', '-24 hours')) as resolved_last_24h
+        `).get();
+    }
+
+    // ==================== SAVED SEARCH FILTERS ====================
+
+    // Save search filter
+    saveSearchFilter(userId, filterData) {
+        const stmt = this.db.prepare(`
+            INSERT INTO saved_search_filters (
+                user_id, name, description, filters, is_public, created_at
+            ) VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+        `);
+        
+        return stmt.run(
+            userId,
+            filterData.name,
+            filterData.description || '',
+            JSON.stringify(filterData.filters),
+            filterData.isPublic ? 1 : 0
+        );
+    }
+
+    // Get saved search filters for user
+    getSavedSearchFilters(userId) {
+        return this.db.prepare(`
+            SELECT * FROM saved_search_filters 
+            WHERE user_id = ? OR is_public = 1
+            ORDER BY created_at DESC
+        `).all(userId);
+    }
+
+    // Get saved search filter by ID
+    getSavedSearchFilter(filterId, userId) {
+        return this.db.prepare(`
+            SELECT * FROM saved_search_filters 
+            WHERE id = ? AND (user_id = ? OR is_public = 1)
+        `).get(filterId, userId);
+    }
+
+    // Update saved search filter
+    updateSavedSearchFilter(filterId, userId, filterData) {
+        const stmt = this.db.prepare(`
+            UPDATE saved_search_filters 
+            SET name = ?, description = ?, filters = ?, is_public = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ? AND user_id = ?
+        `);
+        
+        return stmt.run(
+            filterData.name,
+            filterData.description || '',
+            JSON.stringify(filterData.filters),
+            filterData.isPublic ? 1 : 0,
+            filterId,
+            userId
+        );
+    }
+
+    // Delete saved search filter
+    deleteSavedSearchFilter(filterId, userId) {
+        return this.db.prepare(`
+            DELETE FROM saved_search_filters 
+            WHERE id = ? AND user_id = ?
+        `).run(filterId, userId);
+    }
+
+    // ==================== BULK TICKET OPERATIONS ====================
+
+    // Bulk update tickets
+    async bulkUpdateTickets(ticketIds, updates, userId = null) {
+        const transaction = this.db.transaction(() => {
+            let updateFields = [];
+            let updateValues = [];
+            let changes = 0;
+            
+            // Build update fields based on provided updates
+            if (updates.status !== undefined) {
+                updateFields.push('status_id = ?');
+                const status = this.db.prepare('SELECT id FROM ticket_statuses WHERE name = ?').get(updates.status);
+                updateValues.push(status ? status.id : null);
+            }
+            
+            if (updates.priority !== undefined) {
+                updateFields.push('priority_id = ?');
+                const priority = this.db.prepare('SELECT id FROM ticket_priorities WHERE name = ?').get(updates.priority);
+                updateValues.push(priority ? priority.id : null);
+            }
+            
+            if (updates.category !== undefined) {
+                updateFields.push('category_id = ?');
+                const category = this.db.prepare('SELECT id FROM ticket_categories WHERE name = ?').get(updates.category);
+                updateValues.push(category ? category.id : null);
+            }
+            
+            if (updates.assignee !== undefined) {
+                updateFields.push('assignee_id = ?');
+                const assignee = updates.assignee ? this.getUserByEmail(updates.assignee) : null;
+                updateValues.push(assignee ? assignee.id : null);
+            }
+            
+            // Always update the updated_at timestamp
+            updateFields.push('updated_at = CURRENT_TIMESTAMP');
+            
+            if (updateFields.length === 0) {
+                return { changes: 0, updatedTickets: [] };
+            }
+            
+            const updateQuery = `UPDATE tickets SET ${updateFields.join(', ')} WHERE id IN (${ticketIds.map(() => '?').join(',')})`;
+            const allValues = [...updateValues, ...ticketIds];
+            
+            const stmt = this.db.prepare(updateQuery);
+            const result = stmt.run(...allValues);
+            changes = result.changes;
+            
+            // Create timeline entries for each updated ticket
+            const updatedTickets = [];
+            for (const ticketId of ticketIds) {
+                const ticket = this.getTicketById(ticketId);
+                if (ticket) {
+                    updatedTickets.push(ticket);
+                    
+                    // Create timeline entry for the bulk update
+                    let content = 'Bulk update applied: ';
+                    const changes = [];
+                    
+                    if (updates.status !== undefined) {
+                        changes.push(`Status changed to ${updates.status}`);
+                    }
+                    if (updates.priority !== undefined) {
+                        changes.push(`Priority changed to ${updates.priority}`);
+                    }
+                    if (updates.category !== undefined) {
+                        changes.push(`Category changed to ${updates.category}`);
+                    }
+                    if (updates.assignee !== undefined) {
+                        changes.push(`Assignee changed to ${updates.assignee || 'Unassigned'}`);
+                    }
+                    
+                    content += changes.join(', ');
+                    
+                    this.createTimelineEntry(ticketId, {
+                        author: userId ? this.getUserById(userId).name : 'System',
+                        authorType: userId ? 'agent' : 'system',
+                        content: content,
+                        entryType: 'bulk-update'
+                    });
+                }
+            }
+            
+            return { changes, updatedTickets };
+        });
+        
+        return transaction();
+    }
+
+    // Bulk delete tickets
+    async bulkDeleteTickets(ticketIds, userId = null) {
+        const transaction = this.db.transaction(() => {
+            let deletedTickets = [];
+            
+            // Get ticket details before deletion for timeline entries
+            for (const ticketId of ticketIds) {
+                const ticket = this.getTicketById(ticketId);
+                if (ticket) {
+                    deletedTickets.push(ticket);
+                }
+            }
+            
+            // Delete timeline entries first (due to foreign key constraints)
+            const deleteTimelineStmt = this.db.prepare('DELETE FROM ticket_timeline WHERE ticket_id IN (' + ticketIds.map(() => '?').join(',') + ')');
+            deleteTimelineStmt.run(...ticketIds);
+            
+            // Delete tickets
+            const deleteTicketsStmt = this.db.prepare('DELETE FROM tickets WHERE id IN (' + ticketIds.map(() => '?').join(',') + ')');
+            const result = deleteTicketsStmt.run(...ticketIds);
+            
+            return { changes: result.changes, deletedTickets };
+        });
+        
+        return transaction();
+    }
+
+    // Bulk export tickets
+    async bulkExportTickets(ticketIds, format = 'json') {
+        const tickets = [];
+        
+        for (const ticketId of ticketIds) {
+            const ticket = this.getTicketById(ticketId);
+            if (ticket) {
+                tickets.push(ticket);
+            }
+        }
+        
+        if (format === 'csv') {
+            // Convert to CSV format
+            const csvHeaders = [
+                'Ticket ID', 'Subject', 'Description', 'Status', 'Priority', 'Category',
+                'Requester', 'Assignee', 'Created At', 'Updated At'
+            ];
+            
+            const csvRows = tickets.map(ticket => [
+                ticket.ticket_id,
+                ticket.subject,
+                ticket.description,
+                ticket.status_name,
+                ticket.priority_name,
+                ticket.category_name,
+                ticket.requester_name,
+                ticket.assignee_name,
+                ticket.created_at,
+                ticket.updated_at
+            ]);
+            
+            const csvContent = [csvHeaders, ...csvRows]
+                .map(row => row.map(cell => `"${cell || ''}"`).join(','))
+                .join('\n');
+            
+            return { format: 'csv', data: csvContent, filename: `tickets-export-${new Date().toISOString().split('T')[0]}.csv` };
+        }
+        
+        return { format: 'json', data: tickets, filename: `tickets-export-${new Date().toISOString().split('T')[0]}.json` };
+    }
+
+    // Bulk apply template to tickets
+    async bulkApplyTemplate(ticketIds, templateId, userId = null) {
+        const transaction = this.db.transaction(() => {
+            // Get template details
+            const template = this.db.prepare('SELECT * FROM ticket_templates WHERE id = ?').get(templateId);
+            if (!template) {
+                throw new Error('Template not found');
+            }
+            
+            let updatedTickets = [];
+            
+            for (const ticketId of ticketIds) {
+                const ticket = this.getTicketById(ticketId);
+                if (ticket) {
+                    // Apply template updates
+                    const updates = {};
+                    
+                    if (template.category) {
+                        updates.category = template.category;
+                    }
+                    if (template.priority) {
+                        updates.priority = template.priority;
+                    }
+                    
+                    // Update ticket
+                    this.updateTicket(ticketId, updates);
+                    
+                    // Create timeline entry
+                    this.createTimelineEntry(ticketId, {
+                        author: userId ? this.getUserById(userId).name : 'System',
+                        authorType: userId ? 'agent' : 'system',
+                        content: `Template "${template.name}" applied to this ticket`,
+                        entryType: 'template-applied'
+                    });
+                    
+                    updatedTickets.push(this.getTicketById(ticketId));
+                }
+            }
+            
+            return { changes: updatedTickets.length, updatedTickets };
+        });
+        
+        return transaction();
+    }
+
     // ==================== ASSET SERVICES ====================
 
     // Get all assets with related data
