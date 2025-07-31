@@ -588,7 +588,7 @@
                     </select>
                 </div>
                 <div class="filter-group">
-                    <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+                    <button class="btn btn-primary" id="applyFiltersBtn">Apply Filters</button>
                 </div>
             </div>
         </div>
@@ -784,6 +784,14 @@
                     applyFilters();
                 }
             });
+
+            // Filter dropdowns - apply filters when changed
+            document.getElementById('roleFilter').addEventListener('change', applyFilters);
+            document.getElementById('statusFilter').addEventListener('change', applyFilters);
+            document.getElementById('sortBy').addEventListener('change', applyFilters);
+
+            // Apply filters button
+            document.getElementById('applyFiltersBtn').addEventListener('click', applyFilters);
 
             // Form submissions
             document.getElementById('createUserForm').addEventListener('submit', createUser);
