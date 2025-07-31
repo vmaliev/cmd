@@ -253,13 +253,28 @@ router.get('/:id', requireRole(['admin', 'manager']), [
     }
 
     // Get user profile
-    const profile = profileServices.getUserProfile(userId);
+    let profile = null;
+    try {
+        profile = profileServices.getUserProfile(userId);
+    } catch (error) {
+        console.error('Error getting user profile:', error);
+    }
 
     // Get user permissions
-    const permissions = roleServices.getUserPermissions(userId);
+    let permissions = null;
+    try {
+        permissions = roleServices.getUserPermissions(userId);
+    } catch (error) {
+        console.error('Error getting user permissions:', error);
+    }
 
     // Get recent activity
-    const recentActivity = profileServices.getUserActivityLog(userId, 10);
+    let recentActivity = null;
+    try {
+        recentActivity = profileServices.getUserActivityLog(userId, 10);
+    } catch (error) {
+        console.error('Error getting user activity log:', error);
+    }
 
     res.json({
       user,
