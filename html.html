@@ -258,14 +258,24 @@
                             </div>
                             <label for="description">Description *</label>
                             <textarea id="description" rows="5" required></textarea>
-                            <label for="category">Category</label>
-                            <select id="category">
-                                <option value="hardware">Hardware</option>
-                                <option value="software">Software</option>
-                                <option value="network">Network</option>
-                                <option value="access">Access/Permissions</option>
-                                <option value="other">Other</option>
-                            </select>
+                            <div class="form-row">
+                                <div>
+                                    <label for="category">Category</label>
+                                    <select id="category">
+                                        <option value="hardware">Hardware</option>
+                                        <option value="software">Software</option>
+                                        <option value="network">Network</option>
+                                        <option value="access">Access/Permissions</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="template">Use Template (Optional)</label>
+                                    <select id="template">
+                                        <option value="">No Template</option>
+                                    </select>
+                                </div>
+                            </div>
                             
                             <!-- File Attachments Section -->
                             <div class="form-section">
@@ -1077,6 +1087,8 @@
                 // Clear file attachments
                 document.getElementById('selected-files').innerHTML = '';
                 document.getElementById('file-info').textContent = 'No files selected';
+                // Load templates
+                loadTemplates();
                 ticketModal.style.display = 'flex';
             });
             closeTicketModal.addEventListener('click', function() {
@@ -1174,6 +1186,68 @@
                 const sizes = ['Bytes', 'KB', 'MB', 'GB'];
                 const i = Math.floor(Math.log(bytes) / Math.log(k));
                 return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            // Load available templates
+            async function loadTemplates() {
+                const templateSelect = document.getElementById('template');
+                
+                try {
+                    const response = await fetch('/api/templates');
+                    if (!response.ok) {
+                        throw new Error('Failed to load templates');
+                    }
+                    
+                    const templates = await response.json();
+                    
+                    // Clear existing options except the first one
+                    templateSelect.innerHTML = '<option value="">No Template</option>';
+                    
+                    templates.forEach(template => {
+                        const option = document.createElement('option');
+                        option.value = template.id;
+                        option.textContent = template.name;
+                        templateSelect.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error('Error loading templates:', error);
+                }
+            }
+
+            // Handle template selection
+            document.getElementById('template').addEventListener('change', async function() {
+                const templateId = this.value;
+                if (!templateId) return;
+                
+                try {
+                    const response = await fetch(`/api/templates/${templateId}`);
+                    if (!response.ok) {
+                        throw new Error('Failed to load template');
+                    }
+                    
+                    const template = await response.json();
+                    
+                    // Populate form with template data
+                    document.getElementById('subject').value = template.subject_template;
+                    document.getElementById('description').value = template.description_template;
+                    document.getElementById('category').value = template.category_name || 'other';
+                    document.getElementById('priority').value = template.priority_name || 'medium';
+                    
+                    // If template has variables, show a modal to fill them
+                    if (template.variables && template.variables.length > 0) {
+                        showTemplateVariablesModal(template);
+                    }
+                } catch (error) {
+                    console.error('Error loading template:', error);
+                    alert('Error loading template: ' + error.message);
+                }
+            });
+
+            // Show template variables modal
+            function showTemplateVariablesModal(template) {
+                // For now, just show an alert with the template info
+                // In a full implementation, you'd create a modal with form fields for each variable
+                alert(`Template "${template.name}" loaded with ${template.variables.length} variables. Please fill in the required information.`);
             }
 
             // Load and display ticket attachments
