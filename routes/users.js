@@ -27,7 +27,10 @@ router.get('/', requireRole(['admin', 'manager']), [
   query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
   query('search').optional().isString().trim(),
   query('role').optional().isString().trim(),
-  query('status').optional().isIn(['active', 'inactive']),
+  query('status').optional().custom((value) => {
+    if (value === '' || value === null || value === undefined) return true;
+    return ['active', 'inactive'].includes(value);
+  }).withMessage('Status must be either "active" or "inactive"'),
   query('sortBy').optional().isIn(['created_at', 'name', 'email', 'role', 'last_login', 'updated_at']),
   query('sortOrder').optional().isIn(['asc', 'desc'])
 ], async (req, res) => {

@@ -1122,13 +1122,19 @@
         }
 
         function applyFilters() {
-            currentFilters = {
-                search: document.getElementById('searchInput').value,
-                role: document.getElementById('roleFilter').value,
-                status: document.getElementById('statusFilter').value,
-                sortBy: document.getElementById('sortBy').value,
-                sortOrder: 'desc'
-            };
+            currentFilters = {};
+            
+            const searchValue = document.getElementById('searchInput').value.trim();
+            const roleValue = document.getElementById('roleFilter').value;
+            const statusValue = document.getElementById('statusFilter').value;
+            const sortByValue = document.getElementById('sortBy').value;
+            
+            if (searchValue) currentFilters.search = searchValue;
+            if (roleValue) currentFilters.role = roleValue;
+            if (statusValue) currentFilters.status = statusValue;
+            if (sortByValue) currentFilters.sortBy = sortByValue;
+            
+            currentFilters.sortOrder = 'desc';
             
             currentPage = 1;
             loadUsers();
