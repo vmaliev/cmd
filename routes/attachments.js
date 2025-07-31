@@ -39,15 +39,15 @@ const handleValidationErrors = (req, res, next) => {
     next();
 };
 
-// Test simple endpoint
-router.get('/test-simple',
+// Test simple endpoint (must come before /attachments/:attachmentId routes)
+router.get('/test-simple-route',
     (req, res) => {
         console.log('=== SIMPLE TEST ROUTE CALLED ===');
         res.json({ message: 'Simple test route working' });
     }
 );
 
-// Test file upload endpoint
+// Test file upload endpoint (must come before /attachments/:attachmentId routes)
 router.post('/test-upload',
     (req, res) => {
         try {
@@ -94,17 +94,13 @@ router.get('/attachments/stats',
 router.get('/tickets/:ticketId/attachments',
     (req, res) => {
         try {
-            // Try to parse as integer for database lookup
-            const ticketId = parseInt(req.params.ticketId);
-            if (!isNaN(ticketId)) {
-                const attachments = getAttachmentServices().getTicketAttachments(ticketId);
-                res.json(attachments);
-                return;
-            }
+            const ticketId = req.params.ticketId;
+            console.log('Getting attachments for ticket:', ticketId);
             
-            // If not an integer, return empty array for now (tickets in JSON don't have attachments yet)
-            // TODO: Implement attachment support for JSON-based tickets
-            res.json([]);
+            const attachments = getAttachmentServices().getTicketAttachments(ticketId);
+            console.log('Found attachments:', attachments);
+            
+            res.json(attachments);
         } catch (error) {
             console.error('Error getting ticket attachments:', error);
             res.status(500).json({ error: 'Failed to get attachments' });

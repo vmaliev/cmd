@@ -1,6 +1,46 @@
 {
   "tickets": [
     {
+      "id": "TKT-008",
+      "subject": "dfgdsfaggasdsgh",
+      "requester": "2384y28347y",
+      "assignee": "Unassigned",
+      "priority": "medium",
+      "status": "open",
+      "date": "2025-07-31",
+      "email": "vmaliev@gmail.com",
+      "description": "cvbfdsghdhdshfsd",
+      "category": "hardware",
+      "createdDate": "2025-07-31T10:55:21.604Z",
+      "lastUpdated": "2025-07-31T10:55:21.604Z",
+      "timeline": [
+        {
+          "id": "timeline-1753959321604-1",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-31T10:55:21.604Z",
+          "content": "Hello 2384y28347y! Thank you for submitting your ticket. We have received your request and will begin working on it shortly.",
+          "type": "greeting"
+        },
+        {
+          "id": "timeline-1753959321604-2",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-31T10:55:21.604Z",
+          "content": "This ticket has been classified as MEDIUM priority. Expected response time: 4-8 hours. Our team will begin working on this shortly.",
+          "type": "priority-info"
+        },
+        {
+          "id": "timeline-1753959321604-3",
+          "author": "System",
+          "authorType": "system",
+          "date": "2025-07-31T10:55:21.604Z",
+          "content": "Ticket created with ID: TKT-008. Status: Open.",
+          "type": "creation"
+        }
+      ]
+    },
+    {
       "id": "TKT-007",
       "subject": "fdgdsgrsre",
       "requester": "2384y28347y",

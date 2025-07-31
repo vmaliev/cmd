@@ -96,8 +96,18 @@ class AttachmentServices {
 
             console.log('Saving file to:', filePath);
 
-            // Save file to disk
-            fs.writeFileSync(filePath, fileData.data);
+            // Save file to disk using express-fileupload's mv method
+            if (fileData.tempFilePath && fs.existsSync(fileData.tempFilePath)) {
+                // Move the temporary file to our upload directory
+                fs.copyFileSync(fileData.tempFilePath, filePath);
+                // Clean up the temporary file
+                fs.unlinkSync(fileData.tempFilePath);
+            } else if (fileData.data && fileData.data.length > 0) {
+                // Fallback: write buffer data if available
+                fs.writeFileSync(filePath, fileData.data);
+            } else {
+                throw new Error('No file data available');
+            }
 
             // Handle both integer and string ticket IDs
             const isInteger = Number.isInteger(ticketId) || (typeof ticketId === 'string' && !isNaN(parseInt(ticketId)));
