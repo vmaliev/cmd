@@ -266,6 +266,19 @@
                                 <option value="access">Access/Permissions</option>
                                 <option value="other">Other</option>
                             </select>
+                            
+                            <!-- File Attachments Section -->
+                            <div class="form-section">
+                                <label for="attachments">Attachments (Optional)</label>
+                                <div class="file-upload-container">
+                                    <input type="file" id="attachments" multiple accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.txt,.csv,.xls,.xlsx" style="display: none;">
+                                    <button type="button" class="btn btn-secondary" id="browse-files">📎 Browse Files</button>
+                                    <span id="file-info" class="file-info">No files selected</span>
+                                </div>
+                                <div id="selected-files" class="selected-files"></div>
+                                <small class="form-help">Supported formats: Images (JPG, PNG, GIF), Documents (PDF, DOC, DOCX, TXT, CSV, XLS, XLSX). Max size: 10MB per file.</small>
+                            </div>
+                            
                             <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
                                 <button type="button" class="btn btn-secondary" id="cancel-ticket">Cancel</button>
                                 <button type="submit" class="btn">Submit Ticket</button>
@@ -325,6 +338,12 @@
                                 <div class="detail-row">
                                     <div class="detail-label">Description:</div>
                                     <div id="ticket-description">My laptop cannot connect to the company Wi-Fi network. I've tried restarting the computer and the router, but the issue persists. The Wi-Fi icon shows no available networks.</div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-label">Attachments:</div>
+                                    <div id="ticket-attachments">
+                                        <div class="no-attachments">No attachments</div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="timeline">
@@ -1009,6 +1028,9 @@
                             // Render timeline
                             renderTicketTimeline(ticket);
                             
+                            // Load and display attachments
+                            await loadTicketAttachments(ticket.id);
+                            
                             // Store current ticket ID for note form
                             document.getElementById('note-form').setAttribute('data-ticket-id', ticket.id);
                         }
@@ -1052,6 +1074,9 @@
             document.querySelectorAll('.view-ticket').forEach(attachViewTicketListener);
             newTicketBtn.addEventListener('click', function() {
                 ticketForm.reset();
+                // Clear file attachments
+                document.getElementById('selected-files').innerHTML = '';
+                document.getElementById('file-info').textContent = 'No files selected';
                 ticketModal.style.display = 'flex';
             });
             closeTicketModal.addEventListener('click', function() {
@@ -1073,6 +1098,117 @@
                     viewTicketModal.style.display = 'none';
                 }
             });
+
+            // --- File Upload Handling ---
+            const browseFilesBtn = document.getElementById('browse-files');
+            const fileInput = document.getElementById('attachments');
+            const selectedFilesContainer = document.getElementById('selected-files');
+            const fileInfo = document.getElementById('file-info');
+            let selectedFiles = [];
+
+            browseFilesBtn.addEventListener('click', function() {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', function(e) {
+                const files = Array.from(e.target.files);
+                selectedFiles = files;
+                
+                // Update file info
+                if (files.length === 0) {
+                    fileInfo.textContent = 'No files selected';
+                    selectedFilesContainer.innerHTML = '';
+                    return;
+                }
+                
+                fileInfo.textContent = `${files.length} file(s) selected`;
+                selectedFilesContainer.innerHTML = '';
+                
+                files.forEach((file, index) => {
+                    const fileElement = document.createElement('div');
+                    fileElement.className = 'selected-file';
+                    fileElement.innerHTML = `
+                        <span class="file-name">${file.name}</span>
+                        <span class="file-size">${formatFileSize(file.size)}</span>
+                        <button type="button" class="remove-file" data-index="${index}">×</button>
+                    `;
+                    selectedFilesContainer.appendChild(fileElement);
+                });
+            });
+
+            // Remove file when X button is clicked
+            selectedFilesContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-file')) {
+                    const index = parseInt(e.target.getAttribute('data-index'));
+                    selectedFiles.splice(index, 1);
+                    
+                    // Update file input
+                    const dt = new DataTransfer();
+                    selectedFiles.forEach(file => dt.items.add(file));
+                    fileInput.files = dt.files;
+                    
+                    // Update display
+                    if (selectedFiles.length === 0) {
+                        fileInfo.textContent = 'No files selected';
+                        selectedFilesContainer.innerHTML = '';
+                    } else {
+                        fileInfo.textContent = `${selectedFiles.length} file(s) selected`;
+                        selectedFilesContainer.innerHTML = '';
+                        selectedFiles.forEach((file, index) => {
+                            const fileElement = document.createElement('div');
+                            fileElement.className = 'selected-file';
+                            fileElement.innerHTML = `
+                                <span class="file-name">${file.name}</span>
+                                <span class="file-size">${formatFileSize(file.size)}</span>
+                                <button type="button" class="remove-file" data-index="${index}">×</button>
+                            `;
+                            selectedFilesContainer.appendChild(fileElement);
+                        });
+                    }
+                }
+            });
+
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            // Load and display ticket attachments
+            async function loadTicketAttachments(ticketId) {
+                const attachmentsContainer = document.getElementById('ticket-attachments');
+                
+                try {
+                    const response = await fetch(`/api/tickets/${ticketId}/attachments`);
+                    if (!response.ok) {
+                        throw new Error('Failed to load attachments');
+                    }
+                    
+                    const attachments = await response.json();
+                    
+                    if (attachments.length === 0) {
+                        attachmentsContainer.innerHTML = '<div class="no-attachments">No attachments</div>';
+                        return;
+                    }
+                    
+                    attachmentsContainer.innerHTML = '';
+                    attachments.forEach(attachment => {
+                        const attachmentElement = document.createElement('div');
+                        attachmentElement.className = 'ticket-attachment';
+                        attachmentElement.innerHTML = `
+                            <span class="attachment-name">${attachment.original_filename}</span>
+                            <span class="attachment-size">${formatFileSize(attachment.file_size)}</span>
+                            <a href="/api/attachments/${attachment.id}/download" class="download-attachment" target="_blank">Download</a>
+                        `;
+                        attachmentsContainer.appendChild(attachmentElement);
+                    });
+                } catch (error) {
+                    console.error('Error loading attachments:', error);
+                    attachmentsContainer.innerHTML = '<div class="no-attachments">Error loading attachments</div>';
+                }
+            }
 
             // --- Backend Persistence ---
             async function fetchTickets() {
@@ -1259,6 +1395,7 @@
                 const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
                 const formattedDate = now.toLocaleDateString('en-US', dateOptions);
                 const isoDate = now.toISOString().split('T')[0];
+                
                 // Generate ticket ID (let backend handle uniqueness, but for now mimic old logic)
                 const tickets = await fetchTickets();
                 let ticketCounter = 4;
@@ -1281,15 +1418,43 @@
                     description,
                     category
                 };
+                
                 try {
+                    // First create the ticket
                     const res = await fetch('/api/tickets', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(ticket)
                     });
+                    
                     if (!res.ok) throw new Error('Failed to create ticket');
+                    
+                    const createdTicket = await res.json();
+                    
+                    // Upload attachments if any files are selected
+                    if (selectedFiles.length > 0) {
+                        for (const file of selectedFiles) {
+                            const formData = new FormData();
+                            formData.append('file', file);
+                            
+                            const attachmentRes = await fetch(`/api/tickets/${createdTicket.id}/attachments`, {
+                                method: 'POST',
+                                body: formData
+                            });
+                            
+                            if (!attachmentRes.ok) {
+                                console.warn(`Failed to upload attachment ${file.name}:`, await attachmentRes.text());
+                            }
+                        }
+                    }
+                    
                     ticketModal.style.display = 'none';
                     ticketForm.reset();
+                    // Clear file attachments
+                    selectedFiles = [];
+                    document.getElementById('selected-files').innerHTML = '';
+                    document.getElementById('file-info').textContent = 'No files selected';
+                    
                     await renderTickets();
                     await updateDashboardStats();
                     alert(`Ticket #${ticketId} has been created successfully!`);

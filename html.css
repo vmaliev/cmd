@@ -270,7 +270,115 @@
             gap: 15px;
         }
         
-        /* Modal styles */
+        /* File Upload Styles */
+.file-upload-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.file-info {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.selected-files {
+    margin-top: 10px;
+}
+
+.selected-file {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.selected-file .file-name {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.selected-file .file-size {
+    color: #666;
+    font-size: 0.8rem;
+    margin-right: 10px;
+}
+
+.selected-file .remove-file {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 2px 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.selected-file .remove-file:hover {
+    background: #c82333;
+}
+
+.form-help {
+    color: #6c757d;
+    font-size: 0.8rem;
+    margin-top: 5px;
+    display: block;
+}
+
+.form-section {
+    margin-bottom: 20px;
+}
+
+.no-attachments {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.ticket-attachment {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+.ticket-attachment .attachment-name {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.ticket-attachment .attachment-size {
+    color: #666;
+    font-size: 0.8rem;
+    margin-right: 10px;
+}
+
+.ticket-attachment .download-attachment {
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    text-decoration: none;
+}
+
+.ticket-attachment .download-attachment:hover {
+    background: #0056b3;
+}
+
+/* Modal styles */
         .modal {
             display: none;
             position: fixed;
