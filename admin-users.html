@@ -774,16 +774,7 @@
             document.getElementById('sortRole').addEventListener('click', () => setSort('role'));
             document.getElementById('sortStatus').addEventListener('click', () => setSort('is_active'));
             document.getElementById('sortLastLogin').addEventListener('click', () => setSort('last_login'));
-            // Modal close buttons
-            document.querySelector('.close-create-user-modal').addEventListener('click', function() {
-                closeModal('createUserModal');
-            });
-            document.querySelector('.close-edit-user-modal').addEventListener('click', function() {
-                closeModal('editUserModal');
-            });
-            document.querySelector('.close-import-user-modal').addEventListener('click', function() {
-                closeModal('importUserModal');
-            });
+            // Modal close buttons - moved to setupEventListeners for better reliability
         });
 
         function setupEventListeners() {
@@ -801,22 +792,86 @@
             // Import button
             document.getElementById('importSubmitBtn').addEventListener('click', importUsers);
             
+            // Click outside modal to close
+            window.addEventListener('click', function(event) {
+                const modals = document.querySelectorAll('.modal');
+                modals.forEach(modal => {
+                    if (event.target === modal) {
+                        console.log('Clicking outside modal to close:', modal.id);
+                        closeModal(modal.id);
+                    }
+                });
+            });
+            
+            // Modal close buttons (X buttons)
+            const closeCreateBtn = document.querySelector('.close-create-user-modal');
+            if (closeCreateBtn) {
+                closeCreateBtn.addEventListener('click', function() {
+                    console.log('Closing create user modal');
+                    closeModal('createUserModal');
+                    document.getElementById('createUserForm').reset();
+                });
+            } else {
+                console.error('Close create user modal button not found');
+            }
+            
+            const closeEditBtn = document.querySelector('.close-edit-user-modal');
+            if (closeEditBtn) {
+                closeEditBtn.addEventListener('click', function() {
+                    console.log('Closing edit user modal');
+                    closeModal('editUserModal');
+                });
+            } else {
+                console.error('Close edit user modal button not found');
+            }
+            
+            const closeImportBtn = document.querySelector('.close-import-user-modal');
+            if (closeImportBtn) {
+                closeImportBtn.addEventListener('click', function() {
+                    console.log('Closing import user modal');
+                    closeModal('importUserModal');
+                    document.getElementById('importFile').value = '';
+                    document.getElementById('importPreview').style.display = 'none';
+                    document.getElementById('importSubmitBtn').disabled = true;
+                });
+            } else {
+                console.error('Close import user modal button not found');
+            }
+            
             // Modal cancel buttons
-            document.querySelector('.cancel-create-user-btn').addEventListener('click', function() {
-                closeModal('createUserModal');
-                document.getElementById('createUserForm').reset();
-            });
+            const cancelCreateBtn = document.querySelector('.cancel-create-user-btn');
+            if (cancelCreateBtn) {
+                cancelCreateBtn.addEventListener('click', function() {
+                    console.log('Canceling create user modal');
+                    closeModal('createUserModal');
+                    document.getElementById('createUserForm').reset();
+                });
+            } else {
+                console.error('Cancel create user modal button not found');
+            }
             
-            document.querySelector('.cancel-edit-user-btn').addEventListener('click', function() {
-                closeModal('editUserModal');
-            });
+            const cancelEditBtn = document.querySelector('.cancel-edit-user-btn');
+            if (cancelEditBtn) {
+                cancelEditBtn.addEventListener('click', function() {
+                    console.log('Canceling edit user modal');
+                    closeModal('editUserModal');
+                });
+            } else {
+                console.error('Cancel edit user modal button not found');
+            }
             
-            document.querySelector('.cancel-import-user-btn').addEventListener('click', function() {
-                closeModal('importUserModal');
-                document.getElementById('importFile').value = '';
-                document.getElementById('importPreview').style.display = 'none';
-                document.getElementById('importSubmitBtn').disabled = true;
-            });
+            const cancelImportBtn = document.querySelector('.cancel-import-user-btn');
+            if (cancelImportBtn) {
+                cancelImportBtn.addEventListener('click', function() {
+                    console.log('Canceling import user modal');
+                    closeModal('importUserModal');
+                    document.getElementById('importFile').value = '';
+                    document.getElementById('importPreview').style.display = 'none';
+                    document.getElementById('importSubmitBtn').disabled = true;
+                });
+            } else {
+                console.error('Cancel import user modal button not found');
+            }
         }
 
         function addTableEventListeners() {
@@ -1246,7 +1301,14 @@
         }
 
         function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
+            console.log('Closing modal:', modalId);
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+                console.log('Modal closed successfully:', modalId);
+            } else {
+                console.error('Modal not found:', modalId);
+            }
         }
 
         async function createUser(event) {
