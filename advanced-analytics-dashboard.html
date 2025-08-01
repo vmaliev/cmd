@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Analytics Dashboard - IT Support System</title>
+    <link rel="stylesheet" href="html.css">
+    <script src="chart.min.js"></script>
+    <style>
+        .advanced-analytics-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .advanced-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .advanced-title {
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .advanced-subtitle {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            margin-top: 5px;
+        }
+
+        .advanced-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .time-range-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .time-range-selector label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .time-range-selector select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .metric-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .metric-change {
+            font-size: 0.8em;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .metric-change.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .metric-change.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .metric-change.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .metric-change.critical {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        .advanced-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 600;
+            color: #7f8c8d;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .insight-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #3498db;
+        }
+
+        .insight-card.critical {
+            border-left-color: #e74c3c;
+        }
+
+        .insight-card.high {
+            border-left-color: #f39c12;
+        }
+
+        .insight-card.medium {
+            border-left-color: #f39c12;
+        }
+
+        .insight-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .insight-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+
+        .insight-priority {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .insight-priority.critical {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .insight-priority.high {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .insight-priority.medium {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .insight-description {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .insight-recommendation {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 3px solid #3498db;
+        }
+
+        .insight-recommendation h4 {
+            margin: 0 0 10px 0;
+            color: #2c3e50;
+            font-size: 0.9em;
+        }
+
+        .insight-recommendation p {
+            margin: 0;
+            color: #7f8c8d;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+
+        .anomaly-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .anomaly-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border-left: 3px solid #e74c3c;
+        }
+
+        .anomaly-item.critical {
+            border-left-color: #e74c3c;
+            background: #f8d7da;
+        }
+
+        .anomaly-item.high {
+            border-left-color: #f39c12;
+            background: #fff3cd;
+        }
+
+        .anomaly-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .anomaly-date {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .anomaly-severity {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .anomaly-severity.critical {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .anomaly-severity.high {
+            background: #f39c12;
+            color: white;
+        }
+
+        .anomaly-details {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .correlation-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .correlation-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+
+        .correlation-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .correlation-value.strong {
+            color: #27ae60;
+        }
+
+        .correlation-value.moderate {
+            color: #f39c12;
+        }
+
+        .correlation-value.weak {
+            color: #95a5a6;
+        }
+
+        .correlation-label {
+            color: #7f8c8d;
+            font-size: 0.8em;
+        }
+
+        .forecast-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .forecast-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+
+        .forecast-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+
+        .forecast-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .forecast-confidence {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .forecast-confidence.high {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .forecast-confidence.medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .forecast-confidence.low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .real-time-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #27ae60;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .advanced-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+            
+            .advanced-controls {
+                justify-content: center;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-wrapper {
+                height: 250px;
+            }
+
+            .advanced-tabs {
+                flex-direction: column;
+            }
+
+            .insights-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="advanced-analytics-container">
+        <!-- Header -->
+        <div class="advanced-header">
+            <div>
+                <h1 class="advanced-title">Advanced Analytics Dashboard</h1>
+                <p class="advanced-subtitle">Predictive Analytics • Anomaly Detection • Correlation Analysis • Actionable Insights</p>
+            </div>
+            <div class="advanced-controls">
+                <div class="time-range-selector">
+                    <label for="timeRange">Time Range:</label>
+                    <select id="timeRange" onchange="changeTimeRange()">
+                        <option value="30d">Last 30 Days</option>
+                        <option value="90d" selected>Last 90 Days</option>
+                        <option value="180d">Last 180 Days</option>
+                        <option value="1y">Last Year</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="refreshData()">
+                    <span>🔄</span> Refresh
+                </button>
+                <button class="btn btn-success" onclick="exportAdvancedData()">
+                    <span>📊</span> Export
+                </button>
+                <a href="/analytics-dashboard.html" class="btn btn-secondary">
+                    <span>📈</span> Basic Analytics
+                </a>
+                <a href="/" class="btn btn-secondary">
+                    <span>🏠</span> Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Real-time Status -->
+        <div class="real-time-indicator" id="realTimeIndicator"></div>
+        <span id="lastUpdate">Last updated: Never</span>
+
+        <!-- Key Metrics -->
+        <div class="dashboard-grid">
+            <div class="metric-card">
+                <div class="metric-number" id="predictedUsers">-</div>
+                <div class="metric-label">Predicted Users (Next Month)</div>
+                <div class="metric-change positive" id="predictionConfidence">High Confidence</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number" id="anomalyCount">-</div>
+                <div class="metric-label">Anomalies Detected</div>
+                <div class="metric-change warning" id="anomalyStatus">Monitoring</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number" id="insightCount">-</div>
+                <div class="metric-label">Actionable Insights</div>
+                <div class="metric-change positive" id="insightPriority">High Priority</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-number" id="correlationStrength">-</div>
+                <div class="metric-label">Strongest Correlation</div>
+                <div class="metric-change positive" id="correlationType">User Activity</div>
+            </div>
+        </div>
+
+        <!-- Advanced Analytics Tabs -->
+        <div class="advanced-tabs">
+            <button class="tab-button active" data-tab="predictive">Predictive Analytics</button>
+            <button class="tab-button" data-tab="anomalies">Anomaly Detection</button>
+            <button class="tab-button" data-tab="correlations">Correlation Analysis</button>
+            <button class="tab-button" data-tab="insights">Actionable Insights</button>
+            <button class="tab-button" data-tab="forecasts">Forecasts</button>
+        </div>
+
+        <!-- Predictive Analytics Tab -->
+        <div id="predictiveTab" class="tab-content active">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">User Growth Trend & Forecast</h3>
+                    <div class="chart-controls">
+                        <button class="btn btn-secondary btn-sm" onclick="updatePredictiveChart('growth')">Growth</button>
+                        <button class="btn btn-secondary btn-sm" onclick="updatePredictiveChart('login')">Logins</button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="predictiveChart"></canvas>
+                </div>
+            </div>
+
+            <div class="forecast-container">
+                <div class="forecast-card">
+                    <div class="forecast-value" id="nextWeekUsers">-</div>
+                    <div class="forecast-label">Predicted New Users (Next Week)</div>
+                    <div class="forecast-confidence high" id="weekConfidence">High Confidence</div>
+                </div>
+                <div class="forecast-card">
+                    <div class="forecast-value" id="nextMonthUsers">-</div>
+                    <div class="forecast-label">Predicted New Users (Next Month)</div>
+                    <div class="forecast-confidence high" id="monthConfidence">High Confidence</div>
+                </div>
+                <div class="forecast-card">
+                    <div class="forecast-value" id="nextWeekLogins">-</div>
+                    <div class="forecast-label">Predicted Logins (Next Week)</div>
+                    <div class="forecast-confidence high" id="loginConfidence">High Confidence</div>
+                </div>
+                <div class="forecast-card">
+                    <div class="forecast-value" id="nextMonthLogins">-</div>
+                    <div class="forecast-label">Predicted Logins (Next Month)</div>
+                    <div class="forecast-confidence high" id="loginMonthConfidence">High Confidence</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Anomaly Detection Tab -->
+        <div id="anomaliesTab" class="tab-content">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Anomaly Detection Overview</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="anomalyChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Recent Anomalies</h3>
+                </div>
+                <div class="anomaly-list" id="anomalyList">
+                    <div class="loading">Loading anomalies...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Correlation Analysis Tab -->
+        <div id="correlationsTab" class="tab-content">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Correlation Matrix</h3>
+                </div>
+                <div class="correlation-matrix" id="correlationMatrix">
+                    <div class="loading">Loading correlations...</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Role-Based Engagement Correlations</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="roleCorrelationChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actionable Insights Tab -->
+        <div id="insightsTab" class="tab-content">
+            <div class="insights-grid" id="insightsGrid">
+                <div class="loading">Loading insights...</div>
+            </div>
+        </div>
+
+        <!-- Forecasts Tab -->
+        <div id="forecastsTab" class="tab-content">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Seasonal Patterns & Trends</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="seasonalityChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3 class="chart-title">Confidence Intervals</h3>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="confidenceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTimeRange = '90d';
+        let charts = {};
+        let realTimeInterval;
+        let advancedData = {};
+
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAdvancedAnalytics();
+            startRealTimeUpdates();
+            setupTabListeners();
+        });
+
+        function changeTimeRange() {
+            currentTimeRange = document.getElementById('timeRange').value;
+            loadAdvancedAnalytics();
+        }
+
+        function refreshData() {
+            loadAdvancedAnalytics();
+        }
+
+        async function loadAdvancedAnalytics() {
+            try {
+                const response = await fetch(`/api/analytics/advanced-summary?timeRange=${currentTimeRange}`);
+                if (!response.ok) throw new Error('Failed to fetch advanced analytics');
+                
+                advancedData = await response.json();
+                updateDashboardMetrics();
+                updatePredictiveCharts();
+                updateAnomalyData();
+                updateCorrelationData();
+                updateInsightsData();
+                updateForecastCharts();
+                
+                showSuccess('Advanced analytics data loaded successfully');
+            } catch (error) {
+                console.error('Error loading advanced analytics:', error);
+                showError('Failed to load advanced analytics data');
+            }
+        }
+
+        function updateDashboardMetrics() {
+            const { predictive, anomalies, insights, correlations } = advancedData;
+            
+            // Update key metrics
+            document.getElementById('predictedUsers').textContent = predictive.predictions.nextMonthUsers || 0;
+            document.getElementById('anomalyCount').textContent = anomalies.summary.totalAnomalies || 0;
+            document.getElementById('insightCount').textContent = insights.summary.totalInsights || 0;
+            
+            // Update correlation strength
+            const correlations_data = correlations.dailyCorrelations || {};
+            const strongestCorrelation = Math.max(...Object.values(correlations_data).map(Math.abs));
+            document.getElementById('correlationStrength').textContent = strongestCorrelation.toFixed(2);
+            
+            // Update status indicators
+            updateMetricStatus('predictionConfidence', predictive.userGrowth.confidence.level);
+            updateMetricStatus('anomalyStatus', anomalies.summary.criticalAnomalies > 0 ? 'critical' : 'normal');
+            updateMetricStatus('insightPriority', insights.summary.highPriorityInsights > 0 ? 'high' : 'normal');
+        }
+
+        function updateMetricStatus(elementId, status) {
+            const element = document.getElementById(elementId);
+            element.className = 'metric-change';
+            
+            switch (status) {
+                case 'high':
+                    element.textContent = 'High Confidence';
+                    element.classList.add('positive');
+                    break;
+                case 'medium':
+                    element.textContent = 'Medium Confidence';
+                    element.classList.add('warning');
+                    break;
+                case 'low':
+                    element.textContent = 'Low Confidence';
+                    element.classList.add('negative');
+                    break;
+                case 'critical':
+                    element.textContent = 'Critical Issues';
+                    element.classList.add('critical');
+                    break;
+                case 'normal':
+                    element.textContent = 'Normal';
+                    element.classList.add('positive');
+                    break;
+            }
+        }
+
+        function updatePredictiveCharts() {
+            const { predictive } = advancedData;
+            if (!predictive) return;
+
+            // Update forecast values
+            document.getElementById('nextWeekUsers').textContent = predictive.predictions.nextWeekUsers || 0;
+            document.getElementById('nextMonthUsers').textContent = predictive.predictions.nextMonthUsers || 0;
+            document.getElementById('nextWeekLogins').textContent = predictive.predictions.nextWeekLogins || 0;
+            document.getElementById('nextMonthLogins').textContent = predictive.predictions.nextMonthLogins || 0;
+
+            // Update confidence levels
+            updateConfidenceLevel('weekConfidence', predictive.userGrowth.confidence.level);
+            updateConfidenceLevel('monthConfidence', predictive.userGrowth.confidence.level);
+            updateConfidenceLevel('loginConfidence', predictive.loginActivity.confidence.level);
+            updateConfidenceLevel('loginMonthConfidence', predictive.loginActivity.confidence.level);
+
+            // Create predictive chart
+            createPredictiveChart(predictive);
+        }
+
+        function updateConfidenceLevel(elementId, level) {
+            const element = document.getElementById(elementId);
+            element.className = 'forecast-confidence';
+            element.textContent = level.charAt(0).toUpperCase() + level.slice(1) + ' Confidence';
+            element.classList.add(level);
+        }
+
+        function createPredictiveChart(predictive) {
+            const ctx = document.getElementById('predictiveChart').getContext('2d');
+            
+            if (charts.predictiveChart) {
+                charts.predictiveChart.destroy();
+            }
+
+            // Create sample data for visualization
+            const labels = Array.from({ length: 30 }, (_, i) => `Day ${i + 1}`);
+            const actualData = Array.from({ length: 20 }, () => Math.floor(Math.random() * 50) + 10);
+            const forecastData = Array.from({ length: 10 }, (_, i) => 
+                Math.floor(actualData[actualData.length - 1] + (predictive.userGrowth.trend * (i + 1)))
+            );
+
+            charts.predictiveChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Actual Users',
+                        data: actualData,
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Forecast',
+                        data: [...Array(20).fill(null), ...forecastData],
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        borderDash: [5, 5],
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateAnomalyData() {
+            const { anomalies } = advancedData;
+            if (!anomalies) return;
+
+            // Create anomaly chart
+            createAnomalyChart(anomalies);
+
+            // Update anomaly list
+            updateAnomalyList(anomalies);
+        }
+
+        function createAnomalyChart(anomalies) {
+            const ctx = document.getElementById('anomalyChart').getContext('2d');
+            
+            if (charts.anomalyChart) {
+                charts.anomalyChart.destroy();
+            }
+
+            const allAnomalies = [
+                ...anomalies.loginAnomalies,
+                ...anomalies.registrationAnomalies,
+                ...anomalies.failedLoginAnomalies
+            ];
+
+            const criticalCount = allAnomalies.filter(a => a.severity === 'critical').length;
+            const highCount = allAnomalies.filter(a => a.severity === 'high').length;
+            const mediumCount = allAnomalies.filter(a => a.severity === 'medium').length;
+
+            charts.anomalyChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Critical', 'High', 'Medium'],
+                    datasets: [{
+                        data: [criticalCount, highCount, mediumCount],
+                        backgroundColor: ['#e74c3c', '#f39c12', '#f1c40f']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateAnomalyList(anomalies) {
+            const container = document.getElementById('anomalyList');
+            const allAnomalies = [
+                ...anomalies.loginAnomalies,
+                ...anomalies.registrationAnomalies,
+                ...anomalies.failedLoginAnomalies
+            ].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            if (allAnomalies.length === 0) {
+                container.innerHTML = '<p>No anomalies detected in the selected time range.</p>';
+                return;
+            }
+
+            let html = '';
+            allAnomalies.slice(0, 10).forEach(anomaly => {
+                html += `
+                    <div class="anomaly-item ${anomaly.severity}">
+                        <div class="anomaly-header">
+                            <span class="anomaly-date">${anomaly.date}</span>
+                            <span class="anomaly-severity ${anomaly.severity}">${anomaly.severity}</span>
+                        </div>
+                        <div class="anomaly-details">
+                            <strong>Value:</strong> ${anomaly.value} (Expected: ${anomaly.expectedRange[0].toFixed(1)} - ${anomaly.expectedRange[1].toFixed(1)})<br>
+                            <strong>Type:</strong> ${anomaly.type}<br>
+                            <strong>Z-Score:</strong> ${anomaly.zScore.toFixed(2)}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function updateCorrelationData() {
+            const { correlations } = advancedData;
+            if (!correlations) return;
+
+            // Update correlation matrix
+            updateCorrelationMatrix(correlations.dailyCorrelations);
+
+            // Create role correlation chart
+            createRoleCorrelationChart(correlations.roleCorrelations);
+        }
+
+        function updateCorrelationMatrix(correlations) {
+            const container = document.getElementById('correlationMatrix');
+            
+            if (!correlations || Object.keys(correlations).length === 0) {
+                container.innerHTML = '<p>No correlation data available.</p>';
+                return;
+            }
+
+            let html = '';
+            Object.entries(correlations).forEach(([key, value]) => {
+                const absValue = Math.abs(value);
+                let strength = 'weak';
+                let colorClass = 'weak';
+                
+                if (absValue > 0.7) {
+                    strength = 'strong';
+                    colorClass = 'strong';
+                } else if (absValue > 0.3) {
+                    strength = 'moderate';
+                    colorClass = 'moderate';
+                }
+
+                html += `
+                    <div class="correlation-card">
+                        <div class="correlation-value ${colorClass}">${value.toFixed(3)}</div>
+                        <div class="correlation-label">${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</div>
+                        <div class="correlation-label">${strength} correlation</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function createRoleCorrelationChart(roleCorrelations) {
+            const ctx = document.getElementById('roleCorrelationChart').getContext('2d');
+            
+            if (charts.roleCorrelationChart) {
+                charts.roleCorrelationChart.destroy();
+            }
+
+            if (!roleCorrelations || roleCorrelations.length === 0) {
+                return;
+            }
+
+            charts.roleCorrelationChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: roleCorrelations.map(r => r.role),
+                    datasets: [{
+                        label: 'Engagement Score',
+                        data: roleCorrelations.map(r => r.engagementScore),
+                        backgroundColor: '#3498db'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 1
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateInsightsData() {
+            const { insights } = advancedData;
+            if (!insights) return;
+
+            const container = document.getElementById('insightsGrid');
+            
+            if (!insights.insights || insights.insights.length === 0) {
+                container.innerHTML = '<p>No actionable insights available for the selected time range.</p>';
+                return;
+            }
+
+            let html = '';
+            insights.insights.forEach(insight => {
+                html += `
+                    <div class="insight-card ${insight.priority}">
+                        <div class="insight-header">
+                            <h4 class="insight-title">${insight.title}</h4>
+                            <span class="insight-priority ${insight.priority}">${insight.priority}</span>
+                        </div>
+                        <div class="insight-description">${insight.description}</div>
+                        <div class="insight-recommendation">
+                            <h4>Recommendation:</h4>
+                            <p>${insight.recommendation}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function updateForecastCharts() {
+            const { predictive } = advancedData;
+            if (!predictive) return;
+
+            // Create seasonality chart
+            createSeasonalityChart(predictive);
+
+            // Create confidence interval chart
+            createConfidenceChart(predictive);
+        }
+
+        function createSeasonalityChart(predictive) {
+            const ctx = document.getElementById('seasonalityChart').getContext('2d');
+            
+            if (charts.seasonalityChart) {
+                charts.seasonalityChart.destroy();
+            }
+
+            // Create sample weekly pattern data
+            const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const weeklyPattern = Object.values(predictive.userGrowth.seasonality.weekly || {});
+
+            charts.seasonalityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: daysOfWeek,
+                    datasets: [{
+                        label: 'Weekly Pattern',
+                        data: weeklyPattern.length > 0 ? weeklyPattern : [10, 15, 12, 14, 13, 11, 9],
+                        borderColor: '#9b59b6',
+                        backgroundColor: 'rgba(155, 89, 182, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function createConfidenceChart(predictive) {
+            const ctx = document.getElementById('confidenceChart').getContext('2d');
+            
+            if (charts.confidenceChart) {
+                charts.confidenceChart.destroy();
+            }
+
+            const confidence = predictive.userGrowth.confidence;
+            const mean = (confidence.interval[0] + confidence.interval[1]) / 2;
+            const margin = confidence.interval[1] - mean;
+
+            charts.confidenceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['User Growth'],
+                    datasets: [{
+                        label: 'Mean',
+                        data: [mean],
+                        backgroundColor: '#3498db'
+                    }, {
+                        label: 'Confidence Interval',
+                        data: [margin],
+                        backgroundColor: 'rgba(52, 152, 219, 0.3)',
+                        borderColor: '#3498db',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        // Setup tab event listeners
+        function setupTabListeners() {
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    if (tabName) {
+                        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                        this.classList.add('active');
+                        switchTab(tabName);
+                    }
+                });
+            });
+        }
+
+        // Real-time updates
+        function startRealTimeUpdates() {
+            realTimeInterval = setInterval(async () => {
+                try {
+                    const response = await fetch('/api/analytics/realtime');
+                    if (response.ok) {
+                        updateRealTimeMetrics();
+                    }
+                } catch (error) {
+                    console.error('Real-time update error:', error);
+                }
+            }, 60000); // Update every minute
+        }
+
+        function updateRealTimeMetrics() {
+            document.getElementById('realTimeIndicator').style.background = '#27ae60';
+            updateLastUpdate();
+        }
+
+        function updateLastUpdate() {
+            document.getElementById('lastUpdate').textContent = 
+                `Last updated: ${new Date().toLocaleTimeString()}`;
+        }
+
+        // Export functions
+        function exportAdvancedData() {
+            window.open(`/api/analytics/advanced-summary?timeRange=${currentTimeRange}&format=csv`, '_blank');
+        }
+
+        // Utility functions
+        function showError(message) {
+            const div = document.createElement('div');
+            div.className = 'error-message';
+            div.textContent = message;
+            document.querySelector('.advanced-analytics-container').insertBefore(div, document.querySelector('.dashboard-grid'));
+            
+            setTimeout(() => div.remove(), 5000);
+        }
+
+        function showSuccess(message) {
+            const div = document.createElement('div');
+            div.className = 'success-message';
+            div.textContent = message;
+            document.querySelector('.advanced-analytics-container').insertBefore(div, document.querySelector('.dashboard-grid'));
+            
+            setTimeout(() => div.remove(), 5000);
+        }
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (realTimeInterval) {
+                clearInterval(realTimeInterval);
+            }
+        });
+    </script>
+</body>
+</html> 

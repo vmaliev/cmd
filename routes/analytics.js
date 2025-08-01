@@ -735,6 +735,162 @@ router.get('/export/performance', requireRole(['admin']), [
   }
 });
 
+// ==================== ADVANCED ANALYTICS & INSIGHTS ====================
+
+/**
+ * @route GET /api/analytics/predictive
+ * @desc Get predictive analytics and forecasting
+ * @access Admin, Manager
+ */
+router.get('/predictive', requireRole(['admin', 'manager']), [
+  query('timeRange').optional().isIn(['30d', '90d', '180d', '1y'])
+], async (req, res) => {
+  try {
+    // Validate input
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ 
+        error: 'Validation failed', 
+        details: errors.array() 
+      });
+    }
+
+    const { timeRange = '90d' } = req.query;
+    const analytics = analyticsServices.getPredictiveAnalytics(timeRange);
+    res.json(analytics);
+  } catch (error) {
+    console.error('Get predictive analytics error:', error);
+    res.status(500).json({ error: 'Failed to get predictive analytics' });
+  }
+});
+
+/**
+ * @route GET /api/analytics/anomalies
+ * @desc Get anomaly detection results
+ * @access Admin, Manager
+ */
+router.get('/anomalies', requireRole(['admin', 'manager']), [
+  query('timeRange').optional().isIn(['7d', '30d', '90d'])
+], async (req, res) => {
+  try {
+    // Validate input
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ 
+        error: 'Validation failed', 
+        details: errors.array() 
+      });
+    }
+
+    const { timeRange = '30d' } = req.query;
+    const anomalies = analyticsServices.getAnomalyDetection(timeRange);
+    res.json(anomalies);
+  } catch (error) {
+    console.error('Get anomaly detection error:', error);
+    res.status(500).json({ error: 'Failed to get anomaly detection' });
+  }
+});
+
+/**
+ * @route GET /api/analytics/correlations
+ * @desc Get correlation analysis
+ * @access Admin, Manager
+ */
+router.get('/correlations', requireRole(['admin', 'manager']), [
+  query('timeRange').optional().isIn(['30d', '90d', '180d'])
+], async (req, res) => {
+  try {
+    // Validate input
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ 
+        error: 'Validation failed', 
+        details: errors.array() 
+      });
+    }
+
+    const { timeRange = '90d' } = req.query;
+    const correlations = analyticsServices.getCorrelationAnalysis(timeRange);
+    res.json(correlations);
+  } catch (error) {
+    console.error('Get correlation analysis error:', error);
+    res.status(500).json({ error: 'Failed to get correlation analysis' });
+  }
+});
+
+/**
+ * @route GET /api/analytics/insights
+ * @desc Get actionable insights and recommendations
+ * @access Admin, Manager
+ */
+router.get('/insights', requireRole(['admin', 'manager']), [
+  query('timeRange').optional().isIn(['30d', '90d', '180d'])
+], async (req, res) => {
+  try {
+    // Validate input
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ 
+        error: 'Validation failed', 
+        details: errors.array() 
+      });
+    }
+
+    const { timeRange = '90d' } = req.query;
+    const insights = analyticsServices.getActionableInsights(timeRange);
+    res.json(insights);
+  } catch (error) {
+    console.error('Get actionable insights error:', error);
+    res.status(500).json({ error: 'Failed to get actionable insights' });
+  }
+});
+
+/**
+ * @route GET /api/analytics/advanced-summary
+ * @desc Get comprehensive advanced analytics summary
+ * @access Admin, Manager
+ */
+router.get('/advanced-summary', requireRole(['admin', 'manager']), [
+  query('timeRange').optional().isIn(['30d', '90d', '180d'])
+], async (req, res) => {
+  try {
+    // Validate input
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ 
+        error: 'Validation failed', 
+        details: errors.array() 
+      });
+    }
+
+    const { timeRange = '90d' } = req.query;
+    
+    // Get all advanced analytics data
+    const [predictive, anomalies, correlations, insights] = await Promise.all([
+      analyticsServices.getPredictiveAnalytics(timeRange),
+      analyticsServices.getAnomalyDetection(timeRange),
+      analyticsServices.getCorrelationAnalysis(timeRange),
+      analyticsServices.getActionableInsights(timeRange)
+    ]);
+
+    res.json({
+      predictive,
+      anomalies,
+      correlations,
+      insights,
+      summary: {
+        hasCriticalAnomalies: anomalies.summary.criticalAnomalies > 0,
+        hasHighPriorityInsights: insights.summary.highPriorityInsights > 0,
+        predictionConfidence: predictive.userGrowth.confidence.level,
+        totalInsights: insights.summary.totalInsights
+      }
+    });
+  } catch (error) {
+    console.error('Get advanced analytics summary error:', error);
+    res.status(500).json({ error: 'Failed to get advanced analytics summary' });
+  }
+});
+
 // ==================== MAINTENANCE FUNCTIONS ====================
 
 /**

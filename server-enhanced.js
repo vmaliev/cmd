@@ -911,6 +911,16 @@ app.get('/analytics', requireAdminAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'analytics-dashboard.html'));
 });
 
+// Serve the advanced analytics dashboard (protected)
+app.get('/advanced-analytics', requireAdminAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'advanced-analytics-dashboard.html'));
+});
+
+// Also protect the advanced analytics dashboard .html version
+app.get('/advanced-analytics-dashboard.html', requireAdminAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'advanced-analytics-dashboard.html'));
+});
+
 // Serve the SLA management page (protected)
 app.get('/sla', requireAdminAuth, (req, res) => {
   res.sendFile(path.join(__dirname, 'sla-management.html'));
