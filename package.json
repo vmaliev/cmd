@@ -1,25 +1,56 @@
 {
-  "name": "bybit-bot-opt-backend",
-  "version": "1.0.0",
-  "main": "server.js",
+  "name": "it-support-system",
+  "version": "2.0.0",
+  "description": "Modern IT Support System with enhanced frontend interface",
+  "main": "server-enhanced.js",
   "scripts": {
-    "start": "node server-enhanced.js"
+    "start": "node server-enhanced.js",
+    "dev": "nodemon server-enhanced.js",
+    "build:css": "tailwindcss -i ./modern.css -o ./dist/output.css --watch",
+    "build:css:prod": "tailwindcss -i ./modern.css -o ./dist/output.css --minify",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [
+    "it-support",
+    "ticketing-system",
+    "asset-management",
+    "modern-ui",
+    "tailwind-css"
+  ],
+  "author": "IT Support Team",
+  "license": "MIT",
   "dependencies": {
-    "bcrypt": "^5.1.1",
-    "better-sqlite3": "^12.2.0",
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
     "express": "^4.18.2",
-    "express-fileupload": "^1.5.2",
-    "express-rate-limit": "^8.0.1",
-    "express-validator": "^7.2.1",
-    "helmet": "^8.1.0",
+    "sqlite3": "^5.1.6",
+    "bcrypt": "^5.1.1",
     "jsonwebtoken": "^9.0.2",
-    "morgan": "^1.10.1",
-    "nodemailer": "^6.9.14",
-    "socket.io": "^4.7.5",
-    "sqlite3": "^5.1.7"
-  }
+    "multer": "^1.4.5-lts.1",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "nodemailer": "^6.9.7",
+    "socket.io": "^4.7.4",
+    "compression": "^1.7.4",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.0",
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.10",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vmaliev/cmd.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vmaliev/cmd/issues"
+  },
+  "homepage": "https://github.com/vmaliev/cmd#readme"
 }
